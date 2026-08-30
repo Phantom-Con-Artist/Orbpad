@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media;
 using Orbpad.Services;
 
 namespace Orbpad.Markdown;
@@ -86,8 +88,7 @@ public partial class MarkdownPreviewControl : UserControl
                                 relativePath));
 
                     Uri fileUri =
-                        new Uri(
-                            fullPath);
+                        new Uri(fullPath);
 
                     string normalizedUri =
                         fileUri.AbsoluteUri;
@@ -112,6 +113,67 @@ public partial class MarkdownPreviewControl : UserControl
     private static string BuildHtmlDocument(
         string body)
     {
+        // Read the current Orbpad theme resources.
+        string background =
+            GetBrushHex(
+                "OrbpadBackgroundBrush",
+                "#121214");
+
+        string surface =
+            GetBrushHex(
+                "OrbpadSurfaceBrush",
+                "#19191C");
+
+        string surfaceHover =
+            GetBrushHex(
+                "OrbpadSurfaceHoverBrush",
+                "#25252B");
+
+        string border =
+            GetBrushHex(
+                "OrbpadBorderBrush",
+                "#303036");
+
+        string text =
+            GetBrushHex(
+                "OrbpadTextBrush",
+                "#F4F4F5");
+
+        string mutedText =
+            GetBrushHex(
+                "OrbpadMutedTextBrush",
+                "#A1A1AA");
+
+        string accent =
+            GetBrushHex(
+                "OrbpadAccentBrush",
+                "#8B5CF6");
+
+        bool isLightTheme =
+            ThemeManager.CurrentTheme ==
+            ThemeManager.OrbpadTheme.Light;
+
+        string colorScheme =
+            isLightTheme
+                ? "light"
+                : "dark";
+
+        string codeText =
+            text;
+
+        string alternatingSurface =
+            isLightTheme
+                ? surfaceHover
+                : BlendColors(
+                    background,
+                    surface,
+                    0.55);
+
+        string selection =
+            HexToRgba(
+                accent,
+                0.30);
+
         return $$"""
 <!DOCTYPE html>
 
@@ -123,12 +185,15 @@ public partial class MarkdownPreviewControl : UserControl
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
+    <meta name="color-scheme"
+          content="{{colorScheme}}">
+
     <title>Orbpad Markdown Preview</title>
 
     <style>
 
         :root {
-            color-scheme: dark;
+            color-scheme: {{colorScheme}};
         }
 
         * {
@@ -139,6 +204,7 @@ public partial class MarkdownPreviewControl : UserControl
         body {
             margin: 0;
             padding: 0;
+            min-height: 100%;
         }
 
         body {
@@ -148,17 +214,23 @@ public partial class MarkdownPreviewControl : UserControl
                 Arial,
                 sans-serif;
 
-            background: #121214;
-            color: #F4F4F5;
+            background:
+                {{background}};
 
-            line-height: 1.65;
+            color:
+                {{text}};
+
+            line-height:
+                1.65;
 
             padding:
                 32px 42px 48px 42px;
 
-            max-width: 1000px;
+            max-width:
+                1000px;
 
-            margin: 0 auto;
+            margin:
+                0 auto;
         }
 
         h1,
@@ -167,28 +239,37 @@ public partial class MarkdownPreviewControl : UserControl
         h4,
         h5,
         h6 {
-            color: #F4F4F5;
+            color:
+                {{text}};
 
-            line-height: 1.25;
+            line-height:
+                1.25;
 
-            margin-top: 1.5em;
-            margin-bottom: 0.6em;
+            margin-top:
+                1.5em;
+
+            margin-bottom:
+                0.6em;
         }
 
         h1 {
-            font-size: 2.2rem;
+            font-size:
+                2.2rem;
         }
 
         h2 {
-            font-size: 1.8rem;
+            font-size:
+                1.8rem;
         }
 
         h3 {
-            font-size: 1.45rem;
+            font-size:
+                1.45rem;
         }
 
         h4 {
-            font-size: 1.2rem;
+            font-size:
+                1.2rem;
         }
 
         p {
@@ -197,28 +278,33 @@ public partial class MarkdownPreviewControl : UserControl
         }
 
         a {
-            color: #8B5CF6;
-            text-decoration: none;
+            color:
+                {{accent}};
+
+            text-decoration:
+                none;
         }
 
         a:hover {
-            text-decoration: underline;
+            text-decoration:
+                underline;
         }
 
         blockquote {
-            margin: 1em 0;
+            margin:
+                1em 0;
 
             padding:
                 0.4em 1em;
 
             border-left:
-                4px solid #8B5CF6;
+                4px solid {{accent}};
 
             background:
-                #19191C;
+                {{surface}};
 
             color:
-                #A1A1AA;
+                {{mutedText}};
         }
 
         code {
@@ -227,8 +313,14 @@ public partial class MarkdownPreviewControl : UserControl
                 "Courier New",
                 monospace;
 
+            color:
+                {{codeText}};
+
             background:
-                #19191C;
+                {{surface}};
+
+            border:
+                1px solid {{border}};
 
             border-radius:
                 5px;
@@ -242,10 +334,13 @@ public partial class MarkdownPreviewControl : UserControl
                 auto;
 
             background:
-                #19191C;
+                {{surface}};
+
+            color:
+                {{text}};
 
             border:
-                1px solid #303036;
+                1px solid {{border}};
 
             border-radius:
                 8px;
@@ -261,12 +356,19 @@ public partial class MarkdownPreviewControl : UserControl
             background:
                 transparent;
 
+            border:
+                0;
+
+            color:
+                {{text}};
+
             padding:
                 0;
         }
 
         table {
-            width: 100%;
+            width:
+                100%;
 
             border-collapse:
                 collapse;
@@ -278,7 +380,7 @@ public partial class MarkdownPreviewControl : UserControl
         th,
         td {
             border:
-                1px solid #303036;
+                1px solid {{border}};
 
             padding:
                 8px 10px;
@@ -289,12 +391,12 @@ public partial class MarkdownPreviewControl : UserControl
 
         th {
             background:
-                #19191C;
+                {{surface}};
         }
 
         tr:nth-child(even) {
             background:
-                #17171A;
+                {{alternatingSurface}};
         }
 
         hr {
@@ -302,7 +404,7 @@ public partial class MarkdownPreviewControl : UserControl
                 0;
 
             border-top:
-                1px solid #303036;
+                1px solid {{border}};
 
             margin:
                 2em 0;
@@ -332,17 +434,17 @@ public partial class MarkdownPreviewControl : UserControl
 
         strong {
             color:
-                #FFFFFF;
+                {{text}};
         }
 
         em {
             color:
-                #E4E4E7;
+                {{mutedText}};
         }
 
         del {
             color:
-                #A1A1AA;
+                {{mutedText}};
         }
 
         input[type="checkbox"] {
@@ -352,7 +454,7 @@ public partial class MarkdownPreviewControl : UserControl
 
         ::selection {
             background:
-                rgba(139, 92, 246, 0.35);
+                {{selection}};
         }
 
     </style>
@@ -367,5 +469,163 @@ public partial class MarkdownPreviewControl : UserControl
 
 </html>
 """;
+    }
+
+    // ============================================================
+    // THEME RESOURCES
+    // ============================================================
+
+    private static string GetBrushHex(
+        string resourceKey,
+        string fallback)
+    {
+        if (Application.Current is null)
+        {
+            return fallback;
+        }
+
+        if (Application.Current.Resources[
+                resourceKey]
+            is not SolidColorBrush brush)
+        {
+            return fallback;
+        }
+
+        return ToHex(
+            brush.Color);
+    }
+
+    private static string ToHex(
+        Color color)
+    {
+        return
+            $"#{color.R:X2}" +
+            $"{color.G:X2}" +
+            $"{color.B:X2}";
+    }
+
+    private static string HexToRgba(
+        string hex,
+        double opacity)
+    {
+        if (!TryParseHex(
+                hex,
+                out byte r,
+                out byte g,
+                out byte b))
+        {
+            return
+                $"rgba(139, 92, 246, {opacity:0.##})";
+        }
+
+        return
+            $"rgba({r}, {g}, {b}, {opacity:0.##})";
+    }
+
+    private static bool TryParseHex(
+        string hex,
+        out byte r,
+        out byte g,
+        out byte b)
+    {
+        r = 0;
+        g = 0;
+        b = 0;
+
+        if (string.IsNullOrWhiteSpace(
+                hex))
+        {
+            return false;
+        }
+
+        string value =
+            hex.Trim();
+
+        if (value.StartsWith("#"))
+        {
+            value =
+                value[1..];
+        }
+
+        if (value.Length != 6)
+        {
+            return false;
+        }
+
+        return
+            byte.TryParse(
+                value.Substring(0, 2),
+                System.Globalization.NumberStyles.HexNumber,
+                null,
+                out r)
+            &&
+            byte.TryParse(
+                value.Substring(2, 2),
+                System.Globalization.NumberStyles.HexNumber,
+                null,
+                out g)
+            &&
+            byte.TryParse(
+                value.Substring(4, 2),
+                System.Globalization.NumberStyles.HexNumber,
+                null,
+                out b);
+    }
+
+    // ============================================================
+    // SIMPLE COLOR BLENDING
+    // ============================================================
+
+    private static string BlendColors(
+        string firstHex,
+        string secondHex,
+        double amount)
+    {
+        if (!TryParseHex(
+                firstHex,
+                out byte r1,
+                out byte g1,
+                out byte b1))
+        {
+            return secondHex;
+        }
+
+        if (!TryParseHex(
+                secondHex,
+                out byte r2,
+                out byte g2,
+                out byte b2))
+        {
+            return firstHex;
+        }
+
+        amount =
+            Math.Clamp(
+                amount,
+                0.0,
+                1.0);
+
+        byte r =
+            (byte)Math.Round(
+                r1 +
+                (r2 - r1) *
+                amount);
+
+        byte g =
+            (byte)Math.Round(
+                g1 +
+                (g2 - g1) *
+                amount);
+
+        byte b =
+            (byte)Math.Round(
+                b1 +
+                (b2 - b1) *
+                amount);
+
+        return
+            $"#{r:X2}" +
+            $"{g:X2}" +
+            $"{b:X2}";
     }
 }

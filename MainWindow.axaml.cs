@@ -597,8 +597,10 @@ public partial class MainWindow : Window
         if (result == true)
             return CloseDocumentResult.Save;
 
+
         if (result == false)
             return CloseDocumentResult.DontSave;
+
 
         return CloseDocumentResult.Cancel;
     }
@@ -1409,29 +1411,36 @@ public partial class MainWindow : Window
             FontSize10MenuItem,
             10);
 
+
         SetFontSizeMenuHeader(
             FontSize12MenuItem,
             12);
+
 
         SetFontSizeMenuHeader(
             FontSize14MenuItem,
             14);
 
+
         SetFontSizeMenuHeader(
             FontSize16MenuItem,
             16);
+
 
         SetFontSizeMenuHeader(
             FontSize18MenuItem,
             18);
 
+
         SetFontSizeMenuHeader(
             FontSize20MenuItem,
             20);
 
+
         SetFontSizeMenuHeader(
             FontSize24MenuItem,
             24);
+
 
         SetFontSizeMenuHeader(
             FontSize28MenuItem,
@@ -1500,6 +1509,13 @@ public partial class MainWindow : Window
         RefreshTabs();
         UpdateThemeMenu();
 
+        // ========================================================
+        // MARKDOWN THEME REFRESH
+        // ========================================================
+
+        UpdateMarkdownPreview();
+
+
         SaveCurrentSettings();
     }
 
@@ -1514,6 +1530,13 @@ public partial class MainWindow : Window
 
         RefreshTabs();
         UpdateThemeMenu();
+
+        // ========================================================
+        // MARKDOWN THEME REFRESH
+        // ========================================================
+
+        UpdateMarkdownPreview();
+
 
         SaveCurrentSettings();
     }
@@ -1530,6 +1553,13 @@ public partial class MainWindow : Window
         RefreshTabs();
         UpdateThemeMenu();
 
+        // ========================================================
+        // MARKDOWN THEME REFRESH
+        // ========================================================
+
+        UpdateMarkdownPreview();
+
+
         SaveCurrentSettings();
     }
 
@@ -1544,6 +1574,13 @@ public partial class MainWindow : Window
 
         RefreshTabs();
         UpdateThemeMenu();
+
+        // ========================================================
+        // MARKDOWN THEME REFRESH
+        // ========================================================
+
+        UpdateMarkdownPreview();
+
 
         SaveCurrentSettings();
     }
@@ -1574,11 +1611,14 @@ public partial class MainWindow : Window
         Toolbar.IsVisible =
             _settings.ShowToolbar;
 
+
         StatusBar.IsVisible =
             _settings.ShowStatusBar;
 
+
         Editor.ShowLineNumbers =
             _settings.ShowLineNumbers;
+
 
         Editor.WordWrap =
             _settings.WordWrap;
@@ -1604,6 +1644,7 @@ public partial class MainWindow : Window
             Math.Max(
                 MinWidth,
                 _settings.WindowWidth);
+
 
         Height =
             Math.Max(
@@ -1631,11 +1672,14 @@ public partial class MainWindow : Window
         _settings.ShowToolbar =
             Toolbar.IsVisible;
 
+
         _settings.ShowStatusBar =
             StatusBar.IsVisible;
 
+
         _settings.ShowLineNumbers =
             Editor.ShowLineNumbers;
+
 
         _settings.WordWrap =
             Editor.WordWrap;
@@ -1645,6 +1689,7 @@ public partial class MainWindow : Window
             Editor.FontFamily?.Name ??
             "Inter";
 
+
         _settings.FontSize =
             Editor.FontSize;
 
@@ -1652,11 +1697,14 @@ public partial class MainWindow : Window
         _settings.WindowWidth =
             Width;
 
+
         _settings.WindowHeight =
             Height;
 
+
         _settings.WindowX =
             Position.X;
+
 
         _settings.WindowY =
             Position.Y;
@@ -1708,6 +1756,7 @@ public partial class MainWindow : Window
     {
         var dialog =
             new AboutDialog();
+
 
         await dialog.ShowDialog(
             this);
@@ -1845,11 +1894,14 @@ public partial class MainWindow : Window
                         Title =
                             "Save File",
 
+
                         SuggestedFileName =
                             "Untitled.txt",
 
+
                         DefaultExtension =
                             "txt",
+
 
                         FileTypeChoices =
                         [
@@ -1861,6 +1913,7 @@ public partial class MainWindow : Window
                                     "*.txt"
                                 ]
                             },
+
 
                             new FilePickerFileType(
                                 "All Files")
@@ -1974,6 +2027,7 @@ public partial class MainWindow : Window
 
 
             SaveCurrentDocument();
+
 
             return true;
         }
@@ -2099,8 +2153,10 @@ public partial class MainWindow : Window
         _lastKnownSelectionStart =
             Editor.SelectionStart;
 
+
         _lastKnownSelectionLength =
             Editor.SelectionLength;
+
 
         _lastKnownCaretOffset =
             Editor.CaretOffset;
@@ -2167,6 +2223,7 @@ public partial class MainWindow : Window
     {
         SearchBar.IsVisible =
             false;
+
 
         Editor.TextArea.Focus();
     }
@@ -2240,6 +2297,7 @@ public partial class MainWindow : Window
 
 
         FindNext();
+
 
         UpdateStatusBar();
     }
@@ -2335,6 +2393,7 @@ public partial class MainWindow : Window
 
 
         SaveEditorSelection();
+
 
         UpdateStatusBar();
     }
@@ -2448,6 +2507,7 @@ public partial class MainWindow : Window
 
         SaveEditorSelection();
 
+
         Editor.TextArea.Focus();
     }
 
@@ -2512,6 +2572,7 @@ public partial class MainWindow : Window
 
         SaveEditorSelection();
 
+
         Editor.TextArea.Focus();
     }
 
@@ -2542,6 +2603,7 @@ public partial class MainWindow : Window
             UpdateWindowTitle();
             RefreshTabs();
 
+
             return;
         }
 
@@ -2570,6 +2632,7 @@ public partial class MainWindow : Window
         {
             Title =
                 "Orbpad";
+
 
             return;
         }
