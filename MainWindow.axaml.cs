@@ -22,6 +22,8 @@ public partial class MainWindow : Window
     private readonly SettingsService _settingsService;
     private readonly AppSettings _settings;
 
+    private readonly SyntaxHighlightingService _syntaxHighlightingService;
+
     private readonly Dictionary<Document, Button>
         _documentButtons = new();
 
@@ -50,6 +52,18 @@ public partial class MainWindow : Window
 
         _settings =
             _settingsService.Load();
+
+        // ========================================================
+        // SYNTAX HIGHLIGHTING
+        // ========================================================
+
+        _syntaxHighlightingService =
+            new SyntaxHighlightingService(
+                Editor);
+
+        // ========================================================
+        // APPLY SAVED SETTINGS
+        // ========================================================
 
         ApplySavedSettings();
 
@@ -251,6 +265,14 @@ public partial class MainWindow : Window
     {
         Editor.Text =
             document.Text ?? string.Empty;
+
+        // Apply syntax highlighting based on
+        // the document's file extension.
+        //
+        // Untitled documents have no file path,
+        // so the service falls back to plain text.
+        _syntaxHighlightingService.ApplyForFile(
+            document.FilePath);
 
         Editor.CaretOffset = 0;
 
@@ -1645,6 +1667,11 @@ public partial class MainWindow : Window
 
         SaveCurrentDocument();
 
+        // Re-evaluate syntax highlighting now that
+        // the document has a real file extension.
+        _syntaxHighlightingService.ApplyForFile(
+            filePath);
+
         AddRecentFile(
             filePath);
 
@@ -2304,6 +2331,8 @@ public partial class MainWindow : Window
         EventArgs e)
     {
         SaveCurrentSettings();
+
+        _syntaxHighlightingService.Dispose();
 
         base.OnClosed(e);
     }

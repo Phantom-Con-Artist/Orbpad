@@ -66,9 +66,17 @@
               "target": "Package",
               "version": "[12.1.1, )"
             },
+            "AvaloniaEdit.TextMate": {
+              "target": "Package",
+              "version": "[12.0.0, )"
+            },
             "AvaloniaUI.DiagnosticsSupport": {
               "target": "Package",
               "version": "[2.2.3, )"
+            },
+            "Markdig": {
+              "target": "Package",
+              "version": "[1.3.2, )"
             }
           },
           "imports": [

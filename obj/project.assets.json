@@ -328,6 +328,21 @@
           }
         }
       },
+      "AvaloniaEdit.TextMate/12.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Avalonia": "12.0.0",
+          "Avalonia.AvaloniaEdit": "12.0.0",
+          "TextMateSharp": "2.0.3",
+          "TextMateSharp.Grammars": "2.0.3"
+        },
+        "compile": {
+          "lib/net10.0/AvaloniaEdit.TextMate.dll": {}
+        },
+        "runtime": {
+          "lib/net10.0/AvaloniaEdit.TextMate.dll": {}
+        }
+      },
       "AvaloniaUI.DiagnosticsSupport/2.2.3": {
         "type": "package",
         "dependencies": {
@@ -483,6 +498,19 @@
           }
         }
       },
+      "Markdig/1.3.2": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/Markdig.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Markdig.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "MicroCom.Runtime/0.11.6": {
         "type": "package",
         "compile": {
@@ -537,6 +565,73 @@
         "runtime": {
           "lib/net6.0/Microsoft.IO.RecyclableMemoryStream.dll": {
             "related": ".xml"
+          }
+        }
+      },
+      "Onigwrap/1.0.10": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Onigwrap.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Onigwrap.dll": {}
+        },
+        "build": {
+          "buildTransitive/netstandard1.0/Onigwrap.props": {},
+          "buildTransitive/netstandard1.0/Onigwrap.targets": {}
+        },
+        "runtimeTargets": {
+          "runtimes/linux-arm64/native/libonigwrap.so": {
+            "assetType": "native",
+            "rid": "linux-arm64"
+          },
+          "runtimes/linux-bionic-arm64/native/libonigwrap.so": {
+            "assetType": "native",
+            "rid": "linux-bionic-arm64"
+          },
+          "runtimes/linux-bionic-x64/native/libonigwrap.so": {
+            "assetType": "native",
+            "rid": "linux-bionic-x64"
+          },
+          "runtimes/linux-musl-arm64/native/libonigwrap.so": {
+            "assetType": "native",
+            "rid": "linux-musl-arm64"
+          },
+          "runtimes/linux-musl-x64/native/libonigwrap.so": {
+            "assetType": "native",
+            "rid": "linux-musl-x64"
+          },
+          "runtimes/linux-x64/native/libonigwrap.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/maccatalyst-arm64/native/libonigwrap.dylib": {
+            "assetType": "native",
+            "rid": "maccatalyst-arm64"
+          },
+          "runtimes/maccatalyst-x64/native/libonigwrap.dylib": {
+            "assetType": "native",
+            "rid": "maccatalyst-x64"
+          },
+          "runtimes/osx-arm64/native/libonigwrap.dylib": {
+            "assetType": "native",
+            "rid": "osx-arm64"
+          },
+          "runtimes/osx-x64/native/libonigwrap.dylib": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          },
+          "runtimes/win-arm64/native/libonigwrap.dll": {
+            "assetType": "native",
+            "rid": "win-arm64"
+          },
+          "runtimes/win-x64/native/libonigwrap.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/libonigwrap.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
           }
         }
       },
@@ -679,6 +774,30 @@
             "assetType": "native",
             "rid": "win-x86"
           }
+        }
+      },
+      "TextMateSharp/2.0.3": {
+        "type": "package",
+        "dependencies": {
+          "Onigwrap": "1.0.10"
+        },
+        "compile": {
+          "lib/netstandard2.0/TextMateSharp.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/TextMateSharp.dll": {}
+        }
+      },
+      "TextMateSharp.Grammars/2.0.3": {
+        "type": "package",
+        "dependencies": {
+          "TextMateSharp": "2.0.3"
+        },
+        "compile": {
+          "lib/netstandard2.0/TextMateSharp.Grammars.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/TextMateSharp.Grammars.dll": {}
         }
       },
       "Tmds.DBus.Protocol/0.94.1": {
@@ -1070,6 +1189,20 @@
         "lib/net8.0/Avalonia.X11.xml"
       ]
     },
+    "AvaloniaEdit.TextMate/12.0.0": {
+      "sha512": "FArIpBB2zcraoYqQIPNkevviNtuzKrA5tEVAAE03PboZMy2recf4TJEXk1BfCw7Oo4fBBh7srUqOdK5RNSUNrg==",
+      "type": "package",
+      "path": "avaloniaedit.textmate/12.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "avaloniaedit.textmate.12.0.0.nupkg.sha512",
+        "avaloniaedit.textmate.nuspec",
+        "lib/net10.0/AvaloniaEdit.TextMate.dll",
+        "lib/net8.0/AvaloniaEdit.TextMate.dll"
+      ]
+    },
     "AvaloniaUI.DiagnosticsSupport/2.2.3": {
       "sha512": "kQCInYusi2c9tjd9hV05Lln6Csbo07kiC672M3G7dsalDBe2j+pOk3We2nzdyy5ptQYy/9gQiC8ZaHhb6u/5Kw==",
       "type": "package",
@@ -1253,6 +1386,29 @@
         "runtimes/win-x86/native/libHarfBuzzSharp.pdb"
       ]
     },
+    "Markdig/1.3.2": {
+      "sha512": "fZgOC/3CswUrndjDTac70aQpYdtxbW5+5bRumR7vzvI2HJbkmgKisB1c9oT+GA6v0jB/JDR9BLa9FiPzQmaK6A==",
+      "type": "package",
+      "path": "markdig/1.3.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net10.0/Markdig.dll",
+        "lib/net10.0/Markdig.xml",
+        "lib/net462/Markdig.dll",
+        "lib/net462/Markdig.xml",
+        "lib/net8.0/Markdig.dll",
+        "lib/net8.0/Markdig.xml",
+        "lib/netstandard2.0/Markdig.dll",
+        "lib/netstandard2.0/Markdig.xml",
+        "lib/netstandard2.1/Markdig.dll",
+        "lib/netstandard2.1/Markdig.xml",
+        "markdig.1.3.2.nupkg.sha512",
+        "markdig.nuspec",
+        "markdig.png",
+        "readme.md"
+      ]
+    },
     "MicroCom.Runtime/0.11.6": {
       "sha512": "NdNWGDiZ6eS/Mf/9+QHR91cj1K7Hy+PX9yrHI/zM7xFYuj9IWT2uxtB6sCHjrnxAeLV9fut1R6zHDUGKX6f9lQ==",
       "type": "package",
@@ -1388,6 +1544,45 @@
         "lib/netstandard2.1/Microsoft.IO.RecyclableMemoryStream.xml",
         "microsoft.io.recyclablememorystream.3.0.1.nupkg.sha512",
         "microsoft.io.recyclablememorystream.nuspec"
+      ]
+    },
+    "Onigwrap/1.0.10": {
+      "sha512": "eujNEpEhCl4UiqHTG0CeG/sWS8v/iYXGqUpaVkgBmYRZp3Utmz/aw38fuFL2rcnhj1FNfHwHaxGDeLY34a3nEA==",
+      "type": "package",
+      "path": "onigwrap/1.0.10",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net471/Onigwrap.props",
+        "buildTransitive/net471/Onigwrap.targets",
+        "buildTransitive/netstandard1.0/Onigwrap.props",
+        "buildTransitive/netstandard1.0/Onigwrap.targets",
+        "buildTransitive/netstandard1.0/wasm/2.0.23/st/libonigwrap.a",
+        "buildTransitive/netstandard1.0/wasm/3.1.12/mt/libonigwrap.a",
+        "buildTransitive/netstandard1.0/wasm/3.1.12/st/libonigwrap.a",
+        "buildTransitive/netstandard1.0/wasm/3.1.34/mt/libonigwrap.a",
+        "buildTransitive/netstandard1.0/wasm/3.1.34/st/libonigwrap.a",
+        "buildTransitive/netstandard1.0/wasm/3.1.56/mt/libonigwrap.a",
+        "buildTransitive/netstandard1.0/wasm/3.1.56/st/libonigwrap.a",
+        "lib/net471/Onigwrap.dll",
+        "lib/netstandard2.0/Onigwrap.dll",
+        "onigwrap.1.0.10.nupkg.sha512",
+        "onigwrap.nuspec",
+        "runtimes/linux-arm64/native/libonigwrap.so",
+        "runtimes/linux-bionic-arm64/native/libonigwrap.so",
+        "runtimes/linux-bionic-x64/native/libonigwrap.so",
+        "runtimes/linux-musl-arm64/native/libonigwrap.so",
+        "runtimes/linux-musl-x64/native/libonigwrap.so",
+        "runtimes/linux-x64/native/libonigwrap.so",
+        "runtimes/maccatalyst-arm64/native/libonigwrap.dylib",
+        "runtimes/maccatalyst-x64/native/libonigwrap.dylib",
+        "runtimes/osx-arm64/native/libonigwrap.dylib",
+        "runtimes/osx-x64/native/libonigwrap.dylib",
+        "runtimes/win-arm64/native/libonigwrap.dll",
+        "runtimes/win-x64/native/libonigwrap.dll",
+        "runtimes/win-x86/native/libonigwrap.dll"
       ]
     },
     "SkiaSharp/3.119.4": {
@@ -1615,6 +1810,30 @@
         "skiasharp.nativeassets.win32.nuspec"
       ]
     },
+    "TextMateSharp/2.0.3": {
+      "sha512": "w0wGeqlBi9SYrzxpS1DBcEfiVCs5NY18Yl5YBIsHzXTXQd0OLOh3mP4LRuFvcktR/1MG8nSBHSMJj0rFvrPk+A==",
+      "type": "package",
+      "path": "textmatesharp/2.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/TextMateSharp.dll",
+        "textmatesharp.2.0.3.nupkg.sha512",
+        "textmatesharp.nuspec"
+      ]
+    },
+    "TextMateSharp.Grammars/2.0.3": {
+      "sha512": "qkI1ogusuyGCGTgeyhljDM+GEfATOexoUTqLIgSb5P0ojmfhRXWfSTRXXJRpZkLDErShJ7RWOb+p10lHfhhO+Q==",
+      "type": "package",
+      "path": "textmatesharp.grammars/2.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/TextMateSharp.Grammars.dll",
+        "textmatesharp.grammars.2.0.3.nupkg.sha512",
+        "textmatesharp.grammars.nuspec"
+      ]
+    },
     "Tmds.DBus.Protocol/0.94.1": {
       "sha512": "11YMr7FnAbL83bQmVxlhbIKHvSLxjO81D12Ej0QMSGXMDTxNA9MTOa4MQxx43nv5el/efuPHwzyrj6a5ha2gug==",
       "type": "package",
@@ -1646,7 +1865,9 @@
       "Avalonia.Desktop >= 12.1.1",
       "Avalonia.Fonts.Inter >= 12.1.1",
       "Avalonia.Themes.Fluent >= 12.1.1",
-      "AvaloniaUI.DiagnosticsSupport >= 2.2.3"
+      "AvaloniaEdit.TextMate >= 12.0.0",
+      "AvaloniaUI.DiagnosticsSupport >= 2.2.3",
+      "Markdig >= 1.3.2"
     ]
   },
   "packageFolders": {
@@ -1714,9 +1935,17 @@
             "target": "Package",
             "version": "[12.1.1, )"
           },
+          "AvaloniaEdit.TextMate": {
+            "target": "Package",
+            "version": "[12.0.0, )"
+          },
           "AvaloniaUI.DiagnosticsSupport": {
             "target": "Package",
             "version": "[2.2.3, )"
+          },
+          "Markdig": {
+            "target": "Package",
+            "version": "[1.3.2, )"
           }
         },
         "imports": [
