@@ -9,7 +9,12 @@
         MinWidth="600"
         MinHeight="400"
         Background="{DynamicResource OrbpadBackgroundBrush}"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown"
+        DragDrop.AllowDrop="True"
+        DragDrop.DragEnter="MainWindow_DragEnter"
+        DragDrop.DragLeave="MainWindow_DragLeave"
+        DragDrop.DragOver="MainWindow_DragOver"
+        DragDrop.Drop="MainWindow_Drop">
 
     <DockPanel>
 
@@ -124,7 +129,6 @@
                               Click="Toolbar_Click"/>
 
                     <Separator/>
-
 
                     <!-- ================================================= -->
                     <!-- FONT                                                -->
@@ -444,7 +448,10 @@
         <!-- EDITOR WORKSPACE                                      -->
         <!-- ===================================================== -->
 
-        <Border Background="{DynamicResource OrbpadBackgroundBrush}">
+        <Border x:Name="EditorWorkspaceBorder"
+                Background="{DynamicResource OrbpadBackgroundBrush}"
+                BorderBrush="{DynamicResource OrbpadAccentBrush}"
+                BorderThickness="0">
 
             <Grid x:Name="EditorWorkspace"
                   ColumnDefinitions="*,4,*">

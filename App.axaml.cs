@@ -27,42 +27,40 @@ public partial class App : Application
             // ====================================================
             // COMMAND-LINE FILE OPENING
             //
-            // Windows can launch Orbpad like:
+            // Example:
             //
-            // Orbpad.exe "C:\Notes\README.md"
-            //
-            // Avalonia exposes those arguments through
-            // desktop.Args.
+            // Orbpad.exe "C:\Users\subhr\Downloads\test.md"
             // ====================================================
 
-            if (desktop.Args.Length > 0)
+            string[] args =
+                desktop.Args ??
+                Array.Empty<string>();
+
+            if (args.Length > 0)
             {
-                string? filePath =
-                    desktop.Args[0];
+                string filePath =
+                    args[0];
 
                 if (!string.IsNullOrWhiteSpace(
                         filePath))
                 {
-                    string fullPath;
-
                     try
                     {
-                        fullPath =
+                        string fullPath =
                             Path.GetFullPath(
                                 filePath);
+
+                        if (File.Exists(
+                                fullPath))
+                        {
+                            mainWindow.OpenFileFromStartup(
+                                fullPath);
+                        }
                     }
                     catch
                     {
-                        fullPath =
-                            string.Empty;
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(
-                            fullPath) &&
-                        File.Exists(fullPath))
-                    {
-                        mainWindow.OpenFileFromStartup(
-                            fullPath);
+                        // Ignore invalid startup paths.
+                        // Orbpad continues normally.
                     }
                 }
             }
