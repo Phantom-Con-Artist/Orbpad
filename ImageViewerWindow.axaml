@@ -27,7 +27,13 @@
                           AllowAutoHide="True"
                           SizeChanged="ImageScrollViewer_SizeChanged">
 
-                <Canvas x:Name="ImageCanvas">
+                <Canvas x:Name="ImageCanvas"
+                        Background="Transparent"
+                        Cursor="Hand"
+                        PointerPressed="ImageCanvas_PointerPressed"
+                        PointerMoved="ImageCanvas_PointerMoved"
+                        PointerReleased="ImageCanvas_PointerReleased"
+                        PointerCaptureLost="ImageCanvas_PointerCaptureLost">
 
                     <Image x:Name="ImagePreview"
                            Stretch="Uniform"
@@ -42,7 +48,7 @@
 
 
         <!-- ============================================= -->
-        <!-- TOOLBAR                                       -->
+        <!-- IMAGE TOOLBAR                                 -->
         <!-- ============================================= -->
 
         <Border Grid.Row="1"
@@ -54,16 +60,24 @@
             <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
                   ColumnSpacing="8">
 
+                <!-- Image information -->
+
                 <TextBlock x:Name="ImageInfoText"
                            Grid.Column="0"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
+
+
+                <!-- Zoom out -->
 
                 <Button Grid.Column="1"
                         Content="−"
                         Width="38"
                         Height="34"
                         Click="ZoomOut_Click"/>
+
+
+                <!-- Current zoom -->
 
                 <Button Grid.Column="2"
                         x:Name="ZoomPercentageButton"
@@ -72,16 +86,25 @@
                         Height="34"
                         Click="ResetZoom_Click"/>
 
+
+                <!-- Zoom in -->
+
                 <Button Grid.Column="3"
                         Content="+"
                         Width="38"
                         Height="34"
                         Click="ZoomIn_Click"/>
 
+
+                <!-- Fit -->
+
                 <Button Grid.Column="4"
                         Content="Fit"
                         Height="34"
                         Click="FitToWindow_Click"/>
+
+
+                <!-- Presets -->
 
                 <Button Grid.Column="5"
                         Content="50%"
@@ -97,6 +120,9 @@
                         Content="200%"
                         Height="34"
                         Click="Zoom200_Click"/>
+
+
+                <!-- Close -->
 
                 <Button Grid.Column="8"
                         Content="Close"

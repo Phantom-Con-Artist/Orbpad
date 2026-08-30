@@ -236,32 +236,52 @@
                 Padding="10"
                 IsVisible="False">
 
-            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto"
-                  ColumnSpacing="6">
+            <Grid RowDefinitions="Auto,Auto"
+                  RowSpacing="6">
 
-                <TextBox x:Name="SearchBox"
-                         Grid.Column="0"
-                         PlaceholderText="Find..."/>
+                <!-- Find row -->
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="*,Auto,Auto,Auto"
+                      ColumnSpacing="6">
 
-                <Button Grid.Column="1"
-                        Content="Previous"
-                        Click="FindPrevious_Click"/>
+                    <TextBox x:Name="SearchBox"
+                             Grid.Column="0"
+                             PlaceholderText="Find..."
+                             KeyDown="SearchBox_KeyDown"/>
 
-                <Button Grid.Column="2"
-                        Content="Next"
-                        Click="FindNext_Click"/>
+                    <Button Grid.Column="1"
+                            Content="Previous"
+                            Click="FindPrevious_Click"/>
 
-                <Button Grid.Column="3"
-                        Content="Replace"
-                        Click="Replace_Click"/>
+                    <Button Grid.Column="2"
+                            Content="Next"
+                            Click="FindNext_Click"/>
 
-                <Button Grid.Column="4"
-                        Content="Replace All"
-                        Click="ReplaceAll_Click"/>
+                    <Button Grid.Column="3"
+                            Content="×"
+                            Click="CloseSearch_Click"/>
 
-                <Button Grid.Column="5"
-                        Content="×"
-                        Click="CloseSearch_Click"/>
+                </Grid>
+
+                <!-- Replace row -->
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="*,Auto,Auto"
+                      ColumnSpacing="6">
+
+                    <TextBox x:Name="ReplaceBox"
+                             Grid.Column="0"
+                             PlaceholderText="Replace with..."
+                             KeyDown="ReplaceBox_KeyDown"/>
+
+                    <Button Grid.Column="1"
+                            Content="Replace"
+                            Click="Replace_Click"/>
+
+                    <Button Grid.Column="2"
+                            Content="Replace All"
+                            Click="ReplaceAll_Click"/>
+
+                </Grid>
 
             </Grid>
 

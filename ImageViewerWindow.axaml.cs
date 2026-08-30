@@ -20,6 +20,12 @@ public partial class ImageViewerWindow : Window
 
     private bool _isUpdatingLayout;
 
+    private bool _isPanning;
+
+    private Point _panPointerStart;
+
+    private Vector _panOffsetStart;
+
     public ImageViewerWindow()
     {
         InitializeComponent();
@@ -535,6 +541,116 @@ public partial class ImageViewerWindow : Window
 
         ApplyZoom(
             preserveView: false);
+    }
+
+
+    // ============================================================
+    // MOUSE PAN / DRAG
+    // ============================================================
+
+    private void ImageCanvas_PointerPressed(
+        object? sender,
+        PointerPressedEventArgs e)
+    {
+        if (_bitmap is null)
+            return;
+
+        var point =
+            e.GetCurrentPoint(
+                ImageScrollViewer);
+
+        if (!point.Properties.IsLeftButtonPressed)
+            return;
+
+        _isPanning = true;
+
+        _panPointerStart =
+            point.Position;
+
+        _panOffsetStart =
+            ImageScrollViewer.Offset;
+
+        ImageCanvas.Cursor =
+            new Cursor(
+                StandardCursorType.SizeAll);
+
+        e.Pointer.Capture(
+            ImageCanvas);
+
+        e.Handled = true;
+    }
+
+    private void ImageCanvas_PointerMoved(
+        object? sender,
+        PointerEventArgs e)
+    {
+        if (!_isPanning)
+            return;
+
+        var currentPosition =
+            e.GetPosition(
+                ImageScrollViewer);
+
+        var delta =
+            _panPointerStart -
+            currentPosition;
+
+        double maxOffsetX =
+            Math.Max(
+                0,
+                ImageScrollViewer.Extent.Width -
+                ImageScrollViewer.Viewport.Width);
+
+        double maxOffsetY =
+            Math.Max(
+                0,
+                ImageScrollViewer.Extent.Height -
+                ImageScrollViewer.Viewport.Height);
+
+        double targetX =
+            Math.Clamp(
+                _panOffsetStart.X + delta.X,
+                0,
+                maxOffsetX);
+
+        double targetY =
+            Math.Clamp(
+                _panOffsetStart.Y + delta.Y,
+                0,
+                maxOffsetY);
+
+        ImageScrollViewer.Offset =
+            new Vector(
+                targetX,
+                targetY);
+
+        e.Handled = true;
+    }
+
+    private void ImageCanvas_PointerReleased(
+        object? sender,
+        PointerReleasedEventArgs e)
+    {
+        EndPan();
+    }
+
+    private void ImageCanvas_PointerCaptureLost(
+        object? sender,
+        PointerCaptureLostEventArgs e)
+    {
+        EndPan();
+    }
+
+    private void EndPan()
+    {
+        if (!_isPanning)
+            return;
+
+        _isPanning = false;
+
+        ImageCanvas.Cursor =
+            new Cursor(
+                StandardCursorType.Hand);
     }
 
 

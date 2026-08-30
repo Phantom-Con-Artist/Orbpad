@@ -1227,7 +1227,50 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        string searchText =
+            SearchBox.Text ?? string.Empty;
+
+        if (string.IsNullOrEmpty(
+                searchText))
+        {
+            return;
+        }
+
+        string replacementText =
+            ReplaceBox.Text ?? string.Empty;
+
+        string selectedText =
+            Editor.SelectedText ?? string.Empty;
+
+        bool selectionMatchesSearch =
+            Editor.SelectionLength > 0 &&
+            string.Equals(
+                selectedText,
+                searchText,
+                StringComparison.OrdinalIgnoreCase);
+
+        if (selectionMatchesSearch)
+        {
+            int start =
+                Editor.SelectionStart;
+
+            Editor.Document.Replace(
+                start,
+                Editor.SelectionLength,
+                replacementText);
+
+            Editor.CaretOffset =
+                start + replacementText.Length;
+
+            SaveEditorSelection();
+        }
+
+        // If nothing matching was selected yet, this just selects the
+        // first/next match so the following click can replace it —
+        // matching standard Find & Replace behavior.
         FindNext();
+
+        UpdateStatusBar();
     }
 
     private void ReplaceAll_Click(
@@ -1243,47 +1286,101 @@ public partial class MainWindow : Window
             return;
         }
 
+        string replacementText =
+            ReplaceBox.Text ?? string.Empty;
+
         string text =
             Editor.Text ?? string.Empty;
 
-        if (text.IndexOf(
-                searchText,
-                StringComparison.OrdinalIgnoreCase)
-            < 0)
-        {
-            return;
-        }
+        var matchOffsets =
+            new List<int>();
 
-        string result =
-            string.Empty;
-
-        int currentIndex = 0;
+        int searchIndex = 0;
 
         while (true)
         {
             int index =
                 text.IndexOf(
                     searchText,
-                    currentIndex,
+                    searchIndex,
                     StringComparison.OrdinalIgnoreCase);
 
             if (index < 0)
-            {
-                result +=
-                    text[currentIndex..];
-
                 break;
-            }
 
-            result +=
-                text[currentIndex..index];
+            matchOffsets.Add(index);
 
-            currentIndex =
+            searchIndex =
                 index + searchText.Length;
         }
 
-        Editor.Text =
-            result;
+        if (matchOffsets.Count == 0)
+            return;
+
+        var document =
+            Editor.Document;
+
+        document.UndoStack.StartUndoGroup();
+
+        try
+        {
+            // Replace from the end backwards so earlier offsets in
+            // the list stay valid as the document shrinks/grows.
+            for (int i = matchOffsets.Count - 1; i >= 0; i--)
+            {
+                document.Replace(
+                    matchOffsets[i],
+                    searchText.Length,
+                    replacementText);
+            }
+        }
+        finally
+        {
+            document.UndoStack.EndUndoGroup();
+        }
+
+        Editor.CaretOffset =
+            Math.Min(
+                matchOffsets[0] + replacementText.Length,
+                Editor.Text?.Length ?? 0);
+
+        SaveEditorSelection();
+
+        UpdateStatusBar();
+    }
+
+    private void SearchBox_KeyDown(
+        object? sender,
+        KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+            return;
+
+        if (e.KeyModifiers.HasFlag(
+                KeyModifiers.Shift))
+        {
+            FindPrevious();
+        }
+        else
+        {
+            FindNext();
+        }
+
+        e.Handled = true;
+    }
+
+    private void ReplaceBox_KeyDown(
+        object? sender,
+        KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+            return;
+
+        Replace_Click(
+            sender,
+            new RoutedEventArgs());
+
+        e.Handled = true;
     }
 
     private void ShowSearchBar()
