@@ -5,12 +5,17 @@
         Width="1000"
         Height="700"
         MinWidth="600"
-        MinHeight="400">
+        MinHeight="400"
+        Background="{DynamicResource OrbpadBackgroundBrush}">
 
     <DockPanel>
 
-        <!-- Application Menu -->
-        <Menu DockPanel.Dock="Top">
+        <!-- ============================= -->
+        <!-- Menu                           -->
+        <!-- ============================= -->
+
+        <Menu DockPanel.Dock="Top"
+              Background="{DynamicResource OrbpadSurfaceBrush}">
 
             <MenuItem Header="_File">
 
@@ -77,38 +82,59 @@
 
         </Menu>
 
-        <!-- Status Bar -->
+
+        <!-- ============================= -->
+        <!-- Status Bar                     -->
+        <!-- ============================= -->
+
         <Border DockPanel.Dock="Bottom"
-                Padding="10,6">
+                Background="{DynamicResource OrbpadSurfaceBrush}"
+                BorderBrush="{DynamicResource OrbpadBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="12,7">
 
             <Grid ColumnDefinitions="Auto,*,Auto,Auto">
 
                 <TextBlock x:Name="CursorPositionText"
                            Grid.Column="0"
-                           Text="Ln 1, Col 1"/>
+                           Text="Ln 1, Col 1"
+                           Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
 
                 <TextBlock Grid.Column="1"/>
 
                 <TextBlock x:Name="WordCountText"
                            Grid.Column="2"
-                           Text="0 words"/>
+                           Text="0 words"
+                           Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
 
                 <TextBlock x:Name="CharacterCountText"
                            Grid.Column="3"
-                           Text="  0 characters"/>
+                           Text="  0 characters"
+                           Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
 
             </Grid>
 
         </Border>
 
-        <!-- Text Editor -->
-        <TextBox x:Name="Editor"
-                 AcceptsReturn="True"
-                 AcceptsTab="True"
-                 TextWrapping="NoWrap"
-                 FontSize="16"
-                 Padding="16"
-                 TextChanged="Editor_TextChanged"/>
+
+        <!-- ============================= -->
+        <!-- Editor                         -->
+        <!-- ============================= -->
+
+        <Border Background="{DynamicResource OrbpadBackgroundBrush}">
+
+            <TextBox x:Name="Editor"
+                     AcceptsReturn="True"
+                     AcceptsTab="True"
+                     TextWrapping="NoWrap"
+                     FontSize="16"
+                     Padding="20"
+                     Background="{DynamicResource OrbpadBackgroundBrush}"
+                     Foreground="{DynamicResource OrbpadTextBrush}"
+                     BorderThickness="0"
+                     TextChanged="Editor_TextChanged"/>
+
+        </Border>
 
     </DockPanel>
 

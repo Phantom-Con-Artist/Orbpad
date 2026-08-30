@@ -1,0 +1,41 @@
+<ResourceDictionary
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Colors -->
+
+    <Color x:Key="OrbpadBackgroundColor">#18181B</Color>
+    <Color x:Key="OrbpadSurfaceColor">#202023</Color>
+    <Color x:Key="OrbpadSurfaceHoverColor">#2A2A2E</Color>
+    <Color x:Key="OrbpadBorderColor">#303034</Color>
+
+    <Color x:Key="OrbpadTextColor">#F4F4F5</Color>
+    <Color x:Key="OrbpadMutedTextColor">#A1A1AA</Color>
+
+    <Color x:Key="OrbpadAccentColor">#8B5CF6</Color>
+
+
+    <!-- Brushes -->
+
+    <SolidColorBrush x:Key="OrbpadBackgroundBrush"
+                     Color="{StaticResource OrbpadBackgroundColor}"/>
+
+    <SolidColorBrush x:Key="OrbpadSurfaceBrush"
+                     Color="{StaticResource OrbpadSurfaceColor}"/>
+
+    <SolidColorBrush x:Key="OrbpadSurfaceHoverBrush"
+                     Color="{StaticResource OrbpadSurfaceHoverColor}"/>
+
+    <SolidColorBrush x:Key="OrbpadBorderBrush"
+                     Color="{StaticResource OrbpadBorderColor}"/>
+
+    <SolidColorBrush x:Key="OrbpadTextBrush"
+                     Color="{StaticResource OrbpadTextColor}"/>
+
+    <SolidColorBrush x:Key="OrbpadMutedTextBrush"
+                     Color="{StaticResource OrbpadMutedTextColor}"/>
+
+    <SolidColorBrush x:Key="OrbpadAccentBrush"
+                     Color="{StaticResource OrbpadAccentColor}"/>
+
+</ResourceDictionary>
