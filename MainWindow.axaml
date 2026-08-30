@@ -15,18 +15,22 @@
             <MenuItem Header="_File">
 
                 <MenuItem Header="_New"
-                          Click="New_Click"/>
+                          Click="New_Click"
+                          HotKey="Ctrl+N"/>
 
                 <MenuItem Header="_Open..."
-                          Click="Open_Click"/>
+                          Click="Open_Click"
+                          HotKey="Ctrl+O"/>
 
                 <Separator/>
 
                 <MenuItem Header="_Save"
-                          Click="Save_Click"/>
+                          Click="Save_Click"
+                          HotKey="Ctrl+S"/>
 
                 <MenuItem Header="Save _As..."
-                          Click="SaveAs_Click"/>
+                          Click="SaveAs_Click"
+                          HotKey="Ctrl+Shift+S"/>
 
                 <Separator/>
 
@@ -38,26 +42,32 @@
             <MenuItem Header="_Edit">
 
                 <MenuItem Header="_Undo"
-                          Click="Undo_Click"/>
+                          Click="Undo_Click"
+                          HotKey="Ctrl+Z"/>
 
                 <MenuItem Header="_Redo"
-                          Click="Redo_Click"/>
+                          Click="Redo_Click"
+                          HotKey="Ctrl+Y"/>
 
                 <Separator/>
 
                 <MenuItem Header="Cu_t"
-                          Click="Cut_Click"/>
+                          Click="Cut_Click"
+                          HotKey="Ctrl+X"/>
 
                 <MenuItem Header="_Copy"
-                          Click="Copy_Click"/>
+                          Click="Copy_Click"
+                          HotKey="Ctrl+C"/>
 
                 <MenuItem Header="_Paste"
-                          Click="Paste_Click"/>
+                          Click="Paste_Click"
+                          HotKey="Ctrl+V"/>
 
                 <Separator/>
 
                 <MenuItem Header="Select _All"
-                          Click="SelectAll_Click"/>
+                          Click="SelectAll_Click"
+                          HotKey="Ctrl+A"/>
 
             </MenuItem>
 
@@ -66,6 +76,30 @@
             <MenuItem Header="_Help"/>
 
         </Menu>
+
+        <!-- Status Bar -->
+        <Border DockPanel.Dock="Bottom"
+                Padding="10,6">
+
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+
+                <TextBlock x:Name="CursorPositionText"
+                           Grid.Column="0"
+                           Text="Ln 1, Col 1"/>
+
+                <TextBlock Grid.Column="1"/>
+
+                <TextBlock x:Name="WordCountText"
+                           Grid.Column="2"
+                           Text="0 words"/>
+
+                <TextBlock x:Name="CharacterCountText"
+                           Grid.Column="3"
+                           Text="  0 characters"/>
+
+            </Grid>
+
+        </Border>
 
         <!-- Text Editor -->
         <TextBox x:Name="Editor"
