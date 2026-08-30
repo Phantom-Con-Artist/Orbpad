@@ -43,6 +43,12 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        // ========================================================
+        // FILE EXPLORER
+        // ========================================================
+
+        InitializeExplorer();
+
 
         // ========================================================
         // SETTINGS

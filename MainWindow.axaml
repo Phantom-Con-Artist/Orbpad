@@ -307,6 +307,14 @@
                 <Button Content="Find"
                         Click="Find_Click"/>
 
+                <Border Width="1"
+                        Margin="4,2"
+                        Background="{DynamicResource OrbpadBorderBrush}"/>
+
+                <Button x:Name="ExplorerButton"
+                        Content="Explorer"
+                        Click="ExplorerButton_Click"/>
+
             </StackPanel>
 
         </Border>

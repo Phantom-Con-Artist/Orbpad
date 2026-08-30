@@ -1,0 +1,220 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Orbpad.Explorer.ExplorerView">
+
+    <Border Background="{DynamicResource OrbpadSurfaceBrush}"
+            BorderBrush="{DynamicResource OrbpadBorderBrush}"
+            BorderThickness="0,0,1,0">
+
+        <DockPanel>
+
+            <!-- ================================================= -->
+            <!-- HEADER                                             -->
+            <!-- ================================================= -->
+
+            <Border DockPanel.Dock="Top"
+                    Padding="12,10"
+                    Background="{DynamicResource OrbpadSurfaceBrush}"
+                    BorderBrush="{DynamicResource OrbpadBorderBrush}"
+                    BorderThickness="0,0,0,1">
+
+                <Grid RowDefinitions="Auto,Auto"
+                      RowSpacing="8">
+
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+                          ColumnSpacing="5">
+
+                        <TextBlock Grid.Column="0"
+                                   Text="EXPLORER"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource OrbpadMutedTextBrush}"
+                                   VerticalAlignment="Center"/>
+
+                        <!-- Collapse -->
+                        <Button x:Name="CollapseButton"
+                                Grid.Column="1"
+                                Content="◀"
+                                Width="30"
+                                Height="28"
+                                Padding="0"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Click="Collapse_Click"/>
+
+                        <!-- Refresh -->
+                        <Button x:Name="RefreshButton"
+                                Grid.Column="2"
+                                Content="↻"
+                                Width="30"
+                                Height="28"
+                                Padding="0"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Click="Refresh_Click"/>
+
+                        <!-- Open Folder -->
+                        <Button x:Name="OpenFolderButton"
+                                Grid.Column="3"
+                                Content="📁"
+                                Width="30"
+                                Height="28"
+                                Padding="0"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Click="OpenFolder_Click"/>
+
+                    </Grid>
+
+
+                    <!-- ========================================= -->
+                    <!-- WORKSPACE ROOT                              -->
+                    <!-- ========================================= -->
+
+                    <TextBlock x:Name="WorkspacePathText"
+                               Grid.Row="1"
+                               Text="No folder opened"
+                               FontSize="11"
+                               Foreground="{DynamicResource OrbpadMutedTextBrush}"
+                               TextTrimming="CharacterEllipsis"
+                               MaxLines="1"/>
+
+                </Grid>
+
+            </Border>
+
+
+            <!-- ================================================= -->
+            <!-- EMPTY STATE                                        -->
+            <!-- ================================================= -->
+
+            <Grid x:Name="EmptyState">
+
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="20"
+                            Spacing="8">
+
+                    <TextBlock Text="📁"
+                               FontSize="28"
+                               HorizontalAlignment="Center"/>
+
+                    <TextBlock Text="Open a folder"
+                               FontSize="14"
+                               Foreground="{DynamicResource OrbpadTextBrush}"
+                               HorizontalAlignment="Center"/>
+
+                    <TextBlock Text="Browse your files in Orbpad"
+                               FontSize="11"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
+
+                    <Button Content="Open Folder"
+                            HorizontalAlignment="Center"
+                            Margin="0,6,0,0"
+                            Click="OpenFolder_Click"/>
+
+                </StackPanel>
+
+            </Grid>
+
+
+            <!-- ================================================= -->
+            <!-- FILE TREE                                           -->
+            <!-- ================================================= -->
+
+            <TreeView x:Name="FileTree"
+                      IsVisible="False"
+                      Background="Transparent"
+                      BorderThickness="0"
+                      Margin="4"
+                      DoubleTapped="FileTree_DoubleTapped"
+                      KeyDown="FileTree_KeyDown">
+
+                <TreeView.Styles>
+
+                    <!-- ========================================= -->
+                    <!-- TREE ITEM                                   -->
+                    <!-- ========================================= -->
+
+                    <Style Selector="TreeViewItem">
+
+                        <Setter Property="IsExpanded"
+                                Value="{ReflectionBinding IsExpanded, Mode=TwoWay}"/>
+
+                        <Setter Property="Padding"
+                                Value="3"/>
+
+                    </Style>
+
+
+                    <!-- ========================================= -->
+                    <!-- HOVER                                       -->
+                    <!-- ========================================= -->
+
+                    <Style Selector="TreeViewItem:pointerover">
+
+                        <Setter Property="Background"
+                                Value="{DynamicResource OrbpadSurfaceHoverBrush}"/>
+
+                    </Style>
+
+
+                    <!-- ========================================= -->
+                    <!-- SELECTED                                    -->
+                    <!-- ========================================= -->
+
+                    <Style Selector="TreeViewItem:selected /template/ ContentPresenter#PART_HeaderPresenter">
+
+                        <Setter Property="Background"
+                                Value="{DynamicResource OrbpadSurfaceHoverBrush}"/>
+
+                    </Style>
+
+                </TreeView.Styles>
+
+
+                <!-- ================================================= -->
+                <!-- TREE TEMPLATE                                     -->
+                <!-- ================================================= -->
+
+                <TreeView.ItemTemplate>
+
+                    <TreeDataTemplate ItemsSource="{ReflectionBinding Children}">
+
+                        <Grid ColumnDefinitions="Auto,*"
+                              ColumnSpacing="7"
+                              MinHeight="24">
+
+                            <TextBlock Grid.Column="0"
+                                       Text="{ReflectionBinding Icon}"
+                                       FontSize="13"
+                                       VerticalAlignment="Center"/>
+
+                            <TextBlock Grid.Column="1"
+                                       Text="{ReflectionBinding Name}"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource OrbpadTextBrush}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+
+                        </Grid>
+
+                    </TreeDataTemplate>
+
+                </TreeView.ItemTemplate>
+
+            </TreeView>
+
+        </DockPanel>
+
+    </Border>
+
+</UserControl>
