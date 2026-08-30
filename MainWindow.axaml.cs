@@ -19,6 +19,9 @@ public partial class MainWindow : Window
     private readonly DocumentManager _documentManager;
     private readonly FileService _fileService;
 
+    private readonly SettingsService _settingsService;
+    private readonly AppSettings _settings;
+
     private readonly Dictionary<Document, Button>
         _documentButtons = new();
 
@@ -36,6 +39,22 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        // ========================================================
+        // SETTINGS
+        // ========================================================
+
+        _settingsService =
+            new SettingsService();
+
+        _settings =
+            _settingsService.Load();
+
+        ApplySavedSettings();
+
+        // ========================================================
+        // CORE SERVICES
+        // ========================================================
+
         _documentManager =
             new DocumentManager();
 
@@ -43,6 +62,10 @@ public partial class MainWindow : Window
             new FileService();
 
         CreateInitialDocument();
+
+        // ========================================================
+        // EDITOR EVENTS
+        // ========================================================
 
         Editor.TextChanged +=
             Editor_TextChanged;
@@ -53,10 +76,15 @@ public partial class MainWindow : Window
         Editor.TextArea.SelectionChanged +=
             Editor_SelectionChanged;
 
+        // ========================================================
+        // INITIAL UI STATE
+        // ========================================================
+
         UpdateWindowTitle();
         UpdateStatusBar();
         RefreshTabs();
         UpdateThemeMenu();
+        UpdateViewMenu();
 
         SaveEditorSelection();
     }
@@ -307,7 +335,8 @@ public partial class MainWindow : Window
         var closeButton =
             new Button
             {
-                Content = "×",
+                Content =
+                    "×",
 
                 Background =
                     Brushes.Transparent,
@@ -516,8 +545,11 @@ public partial class MainWindow : Window
                 .OpenFilePickerAsync(
                     new FilePickerOpenOptions
                     {
-                        Title = "Open File",
-                        AllowMultiple = false
+                        Title =
+                            "Open File",
+
+                        AllowMultiple =
+                            false
                     });
 
         if (files.Count == 0)
@@ -561,8 +593,11 @@ public partial class MainWindow : Window
                 .OpenFilePickerAsync(
                     new FilePickerOpenOptions
                     {
-                        Title = "Open Image",
-                        AllowMultiple = false,
+                        Title =
+                            "Open Image",
+
+                        AllowMultiple =
+                            false,
 
                         FileTypeFilter =
                         [
@@ -604,8 +639,11 @@ public partial class MainWindow : Window
                     Title =
                         "Unable to Open Image",
 
-                    Width = 450,
-                    Height = 220,
+                    Width =
+                        450,
+
+                    Height =
+                        220,
 
                     WindowStartupLocation =
                         WindowStartupLocation.CenterOwner
@@ -617,7 +655,8 @@ public partial class MainWindow : Window
                     Margin =
                         new Thickness(24),
 
-                    Spacing = 16
+                    Spacing =
+                        16
                 };
 
             panel.Children.Add(
@@ -626,7 +665,8 @@ public partial class MainWindow : Window
                     Text =
                         "Orbpad could not open this image.",
 
-                    FontSize = 18
+                    FontSize =
+                        18
                 });
 
             panel.Children.Add(
@@ -679,6 +719,7 @@ public partial class MainWindow : Window
         if (document.FilePath is null)
         {
             _ = SaveAsAsync();
+
             return;
         }
 
@@ -714,6 +755,8 @@ public partial class MainWindow : Window
             Editor.WordWrap
                 ? "_Word Wrap ✓"
                 : "_Word Wrap";
+
+        SaveCurrentSettings();
     }
 
     private void StatusBar_Click(
@@ -727,6 +770,8 @@ public partial class MainWindow : Window
             StatusBar.IsVisible
                 ? "_Show Status Bar ✓"
                 : "_Show Status Bar";
+
+        SaveCurrentSettings();
     }
 
     private void LineNumbers_Click(
@@ -740,6 +785,8 @@ public partial class MainWindow : Window
             Editor.ShowLineNumbers
                 ? "_Show Line Numbers ✓"
                 : "_Show Line Numbers";
+
+        SaveCurrentSettings();
     }
 
     private void Toolbar_Click(
@@ -753,6 +800,8 @@ public partial class MainWindow : Window
             Toolbar.IsVisible
                 ? "_Show Toolbar ✓"
                 : "_Show Toolbar";
+
+        SaveCurrentSettings();
     }
 
     // ============================================================
@@ -768,6 +817,7 @@ public partial class MainWindow : Window
 
         RefreshTabs();
         UpdateThemeMenu();
+        SaveCurrentSettings();
     }
 
     private void MidnightTheme_Click(
@@ -779,6 +829,7 @@ public partial class MainWindow : Window
 
         RefreshTabs();
         UpdateThemeMenu();
+        SaveCurrentSettings();
     }
 
     private void ForestTheme_Click(
@@ -790,6 +841,7 @@ public partial class MainWindow : Window
 
         RefreshTabs();
         UpdateThemeMenu();
+        SaveCurrentSettings();
     }
 
     private void LightTheme_Click(
@@ -801,6 +853,169 @@ public partial class MainWindow : Window
 
         RefreshTabs();
         UpdateThemeMenu();
+        SaveCurrentSettings();
+    }
+
+    // ============================================================
+    // SETTINGS
+    // ============================================================
+
+    private void ApplySavedSettings()
+    {
+        // ========================================================
+        // THEME
+        // ========================================================
+
+        if (Enum.TryParse<
+                ThemeManager.OrbpadTheme>(
+                _settings.Theme,
+                true,
+                out var theme))
+        {
+            ThemeManager.ApplyTheme(
+                theme);
+        }
+        else
+        {
+            ThemeManager.ApplyTheme(
+                ThemeManager.OrbpadTheme.Dark);
+        }
+
+        // ========================================================
+        // VIEW
+        // ========================================================
+
+        Toolbar.IsVisible =
+            _settings.ShowToolbar;
+
+        StatusBar.IsVisible =
+            _settings.ShowStatusBar;
+
+        Editor.ShowLineNumbers =
+            _settings.ShowLineNumbers;
+
+        Editor.WordWrap =
+            _settings.WordWrap;
+
+        // ========================================================
+        // EDITOR
+        // ========================================================
+
+        if (!string.IsNullOrWhiteSpace(
+                _settings.FontFamily))
+        {
+            Editor.FontFamily =
+                new FontFamily(
+                    _settings.FontFamily);
+        }
+
+        if (_settings.FontSize > 0)
+        {
+            Editor.FontSize =
+                _settings.FontSize;
+        }
+
+        // ========================================================
+        // WINDOW
+        // ========================================================
+
+        Width =
+            Math.Max(
+                MinWidth,
+                _settings.WindowWidth);
+
+        Height =
+            Math.Max(
+                MinHeight,
+                _settings.WindowHeight);
+
+        if (_settings.WindowX.HasValue &&
+            _settings.WindowY.HasValue)
+        {
+            Position =
+                new PixelPoint(
+                    _settings.WindowX.Value,
+                    _settings.WindowY.Value);
+        }
+    }
+
+    private void UpdateViewMenu()
+    {
+        WordWrapMenuItem.Header =
+            Editor.WordWrap
+                ? "_Word Wrap ✓"
+                : "_Word Wrap";
+
+        StatusBarMenuItem.Header =
+            StatusBar.IsVisible
+                ? "_Show Status Bar ✓"
+                : "_Show Status Bar";
+
+        LineNumbersMenuItem.Header =
+            Editor.ShowLineNumbers
+                ? "_Show Line Numbers ✓"
+                : "_Show Line Numbers";
+
+        ToolbarMenuItem.Header =
+            Toolbar.IsVisible
+                ? "_Show Toolbar ✓"
+                : "_Show Toolbar";
+    }
+
+    private void SaveCurrentSettings()
+    {
+        // ========================================================
+        // APPEARANCE
+        // ========================================================
+
+        _settings.Theme =
+            ThemeManager.CurrentTheme.ToString();
+
+        _settings.ShowToolbar =
+            Toolbar.IsVisible;
+
+        _settings.ShowStatusBar =
+            StatusBar.IsVisible;
+
+        _settings.ShowLineNumbers =
+            Editor.ShowLineNumbers;
+
+        // ========================================================
+        // EDITOR
+        // ========================================================
+
+        _settings.WordWrap =
+            Editor.WordWrap;
+
+        _settings.FontFamily =
+            Editor.FontFamily?.Name ??
+            "Inter";
+
+        _settings.FontSize =
+            Editor.FontSize;
+
+        // ========================================================
+        // WINDOW
+        // ========================================================
+
+        _settings.WindowWidth =
+            Width;
+
+        _settings.WindowHeight =
+            Height;
+
+        _settings.WindowX =
+            Position.X;
+
+        _settings.WindowY =
+            Position.Y;
+
+        // ========================================================
+        // SAVE
+        // ========================================================
+
+        _settingsService.Save(
+            _settings);
     }
 
     private void UpdateThemeMenu()
@@ -829,6 +1044,10 @@ public partial class MainWindow : Window
                 ? "_Light ✓"
                 : "_Light";
     }
+
+    // ============================================================
+    // HELP
+    // ============================================================
 
     private async void About_Click(
         object? sender,
@@ -901,7 +1120,9 @@ public partial class MainWindow : Window
                     if (existingDocument ==
                         previousDocument)
                     {
-                        stillExists = true;
+                        stillExists =
+                            true;
+
                         break;
                     }
                 }
@@ -1635,6 +1856,18 @@ public partial class MainWindow : Window
             StringSplitOptions
                 .RemoveEmptyEntries)
             .Length;
+    }
+
+    // ============================================================
+    // WINDOW LIFETIME
+    // ============================================================
+
+    protected override void OnClosed(
+        EventArgs e)
+    {
+        SaveCurrentSettings();
+
+        base.OnClosed(e);
     }
 
     private enum CloseDocumentResult
