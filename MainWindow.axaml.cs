@@ -742,6 +742,19 @@ public partial class MainWindow : Window
                 : "_Show Line Numbers";
     }
 
+    private void Toolbar_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        Toolbar.IsVisible =
+            !Toolbar.IsVisible;
+
+        ToolbarMenuItem.Header =
+            Toolbar.IsVisible
+                ? "_Show Toolbar ✓"
+                : "_Show Toolbar";
+    }
+
     // ============================================================
     // THEMES
     // ============================================================
@@ -1265,9 +1278,6 @@ public partial class MainWindow : Window
             SaveEditorSelection();
         }
 
-        // If nothing matching was selected yet, this just selects the
-        // first/next match so the following click can replace it —
-        // matching standard Find & Replace behavior.
         FindNext();
 
         UpdateStatusBar();
@@ -1324,9 +1334,9 @@ public partial class MainWindow : Window
 
         try
         {
-            // Replace from the end backwards so earlier offsets in
-            // the list stay valid as the document shrinks/grows.
-            for (int i = matchOffsets.Count - 1; i >= 0; i--)
+            for (int i = matchOffsets.Count - 1;
+                 i >= 0;
+                 i--)
             {
                 document.Replace(
                     matchOffsets[i],
@@ -1341,7 +1351,8 @@ public partial class MainWindow : Window
 
         Editor.CaretOffset =
             Math.Min(
-                matchOffsets[0] + replacementText.Length,
+                matchOffsets[0] +
+                replacementText.Length,
                 Editor.Text?.Length ?? 0);
 
         SaveEditorSelection();
