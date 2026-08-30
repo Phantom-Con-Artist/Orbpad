@@ -30,6 +30,7 @@ public partial class MainWindow : Window
 
         UpdateWindowTitle();
         UpdateStatusBar();
+        RefreshTabs();
     }
 
     private void CreateInitialDocument()
@@ -37,12 +38,168 @@ public partial class MainWindow : Window
         var document =
             _documentManager.CreateDocument();
 
+        LoadDocumentIntoEditor(document);
+    }
+
+    private void NewTab_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        CreateNewDocument();
+    }
+
+    private void CreateNewDocument()
+    {
+        var document =
+            _documentManager.CreateDocument();
+
+        LoadDocumentIntoEditor(document);
+
+        RefreshTabs();
+
+        UpdateWindowTitle();
+        UpdateStatusBar();
+    }
+
+    private void RefreshTabs()
+    {
+        TabPanel.Children.Clear();
+
+        foreach (var document
+                 in _documentManager.Documents)
+        {
+            var button =
+                CreateTabButton(document);
+
+            TabPanel.Children.Add(button);
+        }
+
+        UpdateTabAppearance();
+    }
+
+    private Button CreateTabButton(
+        Document document)
+    {
+        string title =
+            GetDocumentTitle(document);
+
+        var button =
+            new Button
+            {
+                Content = title,
+                Padding = new Thickness(14, 7),
+                Margin = new Thickness(0)
+            };
+
+        button.Click +=
+            (_, _) =>
+            {
+                SwitchToDocument(document);
+            };
+
+        return button;
+    }
+
+    private void SwitchToDocument(
+        Document document)
+    {
+        if (_documentManager.ActiveDocument ==
+            document)
+        {
+            return;
+        }
+
+        _documentManager.SetActiveDocument(
+            document);
+
+        LoadDocumentIntoEditor(document);
+
+        UpdateWindowTitle();
+        UpdateStatusBar();
+        UpdateTabAppearance();
+    }
+
+    private void LoadDocumentIntoEditor(
+        Document document)
+    {
         _isUpdatingEditor = true;
 
         Editor.Text =
             document.Text;
 
         _isUpdatingEditor = false;
+    }
+
+    private string GetDocumentTitle(
+        Document document)
+    {
+        int documentNumber = 1;
+
+        foreach (var currentDocument
+                 in _documentManager.Documents)
+        {
+            if (currentDocument == document)
+                break;
+
+            documentNumber++;
+        }
+
+        if (document.FilePath is not null)
+        {
+            string fileName =
+                System.IO.Path.GetFileName(
+                    document.FilePath);
+
+            return document.IsModified
+                ? $"{fileName} *"
+                : fileName;
+        }
+
+        return document.IsModified
+            ? $"Untitled {documentNumber} *"
+            : $"Untitled {documentNumber}";
+    }
+
+    private void UpdateTabAppearance()
+    {
+        foreach (var child
+                 in TabPanel.Children)
+        {
+            if (child is not Button button)
+                continue;
+
+            button.Background =
+                new Avalonia.Media.SolidColorBrush(
+                    Avalonia.Media.Color.Parse(
+                        "#202023"));
+        }
+
+        var activeDocument =
+            _documentManager.ActiveDocument;
+
+        if (activeDocument is null)
+            return;
+
+        foreach (var child
+                 in TabPanel.Children)
+        {
+            if (child is not Button button)
+                continue;
+
+            string title =
+                GetDocumentTitle(activeDocument);
+
+            if (button.Content?.ToString() ==
+                title)
+            {
+                button.Background =
+                    new Avalonia.Media.SolidColorBrush(
+                        Avalonia.Media.Color.Parse(
+                            "#2A2A2E"));
+
+                break;
+            }
+        }
     }
 
     private async void New_Click(
@@ -52,18 +209,7 @@ public partial class MainWindow : Window
         if (!await ConfirmDiscardChangesAsync())
             return;
 
-        var document =
-            _documentManager.CreateDocument();
-
-        _isUpdatingEditor = true;
-
-        Editor.Text =
-            document.Text;
-
-        _isUpdatingEditor = false;
-
-        UpdateWindowTitle();
-        UpdateStatusBar();
+        CreateNewDocument();
     }
 
     private async void Open_Click(
@@ -74,17 +220,19 @@ public partial class MainWindow : Window
             return;
 
         var files =
-            await StorageProvider.OpenFilePickerAsync(
-                new FilePickerOpenOptions
-                {
-                    Title = "Open File",
-                    AllowMultiple = false
-                });
+            await StorageProvider
+                .OpenFilePickerAsync(
+                    new FilePickerOpenOptions
+                    {
+                        Title = "Open File",
+                        AllowMultiple = false
+                    });
 
         if (files.Count == 0)
             return;
 
-        var file = files[0];
+        var file =
+            files[0];
 
         if (file.TryGetLocalPath()
             is not string filePath)
@@ -96,19 +244,19 @@ public partial class MainWindow : Window
             _documentManager.CreateDocument();
 
         document.Text =
-            _fileService.ReadFile(filePath);
+            _fileService.ReadFile(
+                filePath);
 
         document.FilePath =
             filePath;
 
-        document.IsModified = false;
+        document.IsModified =
+            false;
 
-        _isUpdatingEditor = true;
+        LoadDocumentIntoEditor(
+            document);
 
-        Editor.Text =
-            document.Text;
-
-        _isUpdatingEditor = false;
+        RefreshTabs();
 
         UpdateWindowTitle();
         UpdateStatusBar();
@@ -144,8 +292,8 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
-        if (_documentManager.ActiveDocument?.IsModified
-            == true)
+        if (_documentManager.ActiveDocument?
+            .IsModified == true)
         {
             _ = ConfirmExitAsync();
             return;
@@ -275,8 +423,7 @@ public partial class MainWindow : Window
                 break;
             }
 
-            result +=
-                text[currentIndex..index];
+            result += text[currentIndex..index];
 
             currentIndex =
                 index + searchText.Length;
@@ -284,8 +431,7 @@ public partial class MainWindow : Window
 
         _isUpdatingEditor = true;
 
-        Editor.Text =
-            result;
+        Editor.Text = result;
 
         _isUpdatingEditor = false;
 
@@ -300,6 +446,7 @@ public partial class MainWindow : Window
 
         UpdateWindowTitle();
         UpdateStatusBar();
+        RefreshTabs();
     }
 
     private void ShowSearchBar()
@@ -426,6 +573,7 @@ public partial class MainWindow : Window
 
         UpdateWindowTitle();
         UpdateStatusBar();
+        RefreshTabs();
     }
 
     private void Editor_PropertyChanged(
@@ -448,34 +596,39 @@ public partial class MainWindow : Window
             return;
 
         var file =
-            await StorageProvider.SaveFilePickerAsync(
-                new FilePickerSaveOptions
-                {
-                    Title = "Save File",
-                    SuggestedFileName = "Untitled.txt",
-                    DefaultExtension = "txt",
+            await StorageProvider
+                .SaveFilePickerAsync(
+                    new FilePickerSaveOptions
+                    {
+                        Title = "Save File",
 
-                    FileTypeChoices =
-                    [
-                        new FilePickerFileType(
-                            "Text File")
-                        {
-                            Patterns =
-                            [
-                                "*.txt"
-                            ]
-                        },
+                        SuggestedFileName =
+                            "Untitled.txt",
 
-                        new FilePickerFileType(
-                            "All Files")
-                        {
-                            Patterns =
-                            [
-                                "*"
-                            ]
-                        }
-                    ]
-                });
+                        DefaultExtension =
+                            "txt",
+
+                        FileTypeChoices =
+                        [
+                            new FilePickerFileType(
+                                "Text File")
+                            {
+                                Patterns =
+                                [
+                                    "*.txt"
+                                ]
+                            },
+
+                            new FilePickerFileType(
+                                "All Files")
+                            {
+                                Patterns =
+                                [
+                                    "*"
+                                ]
+                            }
+                        ]
+                    });
 
         if (file is null)
             return;
@@ -503,7 +656,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        var content =
+        string content =
             Editor.Text ?? string.Empty;
 
         _fileService.WriteFile(
@@ -518,6 +671,7 @@ public partial class MainWindow : Window
 
         UpdateWindowTitle();
         UpdateStatusBar();
+        RefreshTabs();
     }
 
     private async Task<bool>
@@ -536,7 +690,8 @@ public partial class MainWindow : Window
             new ConfirmDialog();
 
         var result =
-            await dialog.ShowDialog<bool?>(this);
+            await dialog.ShowDialog<bool?>(
+                this);
 
         if (result == true)
         {
@@ -659,7 +814,8 @@ public partial class MainWindow : Window
 
         return text.Split(
             (char[]?)null,
-            StringSplitOptions.RemoveEmptyEntries)
+            StringSplitOptions
+                .RemoveEmptyEntries)
             .Length;
     }
 }
