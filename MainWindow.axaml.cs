@@ -1504,6 +1504,26 @@ public partial class MainWindow : Window
     // THEMES
     // ============================================================
 
+    private void PurpleTheme_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        ThemeManager.ApplyTheme(
+            ThemeManager.OrbpadTheme.Purple);
+
+        RefreshTabs();
+        UpdateThemeMenu();
+
+        // ========================================================
+        // MARKDOWN THEME REFRESH
+        // ========================================================
+
+        UpdateMarkdownPreview();
+
+        SaveCurrentSettings();
+    }
+
+
     private void DarkTheme_Click(
         object? sender,
         RoutedEventArgs e)
@@ -1610,7 +1630,7 @@ public partial class MainWindow : Window
         else
         {
             ThemeManager.ApplyTheme(
-                ThemeManager.OrbpadTheme.Dark);
+                ThemeManager.OrbpadTheme.Purple);
         }
 
 

@@ -8,14 +8,25 @@ public static class ThemeManager
 {
     public enum OrbpadTheme
     {
+        Purple,
         Dark,
         Midnight,
         Forest,
         Light
     }
 
+
+    // ============================================================
+    // CURRENT THEME
+    // ============================================================
+
     public static OrbpadTheme CurrentTheme { get; private set; }
-        = OrbpadTheme.Dark;
+        = OrbpadTheme.Purple;
+
+
+    // ============================================================
+    // APPLY THEME
+    // ============================================================
 
     public static void ApplyTheme(
         OrbpadTheme theme)
@@ -26,8 +37,14 @@ public static class ThemeManager
         if (application is null)
             return;
 
+
         var palette =
             GetPalette(theme);
+
+
+        // ========================================================
+        // MAIN
+        // ========================================================
 
         SetBrush(
             application,
@@ -49,6 +66,11 @@ public static class ThemeManager
             "OrbpadBorderBrush",
             palette.Border);
 
+
+        // ========================================================
+        // TEXT
+        // ========================================================
+
         SetBrush(
             application,
             "OrbpadTextBrush",
@@ -58,6 +80,11 @@ public static class ThemeManager
             application,
             "OrbpadMutedTextBrush",
             palette.MutedText);
+
+
+        // ========================================================
+        // ACCENT
+        // ========================================================
 
         SetBrush(
             application,
@@ -70,14 +97,25 @@ public static class ThemeManager
             palette.Accent,
             opacity: 0.30);
 
+
+        // ========================================================
+        // AVALONIA THEME VARIANT
+        // ========================================================
+
         application.RequestedThemeVariant =
             theme == OrbpadTheme.Light
                 ? ThemeVariant.Light
                 : ThemeVariant.Dark;
 
+
         CurrentTheme =
             theme;
     }
+
+
+    // ============================================================
+    // SET BRUSH
+    // ============================================================
 
     private static void SetBrush(
         Application application,
@@ -91,11 +129,58 @@ public static class ThemeManager
                 opacity);
     }
 
+
+    // ============================================================
+    // PALETTES
+    // ============================================================
+
     private static ThemePalette GetPalette(
         OrbpadTheme theme)
     {
         return theme switch
         {
+            // ====================================================
+            // ORBPAD PURPLE
+            // ====================================================
+
+            OrbpadTheme.Purple =>
+                new ThemePalette
+                {
+                    Background = "#130D1B",
+                    Surface = "#1B1226",
+                    SurfaceHover = "#28183A",
+                    Border = "#3A2850",
+
+                    Text = "#F7F2FC",
+                    MutedText = "#B8A9C7",
+
+                    Accent = "#A855F7"
+                },
+
+
+            // ====================================================
+            // ORBPAD DARK
+            // ====================================================
+
+            OrbpadTheme.Dark =>
+                new ThemePalette
+                {
+                    Background = "#121214",
+                    Surface = "#19191C",
+                    SurfaceHover = "#25252B",
+                    Border = "#303036",
+
+                    Text = "#F4F4F5",
+                    MutedText = "#A1A1AA",
+
+                    Accent = "#8B5CF6"
+                },
+
+
+            // ====================================================
+            // MIDNIGHT
+            // ====================================================
+
             OrbpadTheme.Midnight =>
                 new ThemePalette
                 {
@@ -109,6 +194,11 @@ public static class ThemeManager
 
                     Accent = "#60A5FA"
                 },
+
+
+            // ====================================================
+            // FOREST
+            // ====================================================
 
             OrbpadTheme.Forest =>
                 new ThemePalette
@@ -124,6 +214,11 @@ public static class ThemeManager
                     Accent = "#4ADE80"
                 },
 
+
+            // ====================================================
+            // LIGHT
+            // ====================================================
+
             OrbpadTheme.Light =>
                 new ThemePalette
                 {
@@ -138,21 +233,31 @@ public static class ThemeManager
                     Accent = "#7C3AED"
                 },
 
+
+            // ====================================================
+            // SAFETY FALLBACK
+            // ====================================================
+
             _ =>
                 new ThemePalette
                 {
-                    Background = "#121214",
-                    Surface = "#19191C",
-                    SurfaceHover = "#25252B",
-                    Border = "#303036",
+                    Background = "#130D1B",
+                    Surface = "#1B1226",
+                    SurfaceHover = "#28183A",
+                    Border = "#3A2850",
 
-                    Text = "#F4F4F5",
-                    MutedText = "#A1A1AA",
+                    Text = "#F7F2FC",
+                    MutedText = "#B8A9C7",
 
-                    Accent = "#8B5CF6"
+                    Accent = "#A855F7"
                 }
         };
     }
+
+
+    // ============================================================
+    // THEME PALETTE
+    // ============================================================
 
     private sealed class ThemePalette
     {

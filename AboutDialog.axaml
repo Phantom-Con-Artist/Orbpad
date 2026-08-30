@@ -2,36 +2,204 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Orbpad.AboutDialog"
         Title="About Orbpad"
-        Width="420"
-        Height="270"
-        MinWidth="420"
-        MinHeight="270"
+        Width="560"
+        Height="560"
+        MinWidth="560"
+        MinHeight="560"
         Background="{DynamicResource OrbpadBackgroundBrush}">
 
     <Border Padding="30"
             Background="{DynamicResource OrbpadBackgroundBrush}">
 
-        <StackPanel Spacing="16">
+        <Grid RowDefinitions="Auto,*,Auto"
+              RowSpacing="20">
 
-            <TextBlock Text="Orbpad"
-                       FontSize="30"
-                       Foreground="{DynamicResource OrbpadTextBrush}"/>
+            <!-- ================================================= -->
+            <!-- HEADER                                             -->
+            <!-- ================================================= -->
 
-            <TextBlock Text="A lightweight text editor built with C#, .NET, and Avalonia."
-                       TextWrapping="Wrap"
-                       Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
+            <StackPanel Grid.Row="0"
+                        Spacing="6">
 
-            <TextBlock Text="Version 0.1.0"
-                       Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
+                <TextBlock Text="Orbpad"
+                           FontSize="32"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource OrbpadTextBrush}"/>
 
-            <Border Height="1"
-                    Background="{DynamicResource OrbpadBorderBrush}"/>
+                <TextBlock Text="A lightweight, focused desktop text editor for plain text, source code, and Markdown."
+                           FontSize="14"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
 
-            <Button Content="Close"
-                    HorizontalAlignment="Right"
-                    Click="Close_Click"/>
+                <TextBlock Text="Version 1.0.0  •  August 2026"
+                           Margin="0,6,0,0"
+                           FontSize="12"
+                           Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
 
-        </StackPanel>
+            </StackPanel>
+
+
+            <!-- ================================================= -->
+            <!-- CONTENT                                             -->
+            <!-- ================================================= -->
+
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+
+                <StackPanel Spacing="18">
+
+                    <!-- ========================================= -->
+                    <!-- ABOUT                                        -->
+                    <!-- ========================================= -->
+
+                    <StackPanel Spacing="6">
+
+                        <TextBlock Text="About Orbpad"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource OrbpadTextBrush}"/>
+
+                        <TextBlock Text="Orbpad is a lightweight desktop text editor designed for focused writing and everyday work with plain text, source code, and Markdown. It combines a clean editing environment with practical features while keeping the application simple and responsive."
+                                   FontSize="13"
+                                   LineHeight="20"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource OrbpadTextBrush}"/>
+
+                    </StackPanel>
+
+
+                    <!-- ========================================= -->
+                    <!-- FEATURES                                     -->
+                    <!-- ========================================= -->
+
+                    <StackPanel Spacing="6">
+
+                        <TextBlock Text="Features"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource OrbpadTextBrush}"/>
+
+                        <TextBlock Text="• Plain-text editing&#x0a;• Markdown editing and preview&#x0a;• Syntax highlighting&#x0a;• Multiple document tabs&#x0a;• File Explorer&#x0a;• Resizable and hideable Explorer&#x0a;• Find and Replace&#x0a;• Drag-and-drop file opening&#x0a;• Multiple editor themes&#x0a;• Font and editor display controls&#x0a;• Image viewing&#x0a;• Recent files&#x0a;• Windows Open With integration"
+                                   FontSize="13"
+                                   LineHeight="20"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource OrbpadTextBrush}"/>
+
+                    </StackPanel>
+
+
+                    <!-- ========================================= -->
+                    <!-- TECHNOLOGY                                   -->
+                    <!-- ========================================= -->
+
+                    <StackPanel Spacing="6">
+
+                        <TextBlock Text="Built With"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource OrbpadTextBrush}"/>
+
+                        <TextBlock Text=".NET 10&#x0a;Avalonia UI&#x0a;AvaloniaEdit&#x0a;TextMate&#x0a;Markdig"
+                                   FontSize="13"
+                                   LineHeight="20"
+                                   Foreground="{DynamicResource OrbpadTextBrush}"/>
+
+                    </StackPanel>
+
+
+                    <!-- ========================================= -->
+                    <!-- DEVELOPER                                    -->
+                    <!-- ========================================= -->
+
+                    <StackPanel Spacing="6">
+
+                        <TextBlock Text="Developer"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource OrbpadTextBrush}"/>
+
+                        <TextBlock Text="Phantom Con Artist"
+                                   FontSize="14"
+                                   Foreground="{DynamicResource OrbpadTextBrush}"/>
+
+                        <TextBlock Text="Original developer and maintainer of Orbpad."
+                                   FontSize="12"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
+
+                    </StackPanel>
+
+
+                    <!-- ========================================= -->
+                    <!-- LICENSE                                      -->
+                    <!-- ========================================= -->
+
+                    <StackPanel Spacing="6">
+
+                        <TextBlock Text="License"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource OrbpadTextBrush}"/>
+
+                        <TextBlock Text="Orbpad is distributed under the MIT License."
+                                   FontSize="13"
+                                   Foreground="{DynamicResource OrbpadTextBrush}"/>
+
+                        <TextBlock Text="Copyright © 2026 Phantom Con Artist."
+                                   FontSize="12"
+                                   Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
+
+
+                        <Border Margin="0,8,0,0"
+                                Padding="12"
+                                Background="{DynamicResource OrbpadSurfaceBrush}"
+                                BorderBrush="{DynamicResource OrbpadBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6">
+
+                            <TextBlock Text="MIT License&#x0a;&#x0a;Copyright (c) 2026 Phantom Con Artist&#x0a;&#x0a;Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:&#x0a;&#x0a;The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.&#x0a;&#x0a;THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+                                       FontSize="11"
+                                       LineHeight="17"
+                                       TextWrapping="Wrap"
+                                       Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
+
+                        </Border>
+
+                    </StackPanel>
+
+
+                    <!-- ========================================= -->
+                    <!-- COPYRIGHT                                    -->
+                    <!-- ========================================= -->
+
+                    <TextBlock Text="Orbpad v1.0.0 • Windows"
+                               FontSize="11"
+                               Foreground="{DynamicResource OrbpadMutedTextBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,4,0,4"/>
+
+                </StackPanel>
+
+            </ScrollViewer>
+
+
+            <!-- ================================================= -->
+            <!-- FOOTER                                             -->
+            <!-- ================================================= -->
+
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8">
+
+                <Button Content="Close"
+                        MinWidth="80"
+                        Click="Close_Click"/>
+
+            </StackPanel>
+
+        </Grid>
 
     </Border>
 

@@ -10,6 +10,7 @@ public partial class AboutDialog : Window
         InitializeComponent();
     }
 
+
     private void Close_Click(
         object? sender,
         RoutedEventArgs e)

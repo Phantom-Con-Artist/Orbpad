@@ -4,6 +4,7 @@
         xmlns:Markdown="clr-namespace:Orbpad.Markdown"
         x:Class="Orbpad.MainWindow"
         Title="Orbpad"
+        Icon="/Assets/Orbpad.ico"
         Width="1000"
         Height="700"
         MinWidth="600"
@@ -130,6 +131,7 @@
 
                     <Separator/>
 
+
                     <!-- ================================================= -->
                     <!-- FONT                                                -->
                     <!-- ================================================= -->
@@ -230,18 +232,27 @@
 
                     <MenuItem Header="_Themes">
 
+                        <!-- Orbpad Purple -->
+                        <MenuItem x:Name="PurpleThemeMenuItem"
+                                  Header="Orbpad _Purple ✓"
+                                  Click="PurpleTheme_Click"/>
+
+                        <!-- Orbpad Dark -->
                         <MenuItem x:Name="DarkThemeMenuItem"
-                                  Header="Orbpad _Dark ✓"
+                                  Header="Orbpad _Dark"
                                   Click="DarkTheme_Click"/>
 
+                        <!-- Midnight -->
                         <MenuItem x:Name="MidnightThemeMenuItem"
                                   Header="_Midnight"
                                   Click="MidnightTheme_Click"/>
 
+                        <!-- Forest -->
                         <MenuItem x:Name="ForestThemeMenuItem"
                                   Header="_Forest"
                                   Click="ForestTheme_Click"/>
 
+                        <!-- Light -->
                         <MenuItem x:Name="LightThemeMenuItem"
                                   Header="_Light"
                                   Click="LightTheme_Click"/>
@@ -342,6 +353,7 @@
 
                 </ScrollViewer>
 
+
                 <Button Grid.Column="1"
                         Content="+"
                         Width="42"
@@ -369,6 +381,8 @@
             <Grid RowDefinitions="Auto,Auto"
                   RowSpacing="6">
 
+                <!-- Find -->
+
                 <Grid Grid.Row="0"
                       ColumnDefinitions="*,Auto,Auto,Auto"
                       ColumnSpacing="6">
@@ -392,6 +406,8 @@
 
                 </Grid>
 
+
+                <!-- Replace -->
 
                 <Grid Grid.Row="1"
                       ColumnDefinitions="*,Auto,Auto"

@@ -1,23 +1,86 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
+
+    <!-- Application -->
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\Orbpad.ico</ApplicationIcon>
   </PropertyGroup>
 
+
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="12.1.1" />
-    <PackageReference Include="Avalonia.AvaloniaEdit" Version="12.0.0" />
-    <PackageReference Include="Avalonia.Controls.WebView" Version="12.1.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.1.1" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.1" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.1" />
-    <PackageReference Include="AvaloniaEdit.TextMate" Version="12.0.0" />
-    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
-      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+
+    <!-- ======================================================== -->
+    <!-- AVALONIA RESOURCES                                      -->
+    <!-- ======================================================== -->
+
+    <AvaloniaResource Include="Assets\Orbpad.ico" />
+
+
+    <!-- ======================================================== -->
+    <!-- AVALONIA                                                -->
+    <!-- ======================================================== -->
+
+    <PackageReference Include="Avalonia"
+                      Version="12.1.1" />
+
+    <PackageReference Include="Avalonia.Desktop"
+                      Version="12.1.1" />
+
+    <PackageReference Include="Avalonia.Themes.Fluent"
+                      Version="12.1.1" />
+
+    <PackageReference Include="Avalonia.Fonts.Inter"
+                      Version="12.1.1" />
+
+
+    <!-- ======================================================== -->
+    <!-- EDITOR                                                   -->
+    <!-- ======================================================== -->
+
+    <PackageReference Include="Avalonia.AvaloniaEdit"
+                      Version="12.0.0" />
+
+    <PackageReference Include="AvaloniaEdit.TextMate"
+                      Version="12.0.0" />
+
+
+    <!-- ======================================================== -->
+    <!-- WEB                                                       -->
+    <!-- ======================================================== -->
+
+    <PackageReference Include="Avalonia.Controls.WebView"
+                      Version="12.1.0" />
+
+
+    <!-- ======================================================== -->
+    <!-- MARKDOWN                                                  -->
+    <!-- ======================================================== -->
+
+    <PackageReference Include="Markdig"
+                      Version="1.3.2" />
+
+
+    <!-- ======================================================== -->
+    <!-- DIAGNOSTICS                                               -->
+    <!-- ======================================================== -->
+
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport"
+                      Version="2.2.3">
+
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">
+        None
+      </IncludeAssets>
+
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">
+        All
+      </PrivateAssets>
+
     </PackageReference>
-    <PackageReference Include="Markdig" Version="1.3.2" />
+
   </ItemGroup>
+
 </Project>
