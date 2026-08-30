@@ -45,6 +45,7 @@ Orbpad ships as a self-contained Windows x64 application — no separate .NET ru
 - [Project Structure](#project-structure)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
+- [The Orbis Ecosystem](#the-orbis-ecosystem)
 - [License](#license)
 - [Developer](#developer)
 
@@ -295,6 +296,45 @@ Issues and pull requests are welcome. If you're planning a larger change, please
 4. Push to your branch and open a pull request
 
 ---
+
+---
+
+## The Orbis Ecosystem
+
+Orbpad is the first application in the planned **Orbis Ecosystem**.
+
+The long-term vision of Orbis is to provide a general-purpose structured information platform built around entities, relationships, documents, events, schemas, metadata, and time.
+
+Rather than treating information as isolated files, Orbis is designed to make data highly connected and traversable as a graph.
+
+### Planned Components
+
+#### Orbis Core
+
+The underlying foundation of the ecosystem.
+
+Orbis Core is planned to provide:
+
+- Entity and object models
+- Schemas
+- Relationships
+- Temporal relationships
+- Events and timelines
+- Serialization and storage
+- Validation
+- Query and traversal capabilities
+
+#### Orbpad
+
+The document and authoring environment.
+
+Planned future integration includes native support for:
+
+```text
+.entity
+.bundle
+.lore
+.orb
 
 ## License
 
