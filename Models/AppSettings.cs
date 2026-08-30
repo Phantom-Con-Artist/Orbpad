@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Orbpad.Models;
 
 public class AppSettings
@@ -46,4 +48,12 @@ public class AppSettings
     public int? WindowX { get; set; }
 
     public int? WindowY { get; set; }
+
+
+    // ============================================================
+    // RECENT FILES
+    // ============================================================
+
+    public List<string> RecentFiles { get; set; } =
+        new();
 }

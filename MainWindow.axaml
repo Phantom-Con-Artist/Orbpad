@@ -23,7 +23,9 @@
 
             <Menu Background="Transparent">
 
-                <!-- File -->
+                <!-- ================= -->
+                <!-- File                -->
+                <!-- ================= -->
 
                 <MenuItem Header="_File">
 
@@ -37,6 +39,11 @@
 
                     <MenuItem Header="Open _Image..."
                               Click="OpenImage_Click"/>
+
+                    <Separator/>
+
+                    <MenuItem x:Name="RecentFilesMenuItem"
+                              Header="_Recent Files"/>
 
                     <Separator/>
 
@@ -56,7 +63,9 @@
                 </MenuItem>
 
 
-                <!-- Edit -->
+                <!-- ================= -->
+                <!-- Edit                -->
+                <!-- ================= -->
 
                 <MenuItem Header="_Edit">
 
@@ -91,7 +100,9 @@
                 </MenuItem>
 
 
-                <!-- View -->
+                <!-- ================= -->
+                <!-- View                -->
+                <!-- ================= -->
 
                 <MenuItem Header="_View">
 
@@ -112,6 +123,77 @@
                               Click="Toolbar_Click"/>
 
                     <Separator/>
+
+                    <!-- ================= -->
+                    <!-- Font                -->
+                    <!-- ================= -->
+
+                    <MenuItem Header="_Font">
+
+                        <MenuItem x:Name="InterFontMenuItem"
+                                  Header="Inter ✓"
+                                  Click="InterFont_Click"/>
+
+                        <MenuItem x:Name="SegoeUIFontMenuItem"
+                                  Header="Segoe UI"
+                                  Click="SegoeUIFont_Click"/>
+
+                        <MenuItem x:Name="ConsolasFontMenuItem"
+                                  Header="Consolas"
+                                  Click="ConsolasFont_Click"/>
+
+                        <MenuItem x:Name="CourierNewFontMenuItem"
+                                  Header="Courier New"
+                                  Click="CourierNewFont_Click"/>
+
+                    </MenuItem>
+
+
+                    <!-- ================= -->
+                    <!-- Font Size           -->
+                    <!-- ================= -->
+
+                    <MenuItem Header="Font _Size">
+
+                        <MenuItem x:Name="FontSize10MenuItem"
+                                  Header="10"
+                                  Click="FontSize10_Click"/>
+
+                        <MenuItem x:Name="FontSize12MenuItem"
+                                  Header="12"
+                                  Click="FontSize12_Click"/>
+
+                        <MenuItem x:Name="FontSize14MenuItem"
+                                  Header="14"
+                                  Click="FontSize14_Click"/>
+
+                        <MenuItem x:Name="FontSize16MenuItem"
+                                  Header="16 ✓"
+                                  Click="FontSize16_Click"/>
+
+                        <MenuItem x:Name="FontSize18MenuItem"
+                                  Header="18"
+                                  Click="FontSize18_Click"/>
+
+                        <MenuItem x:Name="FontSize20MenuItem"
+                                  Header="20"
+                                  Click="FontSize20_Click"/>
+
+                        <MenuItem x:Name="FontSize24MenuItem"
+                                  Header="24"
+                                  Click="FontSize24_Click"/>
+
+                        <MenuItem x:Name="FontSize28MenuItem"
+                                  Header="28"
+                                  Click="FontSize28_Click"/>
+
+                    </MenuItem>
+
+                    <Separator/>
+
+                    <!-- ================= -->
+                    <!-- Themes              -->
+                    <!-- ================= -->
 
                     <MenuItem Header="_Themes">
 
@@ -136,7 +218,9 @@
                 </MenuItem>
 
 
-                <!-- Help -->
+                <!-- ================= -->
+                <!-- Help                -->
+                <!-- ================= -->
 
                 <MenuItem Header="_Help">
 

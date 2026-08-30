@@ -25,6 +25,8 @@ public partial class MainWindow : Window
     private readonly Dictionary<Document, Button>
         _documentButtons = new();
 
+    private const int MaxRecentFiles = 10;
+
     // ============================================================
     // EDITOR SELECTION STATE
     // ============================================================
@@ -85,6 +87,7 @@ public partial class MainWindow : Window
         RefreshTabs();
         UpdateThemeMenu();
         UpdateViewMenu();
+        UpdateRecentFilesMenu();
 
         SaveEditorSelection();
     }
@@ -564,25 +567,288 @@ public partial class MainWindow : Window
             return;
         }
 
-        var document =
-            _documentManager.CreateDocument();
-
-        document.Text =
-            _fileService.ReadFile(
-                filePath);
-
-        document.FilePath =
-            filePath;
-
-        document.MarkAsSaved();
-
-        LoadDocumentIntoEditor(
-            document);
-
-        RefreshTabs();
-        UpdateWindowTitle();
-        UpdateStatusBar();
+        OpenTextFile(filePath);
     }
+
+    private void OpenTextFile(
+        string filePath)
+    {
+        try
+        {
+            string fullPath =
+                System.IO.Path.GetFullPath(
+                    filePath);
+
+            if (!System.IO.File.Exists(
+                    fullPath))
+            {
+                RemoveRecentFile(fullPath);
+
+                return;
+            }
+
+            var document =
+                _documentManager.CreateDocument();
+
+            document.Text =
+                _fileService.ReadFile(
+                    fullPath);
+
+            document.FilePath =
+                fullPath;
+
+            document.MarkAsSaved();
+
+            LoadDocumentIntoEditor(
+                document);
+
+            RefreshTabs();
+            UpdateWindowTitle();
+            UpdateStatusBar();
+
+            AddRecentFile(fullPath);
+        }
+        catch
+        {
+            RemoveRecentFile(filePath);
+        }
+    }
+
+    // ============================================================
+    // RECENT FILES
+    // ============================================================
+
+    private void AddRecentFile(
+        string filePath)
+    {
+        if (string.IsNullOrWhiteSpace(
+                filePath))
+        {
+            return;
+        }
+
+        string fullPath;
+
+        try
+        {
+            fullPath =
+                System.IO.Path.GetFullPath(
+                    filePath);
+        }
+        catch
+        {
+            return;
+        }
+
+        if (_settings.RecentFiles is null)
+        {
+            _settings.RecentFiles =
+                new List<string>();
+        }
+
+        for (int i =
+                 _settings.RecentFiles.Count - 1;
+             i >= 0;
+             i--)
+        {
+            if (string.Equals(
+                    _settings.RecentFiles[i],
+                    fullPath,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                _settings.RecentFiles.RemoveAt(i);
+            }
+        }
+
+        _settings.RecentFiles.Insert(
+            0,
+            fullPath);
+
+        while (_settings.RecentFiles.Count >
+               MaxRecentFiles)
+        {
+            _settings.RecentFiles.RemoveAt(
+                _settings.RecentFiles.Count - 1);
+        }
+
+        UpdateRecentFilesMenu();
+
+        SaveCurrentSettings();
+    }
+
+    private void RemoveRecentFile(
+        string filePath)
+    {
+        if (_settings.RecentFiles is null)
+            return;
+
+        for (int i =
+                 _settings.RecentFiles.Count - 1;
+             i >= 0;
+             i--)
+        {
+            if (string.Equals(
+                    _settings.RecentFiles[i],
+                    filePath,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                _settings.RecentFiles.RemoveAt(i);
+            }
+        }
+
+        UpdateRecentFilesMenu();
+
+        SaveCurrentSettings();
+    }
+
+    private void UpdateRecentFilesMenu()
+    {
+        RecentFilesMenuItem.Items.Clear();
+
+        if (_settings.RecentFiles is null)
+        {
+            _settings.RecentFiles =
+                new List<string>();
+        }
+
+        var validFiles =
+            new List<string>();
+
+        foreach (var filePath
+                 in _settings.RecentFiles)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    filePath))
+            {
+                continue;
+            }
+
+            if (!System.IO.File.Exists(
+                    filePath))
+            {
+                continue;
+            }
+
+            bool duplicate =
+                false;
+
+            foreach (var existingPath
+                     in validFiles)
+            {
+                if (string.Equals(
+                        existingPath,
+                        filePath,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    duplicate =
+                        true;
+
+                    break;
+                }
+            }
+
+            if (!duplicate)
+            {
+                validFiles.Add(
+                    filePath);
+            }
+
+            if (validFiles.Count >=
+                MaxRecentFiles)
+            {
+                break;
+            }
+        }
+
+        _settings.RecentFiles.Clear();
+
+        foreach (var filePath
+                 in validFiles)
+        {
+            _settings.RecentFiles.Add(
+                filePath);
+        }
+
+        if (_settings.RecentFiles.Count == 0)
+        {
+            RecentFilesMenuItem.Items.Add(
+                new MenuItem
+                {
+                    Header =
+                        "No recent files",
+
+                    IsEnabled =
+                        false
+                });
+
+            return;
+        }
+
+        foreach (var filePath
+                 in _settings.RecentFiles)
+        {
+            var menuItem =
+                new MenuItem
+                {
+                    Header =
+                        System.IO.Path.GetFileName(
+                            filePath),
+
+                    Tag =
+                        filePath
+                };
+
+            menuItem.Click +=
+                RecentFile_Click;
+
+            RecentFilesMenuItem.Items.Add(
+                menuItem);
+        }
+
+        RecentFilesMenuItem.Items.Add(
+            new Separator());
+
+        var clearItem =
+            new MenuItem
+            {
+                Header =
+                    "Clear Recent Files"
+            };
+
+        clearItem.Click +=
+            ClearRecentFiles_Click;
+
+        RecentFilesMenuItem.Items.Add(
+            clearItem);
+    }
+
+    private void RecentFile_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        if (sender is not MenuItem menuItem)
+            return;
+
+        if (menuItem.Tag is not string filePath)
+            return;
+
+        OpenTextFile(filePath);
+    }
+
+    private void ClearRecentFiles_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        _settings.RecentFiles.Clear();
+
+        UpdateRecentFilesMenu();
+
+        SaveCurrentSettings();
+    }
+
+    // ============================================================
+    // IMAGE OPENING
+    // ============================================================
 
     private async void OpenImage_Click(
         object? sender,
@@ -805,6 +1071,228 @@ public partial class MainWindow : Window
     }
 
     // ============================================================
+    // FONT CONTROLS
+    // ============================================================
+
+    private void InterFont_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFont("Inter");
+    }
+
+    private void SegoeUIFont_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFont("Segoe UI");
+    }
+
+    private void ConsolasFont_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFont("Consolas");
+    }
+
+    private void CourierNewFont_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFont("Courier New");
+    }
+
+    private void SetEditorFont(
+        string fontName)
+    {
+        Editor.FontFamily =
+            new FontFamily(
+                fontName);
+
+        UpdateFontMenu();
+
+        SaveCurrentSettings();
+    }
+
+    private void FontSize10_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFontSize(10);
+    }
+
+    private void FontSize12_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFontSize(12);
+    }
+
+    private void FontSize14_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFontSize(14);
+    }
+
+    private void FontSize16_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFontSize(16);
+    }
+
+    private void FontSize18_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFontSize(18);
+    }
+
+    private void FontSize20_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFontSize(20);
+    }
+
+    private void FontSize24_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFontSize(24);
+    }
+
+    private void FontSize28_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        SetEditorFontSize(28);
+    }
+
+    private void SetEditorFontSize(
+        double fontSize)
+    {
+        Editor.FontSize =
+            fontSize;
+
+        UpdateFontMenu();
+
+        SaveCurrentSettings();
+    }
+
+    // ============================================================
+    // VIEW MENU STATE
+    // ============================================================
+
+    private void UpdateViewMenu()
+    {
+        WordWrapMenuItem.Header =
+            Editor.WordWrap
+                ? "_Word Wrap ✓"
+                : "_Word Wrap";
+
+        StatusBarMenuItem.Header =
+            StatusBar.IsVisible
+                ? "_Show Status Bar ✓"
+                : "_Show Status Bar";
+
+        LineNumbersMenuItem.Header =
+            Editor.ShowLineNumbers
+                ? "_Show Line Numbers ✓"
+                : "_Show Line Numbers";
+
+        ToolbarMenuItem.Header =
+            Toolbar.IsVisible
+                ? "_Show Toolbar ✓"
+                : "_Show Toolbar";
+
+        UpdateFontMenu();
+    }
+
+    private void UpdateFontMenu()
+    {
+        string currentFont =
+            Editor.FontFamily?.Name
+            ?? "Inter";
+
+        InterFontMenuItem.Header =
+            string.Equals(
+                currentFont,
+                "Inter",
+                StringComparison.OrdinalIgnoreCase)
+                ? "Inter ✓"
+                : "Inter";
+
+        SegoeUIFontMenuItem.Header =
+            string.Equals(
+                currentFont,
+                "Segoe UI",
+                StringComparison.OrdinalIgnoreCase)
+                ? "Segoe UI ✓"
+                : "Segoe UI";
+
+        ConsolasFontMenuItem.Header =
+            string.Equals(
+                currentFont,
+                "Consolas",
+                StringComparison.OrdinalIgnoreCase)
+                ? "Consolas ✓"
+                : "Consolas";
+
+        CourierNewFontMenuItem.Header =
+            string.Equals(
+                currentFont,
+                "Courier New",
+                StringComparison.OrdinalIgnoreCase)
+                ? "Courier New ✓"
+                : "Courier New";
+
+        SetFontSizeMenuHeader(
+            FontSize10MenuItem,
+            10);
+
+        SetFontSizeMenuHeader(
+            FontSize12MenuItem,
+            12);
+
+        SetFontSizeMenuHeader(
+            FontSize14MenuItem,
+            14);
+
+        SetFontSizeMenuHeader(
+            FontSize16MenuItem,
+            16);
+
+        SetFontSizeMenuHeader(
+            FontSize18MenuItem,
+            18);
+
+        SetFontSizeMenuHeader(
+            FontSize20MenuItem,
+            20);
+
+        SetFontSizeMenuHeader(
+            FontSize24MenuItem,
+            24);
+
+        SetFontSizeMenuHeader(
+            FontSize28MenuItem,
+            28);
+    }
+
+    private void SetFontSizeMenuHeader(
+        MenuItem menuItem,
+        double size)
+    {
+        menuItem.Header =
+            Math.Abs(
+                Editor.FontSize - size) < 0.1
+                ? $"{size:0} ✓"
+                : $"{size:0}";
+    }
+
+    // ============================================================
     // THEMES
     // ============================================================
 
@@ -862,10 +1350,6 @@ public partial class MainWindow : Window
 
     private void ApplySavedSettings()
     {
-        // ========================================================
-        // THEME
-        // ========================================================
-
         if (Enum.TryParse<
                 ThemeManager.OrbpadTheme>(
                 _settings.Theme,
@@ -881,10 +1365,6 @@ public partial class MainWindow : Window
                 ThemeManager.OrbpadTheme.Dark);
         }
 
-        // ========================================================
-        // VIEW
-        // ========================================================
-
         Toolbar.IsVisible =
             _settings.ShowToolbar;
 
@@ -896,10 +1376,6 @@ public partial class MainWindow : Window
 
         Editor.WordWrap =
             _settings.WordWrap;
-
-        // ========================================================
-        // EDITOR
-        // ========================================================
 
         if (!string.IsNullOrWhiteSpace(
                 _settings.FontFamily))
@@ -914,10 +1390,6 @@ public partial class MainWindow : Window
             Editor.FontSize =
                 _settings.FontSize;
         }
-
-        // ========================================================
-        // WINDOW
-        // ========================================================
 
         Width =
             Math.Max(
@@ -939,35 +1411,8 @@ public partial class MainWindow : Window
         }
     }
 
-    private void UpdateViewMenu()
-    {
-        WordWrapMenuItem.Header =
-            Editor.WordWrap
-                ? "_Word Wrap ✓"
-                : "_Word Wrap";
-
-        StatusBarMenuItem.Header =
-            StatusBar.IsVisible
-                ? "_Show Status Bar ✓"
-                : "_Show Status Bar";
-
-        LineNumbersMenuItem.Header =
-            Editor.ShowLineNumbers
-                ? "_Show Line Numbers ✓"
-                : "_Show Line Numbers";
-
-        ToolbarMenuItem.Header =
-            Toolbar.IsVisible
-                ? "_Show Toolbar ✓"
-                : "_Show Toolbar";
-    }
-
     private void SaveCurrentSettings()
     {
-        // ========================================================
-        // APPEARANCE
-        // ========================================================
-
         _settings.Theme =
             ThemeManager.CurrentTheme.ToString();
 
@@ -980,10 +1425,6 @@ public partial class MainWindow : Window
         _settings.ShowLineNumbers =
             Editor.ShowLineNumbers;
 
-        // ========================================================
-        // EDITOR
-        // ========================================================
-
         _settings.WordWrap =
             Editor.WordWrap;
 
@@ -993,10 +1434,6 @@ public partial class MainWindow : Window
 
         _settings.FontSize =
             Editor.FontSize;
-
-        // ========================================================
-        // WINDOW
-        // ========================================================
 
         _settings.WindowWidth =
             Width;
@@ -1009,10 +1446,6 @@ public partial class MainWindow : Window
 
         _settings.WindowY =
             Position.Y;
-
-        // ========================================================
-        // SAVE
-        // ========================================================
 
         _settingsService.Save(
             _settings);
@@ -1112,7 +1545,8 @@ public partial class MainWindow : Window
 
             if (previousDocument is not null)
             {
-                bool stillExists = false;
+                bool stillExists =
+                    false;
 
                 foreach (var existingDocument
                          in _documentManager.Documents)
@@ -1210,6 +1644,9 @@ public partial class MainWindow : Window
             filePath;
 
         SaveCurrentDocument();
+
+        AddRecentFile(
+            filePath);
 
         return true;
     }
@@ -1555,7 +1992,8 @@ public partial class MainWindow : Window
 
         try
         {
-            for (int i = matchOffsets.Count - 1;
+            for (int i =
+                     matchOffsets.Count - 1;
                  i >= 0;
                  i--)
             {
