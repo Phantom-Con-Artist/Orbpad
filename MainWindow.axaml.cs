@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Orbpad.Managers;
 using Orbpad.Models;
 using Orbpad.Services;
 
@@ -11,7 +12,7 @@ namespace Orbpad;
 
 public partial class MainWindow : Window
 {
-    private Document _document;
+    private readonly DocumentManager _documentManager;
     private readonly FileService _fileService;
 
     private bool _isUpdatingEditor;
@@ -20,12 +21,28 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        _document = new Document();
+        _documentManager = new DocumentManager();
         _fileService = new FileService();
+
+        CreateInitialDocument();
 
         Editor.PropertyChanged += Editor_PropertyChanged;
 
+        UpdateWindowTitle();
         UpdateStatusBar();
+    }
+
+    private void CreateInitialDocument()
+    {
+        var document =
+            _documentManager.CreateDocument();
+
+        _isUpdatingEditor = true;
+
+        Editor.Text =
+            document.Text;
+
+        _isUpdatingEditor = false;
     }
 
     private async void New_Click(
@@ -35,10 +52,14 @@ public partial class MainWindow : Window
         if (!await ConfirmDiscardChangesAsync())
             return;
 
-        _document = new Document();
+        var document =
+            _documentManager.CreateDocument();
 
         _isUpdatingEditor = true;
-        Editor.Text = _document.Text;
+
+        Editor.Text =
+            document.Text;
+
         _isUpdatingEditor = false;
 
         UpdateWindowTitle();
@@ -65,17 +86,28 @@ public partial class MainWindow : Window
 
         var file = files[0];
 
-        if (file.TryGetLocalPath() is not string filePath)
+        if (file.TryGetLocalPath()
+            is not string filePath)
+        {
             return;
+        }
 
-        _document.Text =
+        var document =
+            _documentManager.CreateDocument();
+
+        document.Text =
             _fileService.ReadFile(filePath);
 
-        _document.FilePath = filePath;
-        _document.IsModified = false;
+        document.FilePath =
+            filePath;
+
+        document.IsModified = false;
 
         _isUpdatingEditor = true;
-        Editor.Text = _document.Text;
+
+        Editor.Text =
+            document.Text;
+
         _isUpdatingEditor = false;
 
         UpdateWindowTitle();
@@ -86,7 +118,13 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
-        if (_document.FilePath is null)
+        var document =
+            _documentManager.ActiveDocument;
+
+        if (document is null)
+            return;
+
+        if (document.FilePath is null)
         {
             _ = SaveAsAsync();
             return;
@@ -106,7 +144,8 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
-        if (_document.IsModified)
+        if (_documentManager.ActiveDocument?.IsModified
+            == true)
         {
             _ = ConfirmExitAsync();
             return;
@@ -236,18 +275,28 @@ public partial class MainWindow : Window
                 break;
             }
 
-            result += text[currentIndex..index];
+            result +=
+                text[currentIndex..index];
 
             currentIndex =
                 index + searchText.Length;
         }
 
         _isUpdatingEditor = true;
-        Editor.Text = result;
+
+        Editor.Text =
+            result;
+
         _isUpdatingEditor = false;
 
-        _document.Text = result;
-        _document.IsModified = true;
+        var document =
+            _documentManager.ActiveDocument;
+
+        if (document is not null)
+        {
+            document.Text = result;
+            document.IsModified = true;
+        }
 
         UpdateWindowTitle();
         UpdateStatusBar();
@@ -256,9 +305,11 @@ public partial class MainWindow : Window
     private void ShowSearchBar()
     {
         SearchBar.IsVisible = true;
+
         SearchBox.Focus();
 
-        if (!string.IsNullOrEmpty(Editor.SelectedText))
+        if (!string.IsNullOrEmpty(
+                Editor.SelectedText))
         {
             SearchBox.Text =
                 Editor.SelectedText;
@@ -297,7 +348,9 @@ public partial class MainWindow : Window
         if (index < 0)
             return;
 
-        Editor.SelectionStart = index;
+        Editor.SelectionStart =
+            index;
+
         Editor.SelectionEnd =
             index + searchText.Length;
 
@@ -322,7 +375,8 @@ public partial class MainWindow : Window
             Editor.SelectionStart - 1;
 
         if (startIndex < 0)
-            startIndex = text.Length - 1;
+            startIndex =
+                text.Length - 1;
 
         int index =
             text.LastIndexOf(
@@ -342,7 +396,9 @@ public partial class MainWindow : Window
         if (index < 0)
             return;
 
-        Editor.SelectionStart = index;
+        Editor.SelectionStart =
+            index;
+
         Editor.SelectionEnd =
             index + searchText.Length;
 
@@ -356,10 +412,17 @@ public partial class MainWindow : Window
         if (_isUpdatingEditor)
             return;
 
-        _document.Text =
+        var document =
+            _documentManager.ActiveDocument;
+
+        if (document is null)
+            return;
+
+        document.Text =
             Editor.Text ?? string.Empty;
 
-        _document.IsModified = true;
+        document.IsModified =
+            true;
 
         UpdateWindowTitle();
         UpdateStatusBar();
@@ -378,6 +441,12 @@ public partial class MainWindow : Window
 
     private async Task SaveAsAsync()
     {
+        var document =
+            _documentManager.ActiveDocument;
+
+        if (document is null)
+            return;
+
         var file =
             await StorageProvider.SaveFilePickerAsync(
                 new FilePickerSaveOptions
@@ -385,16 +454,25 @@ public partial class MainWindow : Window
                     Title = "Save File",
                     SuggestedFileName = "Untitled.txt",
                     DefaultExtension = "txt",
+
                     FileTypeChoices =
                     [
-                        new FilePickerFileType("Text File")
+                        new FilePickerFileType(
+                            "Text File")
                         {
-                            Patterns = ["*.txt"]
+                            Patterns =
+                            [
+                                "*.txt"
+                            ]
                         },
 
-                        new FilePickerFileType("All Files")
+                        new FilePickerFileType(
+                            "All Files")
                         {
-                            Patterns = ["*"]
+                            Patterns =
+                            [
+                                "*"
+                            ]
                         }
                     ]
                 });
@@ -402,46 +480,67 @@ public partial class MainWindow : Window
         if (file is null)
             return;
 
-        if (file.TryGetLocalPath() is not string filePath)
+        if (file.TryGetLocalPath()
+            is not string filePath)
+        {
             return;
+        }
 
-        _document.FilePath = filePath;
+        document.FilePath =
+            filePath;
 
         SaveCurrentDocument();
     }
 
     private void SaveCurrentDocument()
     {
-        if (_document.FilePath is null)
+        var document =
+            _documentManager.ActiveDocument;
+
+        if (document is null ||
+            document.FilePath is null)
+        {
             return;
+        }
 
         var content =
             Editor.Text ?? string.Empty;
 
         _fileService.WriteFile(
-            _document.FilePath,
+            document.FilePath,
             content);
 
-        _document.Text = content;
-        _document.IsModified = false;
+        document.Text =
+            content;
+
+        document.IsModified =
+            false;
 
         UpdateWindowTitle();
         UpdateStatusBar();
     }
 
-    private async Task<bool> ConfirmDiscardChangesAsync()
+    private async Task<bool>
+        ConfirmDiscardChangesAsync()
     {
-        if (!_document.IsModified)
-            return true;
+        var document =
+            _documentManager.ActiveDocument;
 
-        var dialog = new ConfirmDialog();
+        if (document is null ||
+            !document.IsModified)
+        {
+            return true;
+        }
+
+        var dialog =
+            new ConfirmDialog();
 
         var result =
             await dialog.ShowDialog<bool?>(this);
 
         if (result == true)
         {
-            if (_document.FilePath is null)
+            if (document.FilePath is null)
             {
                 await SaveAsAsync();
             }
@@ -450,7 +549,7 @@ public partial class MainWindow : Window
                 SaveCurrentDocument();
             }
 
-            return !_document.IsModified;
+            return !document.IsModified;
         }
 
         if (result == false)
@@ -472,9 +571,18 @@ public partial class MainWindow : Window
 
     private void UpdateWindowTitle()
     {
+        var document =
+            _documentManager.ActiveDocument;
+
+        if (document is null)
+        {
+            Title = "Orbpad";
+            return;
+        }
+
         string fileName;
 
-        if (_document.FilePath is null)
+        if (document.FilePath is null)
         {
             fileName = "Untitled";
         }
@@ -482,11 +590,11 @@ public partial class MainWindow : Window
         {
             fileName =
                 System.IO.Path.GetFileName(
-                    _document.FilePath);
+                    document.FilePath);
         }
 
         string modifiedMarker =
-            _document.IsModified
+            document.IsModified
                 ? " *"
                 : string.Empty;
 
@@ -543,7 +651,8 @@ public partial class MainWindow : Window
                 : "characters")}";
     }
 
-    private static int CountWords(string text)
+    private static int CountWords(
+        string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return 0;

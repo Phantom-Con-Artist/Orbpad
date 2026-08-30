@@ -27,26 +27,24 @@ public class DocumentManager
     public void SetActiveDocument(Document document)
     {
         if (!_documents.Contains(document))
+        {
             throw new InvalidOperationException(
                 "The document is not managed by this DocumentManager.");
+        }
 
         ActiveDocument = document;
     }
 
     public bool RemoveDocument(Document document)
     {
-        bool removed =
-            _documents.Remove(document);
-
-        if (!removed)
+        if (!_documents.Remove(document))
             return false;
 
         if (ActiveDocument == document)
         {
             if (_documents.Count > 0)
             {
-                ActiveDocument =
-                    _documents[^1];
+                ActiveDocument = _documents[^1];
             }
             else
             {
