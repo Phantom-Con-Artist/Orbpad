@@ -7,44 +7,98 @@
 
         <FluentTheme />
 
-        <!-- Orbpad Global Styles -->
+        <!-- ========================= -->
+        <!-- Window                      -->
+        <!-- ========================= -->
 
         <Style Selector="Window">
             <Setter Property="Background"
-                    Value="#121214"/>
+                    Value="{DynamicResource OrbpadBackgroundBrush}"/>
+
             <Setter Property="Foreground"
-                    Value="#F4F4F5"/>
+                    Value="{DynamicResource OrbpadTextBrush}"/>
         </Style>
+
+
+        <!-- ========================= -->
+        <!-- Menu                       -->
+        <!-- ========================= -->
 
         <Style Selector="Menu">
             <Setter Property="Background"
-                    Value="#19191C"/>
+                    Value="{DynamicResource OrbpadSurfaceBrush}"/>
+
             <Setter Property="Foreground"
-                    Value="#F4F4F5"/>
+                    Value="{DynamicResource OrbpadTextBrush}"/>
         </Style>
+
+        <Style Selector="MenuItem">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource OrbpadTextBrush}"/>
+        </Style>
+
+
+        <!-- ========================= -->
+        <!-- Buttons                    -->
+        <!-- ========================= -->
+
+        <Style Selector="Button">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource OrbpadTextBrush}"/>
+
+            <Setter Property="Background"
+                    Value="{DynamicResource OrbpadSurfaceBrush}"/>
+        </Style>
+
+        <Style Selector="Button:pointerover">
+            <Setter Property="Background"
+                    Value="{DynamicResource OrbpadSurfaceHoverBrush}"/>
+        </Style>
+
+        <Style Selector="Button:pressed">
+            <Setter Property="Background"
+                    Value="{DynamicResource OrbpadAccentBrush}"/>
+        </Style>
+
+
+        <!-- ========================= -->
+        <!-- Editor                     -->
+        <!-- ========================= -->
 
         <Style Selector="TextBox">
             <Setter Property="Background"
-                    Value="#121214"/>
+                    Value="{DynamicResource OrbpadBackgroundBrush}"/>
+
             <Setter Property="Foreground"
-                    Value="#F4F4F5"/>
+                    Value="{DynamicResource OrbpadTextBrush}"/>
+
             <Setter Property="FontFamily"
                     Value="Inter"/>
+
             <Setter Property="FontSize"
                     Value="16"/>
         </Style>
 
+
+        <!-- ========================= -->
+        <!-- Text                       -->
+        <!-- ========================= -->
+
         <Style Selector="TextBlock">
             <Setter Property="Foreground"
-                    Value="#A1A1AA"/>
+                    Value="{DynamicResource OrbpadMutedTextBrush}"/>
         </Style>
 
     </Application.Styles>
 
+
+    <!-- ============================= -->
+    <!-- Orbpad Theme Resources        -->
+    <!-- ============================= -->
+
     <Application.Resources>
 
-        <!-- Orbpad Resources -->
-
+        <!-- Main -->
         <SolidColorBrush x:Key="OrbpadBackgroundBrush"
                          Color="#121214"/>
 
@@ -52,17 +106,19 @@
                          Color="#19191C"/>
 
         <SolidColorBrush x:Key="OrbpadSurfaceHoverBrush"
-                         Color="#252529"/>
+                         Color="#25252B"/>
 
         <SolidColorBrush x:Key="OrbpadBorderBrush"
                          Color="#303036"/>
 
+        <!-- Text -->
         <SolidColorBrush x:Key="OrbpadTextBrush"
                          Color="#F4F4F5"/>
 
         <SolidColorBrush x:Key="OrbpadMutedTextBrush"
                          Color="#A1A1AA"/>
 
+        <!-- Accent -->
         <SolidColorBrush x:Key="OrbpadAccentBrush"
                          Color="#8B5CF6"/>
 

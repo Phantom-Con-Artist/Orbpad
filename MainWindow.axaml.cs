@@ -21,6 +21,16 @@ public partial class MainWindow : Window
     private readonly Dictionary<Document, Button>
         _documentButtons = new();
 
+    // Remembers the last real selection/caret position in the Editor.
+    // Clicking a menu item moves focus away from the Editor, which
+    // collapses its live selection — these fields let us restore it
+    // right before running a Cut/Copy/Paste command from the menu.
+    private int _lastKnownSelectionStart;
+
+    private int _lastKnownSelectionEnd;
+
+    private int _lastKnownCaretIndex;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -39,6 +49,7 @@ public partial class MainWindow : Window
         UpdateWindowTitle();
         UpdateStatusBar();
         RefreshTabs();
+        UpdateThemeMenu();
     }
 
     // ============================================================
@@ -230,8 +241,8 @@ public partial class MainWindow : Window
             new Border
             {
                 Background =
-                    new SolidColorBrush(
-                        Color.Parse("#202023")),
+                    GetThemeBrush(
+                        "OrbpadSurfaceBrush"),
 
                 CornerRadius =
                     new CornerRadius(5),
@@ -318,6 +329,19 @@ public partial class MainWindow : Window
         return container;
     }
 
+    private IBrush GetThemeBrush(
+        string resourceKey)
+    {
+        if (Application.Current is not null &&
+            Application.Current.Resources[resourceKey]
+                is IBrush brush)
+        {
+            return brush;
+        }
+
+        return Brushes.Transparent;
+    }
+
     private void UpdateTabAppearance()
     {
         foreach (var pair
@@ -328,11 +352,11 @@ public partial class MainWindow : Window
                 _documentManager.ActiveDocument;
 
             pair.Value.Background =
-                new SolidColorBrush(
-                    Color.Parse(
-                        isActive
-                            ? "#2A2A2E"
-                            : "#202023"));
+                isActive
+                    ? GetThemeBrush(
+                        "OrbpadSurfaceHoverBrush")
+                    : GetThemeBrush(
+                        "OrbpadSurfaceBrush");
         }
     }
 
@@ -508,6 +532,111 @@ public partial class MainWindow : Window
         UpdateStatusBar();
     }
 
+    private async void OpenImage_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        var files =
+            await StorageProvider
+                .OpenFilePickerAsync(
+                    new FilePickerOpenOptions
+                    {
+                        Title = "Open Image",
+                        AllowMultiple = false,
+
+                        FileTypeFilter =
+                        [
+                            FilePickerFileTypes.ImageAll
+                        ]
+                    });
+
+        if (files.Count == 0)
+            return;
+
+        var file =
+            files[0];
+
+        try
+        {
+            await using var stream =
+                await file.OpenReadAsync();
+
+            var bitmap =
+                new Avalonia.Media.Imaging.Bitmap(
+                    stream);
+
+            string title =
+                file.Name;
+
+            var imageWindow =
+                new ImageViewerWindow(
+                    bitmap,
+                    title);
+
+            await imageWindow.ShowDialog(
+                this);
+        }
+        catch (Exception ex)
+        {
+            var errorDialog =
+                new Window
+                {
+                    Title = "Unable to Open Image",
+                    Width = 450,
+                    Height = 220,
+                    WindowStartupLocation =
+                        WindowStartupLocation.CenterOwner
+                };
+
+            var panel =
+                new StackPanel
+                {
+                    Margin =
+                        new Thickness(24),
+                    Spacing = 16
+                };
+
+            panel.Children.Add(
+                new TextBlock
+                {
+                    Text =
+                        "Orbpad could not open this image.",
+                    FontSize = 18
+                });
+
+            panel.Children.Add(
+                new TextBlock
+                {
+                    Text = ex.Message,
+                    TextWrapping =
+                        TextWrapping.Wrap
+                });
+
+            var closeButton =
+                new Button
+                {
+                    Content = "Close",
+                    HorizontalAlignment =
+                        Avalonia.Layout.HorizontalAlignment.Right
+                };
+
+            closeButton.Click +=
+                (_, _) =>
+                {
+                    errorDialog.Close();
+                };
+
+            panel.Children.Add(
+                closeButton);
+
+            errorDialog.Content =
+                panel;
+
+            await errorDialog.ShowDialog(
+                this);
+        }
+    }
+
     private void Save_Click(
         object? sender,
         RoutedEventArgs e)
@@ -539,6 +668,131 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         _ = ExitApplicationAsync();
+    }
+
+    // ============================================================
+    // VIEW
+    // ============================================================
+
+    private void WordWrap_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        if (Editor.TextWrapping ==
+            TextWrapping.NoWrap)
+        {
+            Editor.TextWrapping =
+                TextWrapping.Wrap;
+
+            WordWrapMenuItem.Header =
+                "_Word Wrap ✓";
+        }
+        else
+        {
+            Editor.TextWrapping =
+                TextWrapping.NoWrap;
+
+            WordWrapMenuItem.Header =
+                "_Word Wrap";
+        }
+    }
+
+    private void StatusBar_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        StatusBar.IsVisible =
+            !StatusBar.IsVisible;
+
+        StatusBarMenuItem.Header =
+            StatusBar.IsVisible
+                ? "_Show Status Bar ✓"
+                : "_Show Status Bar";
+    }
+
+    // ============================================================
+    // THEMES
+    // ============================================================
+
+    private void DarkTheme_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        ThemeManager.ApplyTheme(
+            ThemeManager.OrbpadTheme.Dark);
+
+        RefreshTabs();
+        UpdateThemeMenu();
+    }
+
+    private void MidnightTheme_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        ThemeManager.ApplyTheme(
+            ThemeManager.OrbpadTheme.Midnight);
+
+        RefreshTabs();
+        UpdateThemeMenu();
+    }
+
+    private void ForestTheme_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        ThemeManager.ApplyTheme(
+            ThemeManager.OrbpadTheme.Forest);
+
+        RefreshTabs();
+        UpdateThemeMenu();
+    }
+
+    private void LightTheme_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        ThemeManager.ApplyTheme(
+            ThemeManager.OrbpadTheme.Light);
+
+        RefreshTabs();
+        UpdateThemeMenu();
+    }
+
+    private void UpdateThemeMenu()
+    {
+        DarkThemeMenuItem.Header =
+            ThemeManager.CurrentTheme ==
+            ThemeManager.OrbpadTheme.Dark
+                ? "Orbpad _Dark ✓"
+                : "Orbpad _Dark";
+
+        MidnightThemeMenuItem.Header =
+            ThemeManager.CurrentTheme ==
+            ThemeManager.OrbpadTheme.Midnight
+                ? "_Midnight ✓"
+                : "_Midnight";
+
+        ForestThemeMenuItem.Header =
+            ThemeManager.CurrentTheme ==
+            ThemeManager.OrbpadTheme.Forest
+                ? "_Forest ✓"
+                : "_Forest";
+
+        LightThemeMenuItem.Header =
+            ThemeManager.CurrentTheme ==
+            ThemeManager.OrbpadTheme.Light
+                ? "_Light ✓"
+                : "_Light";
+    }
+
+    private async void About_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        var dialog =
+            new AboutDialog();
+
+        await dialog.ShowDialog(this);
     }
 
     // ============================================================
@@ -631,7 +885,8 @@ public partial class MainWindow : Window
         return true;
     }
 
-    private async Task<bool> SaveAsAsync()
+    private async Task<bool>
+        SaveAsAsync()
     {
         var document =
             _documentManager.ActiveDocument;
@@ -780,6 +1035,8 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        RestoreEditorSelection();
+
         Editor.Cut();
         UpdateStatusBar();
     }
@@ -788,6 +1045,8 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        RestoreEditorSelection();
+
         Editor.Copy();
     }
 
@@ -795,6 +1054,8 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        RestoreEditorSelection();
+
         Editor.Paste();
         UpdateStatusBar();
     }
@@ -1058,7 +1319,51 @@ public partial class MainWindow : Window
         if (e.Property ==
             TextBox.CaretIndexProperty)
         {
+            _lastKnownCaretIndex =
+                Editor.CaretIndex;
+
             UpdateStatusBar();
+        }
+        else if (e.Property == TextBox.SelectionStartProperty ||
+                 e.Property == TextBox.SelectionEndProperty)
+        {
+            // Only remember a genuine, non-empty selection. Losing
+            // focus collapses SelectionStart/SelectionEnd to the same
+            // value, and we don't want that momentary collapse to
+            // stomp on the real selection the user made.
+            if (Editor.SelectionStart !=
+                Editor.SelectionEnd)
+            {
+                _lastKnownSelectionStart =
+                    Editor.SelectionStart;
+
+                _lastKnownSelectionEnd =
+                    Editor.SelectionEnd;
+            }
+        }
+    }
+
+    // Restores focus and the last known selection (or caret position)
+    // to the Editor. Call this immediately before Cut/Copy/Paste when
+    // the command may have been triggered from a menu, since opening
+    // the menu moves focus off the Editor and collapses its selection.
+    private void RestoreEditorSelection()
+    {
+        Editor.Focus();
+
+        if (_lastKnownSelectionStart !=
+            _lastKnownSelectionEnd)
+        {
+            Editor.SelectionStart =
+                _lastKnownSelectionStart;
+
+            Editor.SelectionEnd =
+                _lastKnownSelectionEnd;
+        }
+        else
+        {
+            Editor.CaretIndex =
+                _lastKnownCaretIndex;
         }
     }
 

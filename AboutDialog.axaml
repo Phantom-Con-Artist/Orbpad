@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Orbpad.AboutDialog"
+        Title="About Orbpad"
+        Width="420"
+        Height="270"
+        MinWidth="420"
+        MinHeight="270"
+        Background="{DynamicResource OrbpadBackgroundBrush}">
+
+    <Border Padding="30"
+            Background="{DynamicResource OrbpadBackgroundBrush}">
+
+        <StackPanel Spacing="16">
+
+            <TextBlock Text="Orbpad"
+                       FontSize="30"
+                       Foreground="{DynamicResource OrbpadTextBrush}"/>
+
+            <TextBlock Text="A lightweight text editor built with C#, .NET, and Avalonia."
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
+
+            <TextBlock Text="Version 0.1.0"
+                       Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
+
+            <Border Height="1"
+                    Background="{DynamicResource OrbpadBorderBrush}"/>
+
+            <Button Content="Close"
+                    HorizontalAlignment="Right"
+                    Click="Close_Click"/>
+
+        </StackPanel>
+
+    </Border>
+
+</Window>

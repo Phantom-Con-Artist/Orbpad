@@ -1,0 +1,112 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Orbpad.ImageViewerWindow"
+        Title="Image"
+        Width="1000"
+        Height="700"
+        MinWidth="500"
+        MinHeight="350"
+        Background="{DynamicResource OrbpadBackgroundBrush}">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- ============================================= -->
+        <!-- IMAGE VIEWER                                  -->
+        <!-- ============================================= -->
+
+        <Border Grid.Row="0"
+                Margin="12"
+                CornerRadius="8"
+                Background="{DynamicResource OrbpadSurfaceBrush}"
+                BorderBrush="{DynamicResource OrbpadBorderBrush}"
+                BorderThickness="1">
+
+            <ScrollViewer x:Name="ImageScrollViewer"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          AllowAutoHide="True"
+                          SizeChanged="ImageScrollViewer_SizeChanged">
+
+                <Canvas x:Name="ImageCanvas">
+
+                    <Image x:Name="ImagePreview"
+                           Stretch="Uniform"
+                           RenderOptions.BitmapInterpolationMode="HighQuality"
+                           PointerWheelChanged="ImagePreview_PointerWheelChanged"/>
+
+                </Canvas>
+
+            </ScrollViewer>
+
+        </Border>
+
+
+        <!-- ============================================= -->
+        <!-- TOOLBAR                                       -->
+        <!-- ============================================= -->
+
+        <Border Grid.Row="1"
+                Background="{DynamicResource OrbpadSurfaceBrush}"
+                BorderBrush="{DynamicResource OrbpadBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="12,8">
+
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                  ColumnSpacing="8">
+
+                <TextBlock x:Name="ImageInfoText"
+                           Grid.Column="0"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource OrbpadMutedTextBrush}"/>
+
+                <Button Grid.Column="1"
+                        Content="−"
+                        Width="38"
+                        Height="34"
+                        Click="ZoomOut_Click"/>
+
+                <Button Grid.Column="2"
+                        x:Name="ZoomPercentageButton"
+                        Content="100%"
+                        Width="65"
+                        Height="34"
+                        Click="ResetZoom_Click"/>
+
+                <Button Grid.Column="3"
+                        Content="+"
+                        Width="38"
+                        Height="34"
+                        Click="ZoomIn_Click"/>
+
+                <Button Grid.Column="4"
+                        Content="Fit"
+                        Height="34"
+                        Click="FitToWindow_Click"/>
+
+                <Button Grid.Column="5"
+                        Content="50%"
+                        Height="34"
+                        Click="Zoom50_Click"/>
+
+                <Button Grid.Column="6"
+                        Content="100%"
+                        Height="34"
+                        Click="Zoom100_Click"/>
+
+                <Button Grid.Column="7"
+                        Content="200%"
+                        Height="34"
+                        Click="Zoom200_Click"/>
+
+                <Button Grid.Column="8"
+                        Content="Close"
+                        Height="34"
+                        Click="Close_Click"/>
+
+            </Grid>
+
+        </Border>
+
+    </Grid>
+
+</Window>

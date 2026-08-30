@@ -22,6 +22,10 @@
 
             <Menu Background="Transparent">
 
+                <!-- ================= -->
+                <!-- File                -->
+                <!-- ================= -->
+
                 <MenuItem Header="_File">
 
                     <MenuItem Header="_New"
@@ -31,6 +35,9 @@
                     <MenuItem Header="_Open..."
                               Click="Open_Click"
                               HotKey="Ctrl+O"/>
+
+                    <MenuItem Header="Open _Image..."
+                              Click="OpenImage_Click"/>
 
                     <Separator/>
 
@@ -48,6 +55,11 @@
                               Click="Exit_Click"/>
 
                 </MenuItem>
+
+
+                <!-- ================= -->
+                <!-- Edit                -->
+                <!-- ================= -->
 
                 <MenuItem Header="_Edit">
 
@@ -81,9 +93,56 @@
 
                 </MenuItem>
 
-                <MenuItem Header="_View"/>
 
-                <MenuItem Header="_Help"/>
+                <!-- ================= -->
+                <!-- View                -->
+                <!-- ================= -->
+
+                <MenuItem Header="_View">
+
+                    <MenuItem x:Name="WordWrapMenuItem"
+                              Header="_Word Wrap"
+                              Click="WordWrap_Click"/>
+
+                    <MenuItem x:Name="StatusBarMenuItem"
+                              Header="_Show Status Bar ✓"
+                              Click="StatusBar_Click"/>
+
+                    <Separator/>
+
+                    <MenuItem Header="_Themes">
+
+                        <MenuItem x:Name="DarkThemeMenuItem"
+                                  Header="Orbpad _Dark ✓"
+                                  Click="DarkTheme_Click"/>
+
+                        <MenuItem x:Name="MidnightThemeMenuItem"
+                                  Header="_Midnight"
+                                  Click="MidnightTheme_Click"/>
+
+                        <MenuItem x:Name="ForestThemeMenuItem"
+                                  Header="_Forest"
+                                  Click="ForestTheme_Click"/>
+
+                        <MenuItem x:Name="LightThemeMenuItem"
+                                  Header="_Light"
+                                  Click="LightTheme_Click"/>
+
+                    </MenuItem>
+
+                </MenuItem>
+
+
+                <!-- ================= -->
+                <!-- Help                -->
+                <!-- ================= -->
+
+                <MenuItem Header="_Help">
+
+                    <MenuItem Header="_About Orbpad..."
+                              Click="About_Click"/>
+
+                </MenuItem>
 
             </Menu>
 
@@ -216,7 +275,8 @@
         <!-- Status Bar                 -->
         <!-- ========================= -->
 
-        <Border DockPanel.Dock="Bottom"
+        <Border x:Name="StatusBar"
+                DockPanel.Dock="Bottom"
                 Background="{DynamicResource OrbpadSurfaceBrush}"
                 BorderBrush="{DynamicResource OrbpadBorderBrush}"
                 BorderThickness="0,1,0,0"
