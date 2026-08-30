@@ -297,8 +297,6 @@ Issues and pull requests are welcome. If you're planning a larger change, please
 
 ---
 
----
-
 ## The Orbis Ecosystem
 
 Orbpad is the first application in the planned **Orbis Ecosystem**.
