@@ -117,8 +117,7 @@ public partial class MainWindow : Window
         int index)
     {
         var document =
-            _documentManager.GetDocumentAt(
-                index);
+            _documentManager.GetDocumentAt(index);
 
         if (document is null)
             return;
@@ -146,8 +145,7 @@ public partial class MainWindow : Window
         var document =
             _documentManager.CreateDocument();
 
-        LoadDocumentIntoEditor(
-            document);
+        LoadDocumentIntoEditor(document);
     }
 
     private void NewTab_Click(
@@ -162,8 +160,7 @@ public partial class MainWindow : Window
         var document =
             _documentManager.CreateDocument();
 
-        LoadDocumentIntoEditor(
-            document);
+        LoadDocumentIntoEditor(document);
 
         RefreshTabs();
         UpdateWindowTitle();
@@ -186,8 +183,7 @@ public partial class MainWindow : Window
         _documentManager.SetActiveDocument(
             document);
 
-        LoadDocumentIntoEditor(
-            document);
+        LoadDocumentIntoEditor(document);
 
         UpdateWindowTitle();
         UpdateStatusBar();
@@ -1043,6 +1039,7 @@ public partial class MainWindow : Window
         {
             UpdateWindowTitle();
             RefreshTabs();
+
             return;
         }
 
