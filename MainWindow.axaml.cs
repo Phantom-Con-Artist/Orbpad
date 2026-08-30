@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Orbpad.Managers;
 using Orbpad.Models;
@@ -17,6 +19,9 @@ public partial class MainWindow : Window
 
     private bool _isUpdatingEditor;
 
+    private readonly Dictionary<Document, Button>
+        _documentButtons = new();
+
     public MainWindow()
     {
         InitializeComponent();
@@ -26,7 +31,8 @@ public partial class MainWindow : Window
 
         CreateInitialDocument();
 
-        Editor.PropertyChanged += Editor_PropertyChanged;
+        Editor.PropertyChanged +=
+            Editor_PropertyChanged;
 
         UpdateWindowTitle();
         UpdateStatusBar();
@@ -64,40 +70,253 @@ public partial class MainWindow : Window
     private void RefreshTabs()
     {
         TabPanel.Children.Clear();
+        _documentButtons.Clear();
 
         foreach (var document
                  in _documentManager.Documents)
         {
-            var button =
-                CreateTabButton(document);
+            var tab =
+                CreateTab(document);
 
-            TabPanel.Children.Add(button);
+            TabPanel.Children.Add(tab);
         }
 
         UpdateTabAppearance();
     }
 
-    private Button CreateTabButton(
+    private Border CreateTab(
         Document document)
     {
-        string title =
-            GetDocumentTitle(document);
-
-        var button =
-            new Button
+        var container =
+            new Border
             {
-                Content = title,
-                Padding = new Thickness(14, 7),
-                Margin = new Thickness(0)
+                Background =
+                    new SolidColorBrush(
+                        Color.Parse("#202023")),
+
+                CornerRadius =
+                    new CornerRadius(5),
+
+                Padding =
+                    new Thickness(4, 2),
+
+                Margin =
+                    new Thickness(0)
             };
 
-        button.Click +=
+        var grid =
+            new Grid
+            {
+                ColumnDefinitions =
+                    new ColumnDefinitions(
+                        "Auto,Auto")
+            };
+
+        var documentButton =
+            new Button
+            {
+                Content =
+                    GetDocumentTitle(document),
+
+                Background =
+                    Brushes.Transparent,
+
+                BorderThickness =
+                    new Thickness(0),
+
+                Padding =
+                    new Thickness(10, 6)
+            };
+
+        documentButton.Click +=
             (_, _) =>
             {
                 SwitchToDocument(document);
             };
 
-        return button;
+        var closeButton =
+            new Button
+            {
+                Content = "×",
+
+                Background =
+                    Brushes.Transparent,
+
+                BorderThickness =
+                    new Thickness(0),
+
+                Padding =
+                    new Thickness(7, 4)
+            };
+
+        closeButton.Click +=
+            async (_, _) =>
+            {
+                await CloseDocumentAsync(
+                    document);
+            };
+
+        Grid.SetColumn(
+            documentButton,
+            0);
+
+        Grid.SetColumn(
+            closeButton,
+            1);
+
+        grid.Children.Add(
+            documentButton);
+
+        grid.Children.Add(
+            closeButton);
+
+        container.Child =
+            grid;
+
+        _documentButtons[document] =
+            documentButton;
+
+        return container;
+    }
+
+    private async Task CloseDocumentAsync(
+        Document document)
+    {
+        if (document.IsModified)
+        {
+            var result =
+                await ShowCloseConfirmationAsync(
+                    document);
+
+            if (result ==
+                CloseDocumentResult.Cancel)
+            {
+                return;
+            }
+
+            if (result ==
+                CloseDocumentResult.Save)
+            {
+                bool saved =
+                    await SaveDocumentAsync(
+                        document);
+
+                if (!saved)
+                    return;
+            }
+        }
+
+        bool wasActive =
+            _documentManager.ActiveDocument ==
+            document;
+
+        _documentManager.RemoveDocument(
+            document);
+
+        if (_documentManager.Documents.Count == 0)
+        {
+            var newDocument =
+                _documentManager.CreateDocument();
+
+            LoadDocumentIntoEditor(
+                newDocument);
+        }
+        else if (wasActive)
+        {
+            var activeDocument =
+                _documentManager.ActiveDocument;
+
+            if (activeDocument is not null)
+            {
+                LoadDocumentIntoEditor(
+                    activeDocument);
+            }
+        }
+
+        RefreshTabs();
+
+        UpdateWindowTitle();
+        UpdateStatusBar();
+    }
+
+    private async Task<CloseDocumentResult>
+        ShowCloseConfirmationAsync(
+            Document document)
+    {
+        var dialog =
+            new ConfirmDialog();
+
+        var result =
+            await dialog.ShowDialog<bool?>(
+                this);
+
+        if (result == true)
+        {
+            return CloseDocumentResult.Save;
+        }
+
+        if (result == false)
+        {
+            return CloseDocumentResult.DontSave;
+        }
+
+        return CloseDocumentResult.Cancel;
+    }
+
+    private async Task<bool>
+        SaveDocumentAsync(
+            Document document)
+    {
+        if (document.FilePath is null)
+        {
+            var previousDocument =
+                _documentManager.ActiveDocument;
+
+            _documentManager.SetActiveDocument(
+                document);
+
+            LoadDocumentIntoEditor(
+                document);
+
+            bool saved =
+                await SaveAsAsync();
+
+            if (previousDocument is not null)
+            {
+                bool stillExists = false;
+
+                foreach (var existingDocument
+                         in _documentManager.Documents)
+                {
+                    if (existingDocument ==
+                        previousDocument)
+                    {
+                        stillExists = true;
+                        break;
+                    }
+                }
+
+                if (stillExists)
+                {
+                    _documentManager.SetActiveDocument(
+                        previousDocument);
+
+                    LoadDocumentIntoEditor(
+                        previousDocument);
+                }
+            }
+
+            return saved;
+        }
+
+        _fileService.WriteFile(
+            document.FilePath,
+            document.Text);
+
+        document.IsModified =
+            false;
+
+        return true;
     }
 
     private void SwitchToDocument(
@@ -112,7 +331,8 @@ public partial class MainWindow : Window
         _documentManager.SetActiveDocument(
             document);
 
-        LoadDocumentIntoEditor(document);
+        LoadDocumentIntoEditor(
+            document);
 
         UpdateWindowTitle();
         UpdateStatusBar();
@@ -162,43 +382,19 @@ public partial class MainWindow : Window
 
     private void UpdateTabAppearance()
     {
-        foreach (var child
-                 in TabPanel.Children)
+        foreach (var pair
+                 in _documentButtons)
         {
-            if (child is not Button button)
-                continue;
+            bool isActive =
+                pair.Key ==
+                _documentManager.ActiveDocument;
 
-            button.Background =
-                new Avalonia.Media.SolidColorBrush(
-                    Avalonia.Media.Color.Parse(
-                        "#202023"));
-        }
-
-        var activeDocument =
-            _documentManager.ActiveDocument;
-
-        if (activeDocument is null)
-            return;
-
-        foreach (var child
-                 in TabPanel.Children)
-        {
-            if (child is not Button button)
-                continue;
-
-            string title =
-                GetDocumentTitle(activeDocument);
-
-            if (button.Content?.ToString() ==
-                title)
-            {
-                button.Background =
-                    new Avalonia.Media.SolidColorBrush(
-                        Avalonia.Media.Color.Parse(
-                            "#2A2A2E"));
-
-                break;
-            }
+            pair.Value.Background =
+                new SolidColorBrush(
+                    Color.Parse(
+                        isActive
+                            ? "#2A2A2E"
+                            : "#202023"));
         }
     }
 
@@ -292,11 +488,28 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
-        if (_documentManager.ActiveDocument?
-            .IsModified == true)
+        _ = ExitApplicationAsync();
+    }
+
+    private async Task ExitApplicationAsync()
+    {
+        foreach (var document
+                 in _documentManager.Documents)
         {
-            _ = ConfirmExitAsync();
-            return;
+            if (!document.IsModified)
+                continue;
+
+            _documentManager.SetActiveDocument(
+                document);
+
+            LoadDocumentIntoEditor(
+                document);
+
+            var shouldContinue =
+                await ConfirmDiscardChangesAsync();
+
+            if (!shouldContinue)
+                return;
         }
 
         Close();
@@ -360,7 +573,9 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
-        SearchBar.IsVisible = false;
+        SearchBar.IsVisible =
+            false;
+
         Editor.Focus();
     }
 
@@ -392,21 +607,26 @@ public partial class MainWindow : Window
         string searchText =
             SearchBox.Text ?? string.Empty;
 
-        if (string.IsNullOrEmpty(searchText))
+        if (string.IsNullOrEmpty(
+                searchText))
+        {
             return;
+        }
 
         string text =
             Editor.Text ?? string.Empty;
 
-        int firstIndex =
-            text.IndexOf(
+        if (text.IndexOf(
                 searchText,
-                StringComparison.OrdinalIgnoreCase);
-
-        if (firstIndex < 0)
+                StringComparison.OrdinalIgnoreCase)
+            < 0)
+        {
             return;
+        }
 
-        string result = string.Empty;
+        string result =
+            string.Empty;
+
         int currentIndex = 0;
 
         while (true)
@@ -419,11 +639,14 @@ public partial class MainWindow : Window
 
             if (index < 0)
             {
-                result += text[currentIndex..];
+                result +=
+                    text[currentIndex..];
+
                 break;
             }
 
-            result += text[currentIndex..index];
+            result +=
+                text[currentIndex..index];
 
             currentIndex =
                 index + searchText.Length;
@@ -431,7 +654,8 @@ public partial class MainWindow : Window
 
         _isUpdatingEditor = true;
 
-        Editor.Text = result;
+        Editor.Text =
+            result;
 
         _isUpdatingEditor = false;
 
@@ -440,8 +664,11 @@ public partial class MainWindow : Window
 
         if (document is not null)
         {
-            document.Text = result;
-            document.IsModified = true;
+            document.Text =
+                result;
+
+            document.IsModified =
+                true;
         }
 
         UpdateWindowTitle();
@@ -451,7 +678,8 @@ public partial class MainWindow : Window
 
     private void ShowSearchBar()
     {
-        SearchBar.IsVisible = true;
+        SearchBar.IsVisible =
+            true;
 
         SearchBox.Focus();
 
@@ -468,8 +696,11 @@ public partial class MainWindow : Window
         string searchText =
             SearchBox.Text ?? string.Empty;
 
-        if (string.IsNullOrEmpty(searchText))
+        if (string.IsNullOrEmpty(
+                searchText))
+        {
             return;
+        }
 
         string text =
             Editor.Text ?? string.Empty;
@@ -509,8 +740,11 @@ public partial class MainWindow : Window
         string searchText =
             SearchBox.Text ?? string.Empty;
 
-        if (string.IsNullOrEmpty(searchText))
+        if (string.IsNullOrEmpty(
+                searchText))
+        {
             return;
+        }
 
         string text =
             Editor.Text ?? string.Empty;
@@ -522,8 +756,10 @@ public partial class MainWindow : Window
             Editor.SelectionStart - 1;
 
         if (startIndex < 0)
+        {
             startIndex =
                 text.Length - 1;
+        }
 
         int index =
             text.LastIndexOf(
@@ -587,13 +823,13 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task SaveAsAsync()
+    private async Task<bool> SaveAsAsync()
     {
         var document =
             _documentManager.ActiveDocument;
 
         if (document is null)
-            return;
+            return false;
 
         var file =
             await StorageProvider
@@ -631,18 +867,20 @@ public partial class MainWindow : Window
                     });
 
         if (file is null)
-            return;
+            return false;
 
         if (file.TryGetLocalPath()
             is not string filePath)
         {
-            return;
+            return false;
         }
 
         document.FilePath =
             filePath;
 
         SaveCurrentDocument();
+
+        return true;
     }
 
     private void SaveCurrentDocument()
@@ -697,31 +935,18 @@ public partial class MainWindow : Window
         {
             if (document.FilePath is null)
             {
-                await SaveAsAsync();
-            }
-            else
-            {
-                SaveCurrentDocument();
+                return await SaveAsAsync();
             }
 
-            return !document.IsModified;
+            SaveCurrentDocument();
+
+            return true;
         }
 
         if (result == false)
             return true;
 
         return false;
-    }
-
-    private async Task ConfirmExitAsync()
-    {
-        var shouldContinue =
-            await ConfirmDiscardChangesAsync();
-
-        if (shouldContinue)
-        {
-            Close();
-        }
     }
 
     private void UpdateWindowTitle()
@@ -809,13 +1034,23 @@ public partial class MainWindow : Window
     private static int CountWords(
         string text)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        if (string.IsNullOrWhiteSpace(
+                text))
+        {
             return 0;
+        }
 
         return text.Split(
             (char[]?)null,
             StringSplitOptions
                 .RemoveEmptyEntries)
             .Length;
+    }
+
+    private enum CloseDocumentResult
+    {
+        Save,
+        DontSave,
+        Cancel
     }
 }
