@@ -1,0 +1,44 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Orbpad.ConfirmDialog"
+        Title="Orbpad"
+        Width="420"
+        Height="190"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid RowDefinitions="Auto,*,Auto"
+          Margin="24">
+
+        <TextBlock Text="Save Changes?"
+                   FontSize="20"
+                   FontWeight="SemiBold"/>
+
+        <TextBlock Grid.Row="1"
+                   Text="You have unsaved changes. Do you want to save them?"
+                   TextWrapping="Wrap"
+                   VerticalAlignment="Center"
+                   FontSize="14"/>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="10">
+
+            <Button Content="Save"
+                    Click="Save_Click"
+                    MinWidth="90"/>
+
+            <Button Content="Don't Save"
+                    Click="DontSave_Click"
+                    MinWidth="90"/>
+
+            <Button Content="Cancel"
+                    Click="Cancel_Click"
+                    MinWidth="90"/>
+
+        </StackPanel>
+
+    </Grid>
+
+</Window>

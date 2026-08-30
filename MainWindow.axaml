@@ -13,6 +13,7 @@
         <Menu DockPanel.Dock="Top">
 
             <MenuItem Header="_File">
+
                 <MenuItem Header="_New"
                           Click="New_Click"/>
 
@@ -29,22 +30,35 @@
 
                 <Separator/>
 
-                <MenuItem Header="E_xit"/>
+                <MenuItem Header="E_xit"
+                          Click="Exit_Click"/>
+
             </MenuItem>
 
             <MenuItem Header="_Edit">
-                <MenuItem Header="_Undo"/>
-                <MenuItem Header="_Redo"/>
+
+                <MenuItem Header="_Undo"
+                          Click="Undo_Click"/>
+
+                <MenuItem Header="_Redo"
+                          Click="Redo_Click"/>
 
                 <Separator/>
 
-                <MenuItem Header="Cu_t"/>
-                <MenuItem Header="_Copy"/>
-                <MenuItem Header="_Paste"/>
+                <MenuItem Header="Cu_t"
+                          Click="Cut_Click"/>
+
+                <MenuItem Header="_Copy"
+                          Click="Copy_Click"/>
+
+                <MenuItem Header="_Paste"
+                          Click="Paste_Click"/>
 
                 <Separator/>
 
-                <MenuItem Header="Select _All"/>
+                <MenuItem Header="Select _All"
+                          Click="SelectAll_Click"/>
+
             </MenuItem>
 
             <MenuItem Header="_View"/>
@@ -59,7 +73,8 @@
                  AcceptsTab="True"
                  TextWrapping="NoWrap"
                  FontSize="16"
-                 Padding="16"/>
+                 Padding="16"
+                 TextChanged="Editor_TextChanged"/>
 
     </DockPanel>
 
