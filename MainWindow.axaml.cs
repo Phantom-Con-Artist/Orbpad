@@ -117,7 +117,8 @@ public partial class MainWindow : Window
         int index)
     {
         var document =
-            _documentManager.GetDocumentAt(index);
+            _documentManager.GetDocumentAt(
+                index);
 
         if (document is null)
             return;
@@ -196,18 +197,6 @@ public partial class MainWindow : Window
     private void LoadDocumentIntoEditor(
         Document document)
     {
-        /*
-         * The important part:
-         *
-         * We simply load the document's text.
-         *
-         * Editor_TextChanged compares the editor
-         * contents against the document contents.
-         *
-         * Therefore loading a document does NOT
-         * automatically make it modified.
-         */
-
         Editor.Text =
             document.Text ?? string.Empty;
 
@@ -513,8 +502,7 @@ public partial class MainWindow : Window
         document.FilePath =
             filePath;
 
-        document.IsModified =
-            false;
+        document.MarkAsSaved();
 
         LoadDocumentIntoEditor(
             document);
@@ -639,8 +627,7 @@ public partial class MainWindow : Window
             document.FilePath,
             document.Text);
 
-        document.IsModified =
-            false;
+        document.MarkAsSaved();
 
         RefreshTabs();
         UpdateWindowTitle();
@@ -722,15 +709,14 @@ public partial class MainWindow : Window
         string content =
             Editor.Text ?? string.Empty;
 
-        _fileService.WriteFile(
-            document.FilePath,
-            content);
-
         document.Text =
             content;
 
-        document.IsModified =
-            false;
+        _fileService.WriteFile(
+            document.FilePath,
+            document.Text);
+
+        document.MarkAsSaved();
 
         UpdateWindowTitle();
         UpdateStatusBar();
@@ -921,22 +907,6 @@ public partial class MainWindow : Window
 
         Editor.Text =
             result;
-
-        var document =
-            _documentManager.ActiveDocument;
-
-        if (document is not null)
-        {
-            document.Text =
-                result;
-
-            document.IsModified =
-                true;
-        }
-
-        UpdateWindowTitle();
-        UpdateStatusBar();
-        RefreshTabs();
     }
 
     private void ShowSearchBar()
@@ -1068,28 +1038,16 @@ public partial class MainWindow : Window
         string editorText =
             Editor.Text ?? string.Empty;
 
-        string documentText =
-            document.Text ?? string.Empty;
-
-        /*
-         * THIS IS THE IMPORTANT FIX.
-         *
-         * If the editor already contains exactly
-         * what the active document contains,
-         * then nothing has actually changed.
-         *
-         * This happens when switching tabs.
-         */
-        if (editorText == documentText)
+        if (editorText ==
+            document.Text)
         {
+            UpdateWindowTitle();
+            RefreshTabs();
             return;
         }
 
         document.Text =
             editorText;
-
-        document.IsModified =
-            true;
 
         UpdateWindowTitle();
         UpdateStatusBar();
