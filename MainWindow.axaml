@@ -10,82 +10,126 @@
 
     <DockPanel>
 
-        <!-- ============================= -->
-        <!-- Menu                           -->
-        <!-- ============================= -->
+        <!-- Menu -->
 
-        <Menu DockPanel.Dock="Top"
-              Background="{DynamicResource OrbpadSurfaceBrush}">
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource OrbpadSurfaceBrush}"
+                BorderBrush="{DynamicResource OrbpadBorderBrush}"
+                BorderThickness="0,0,0,1">
 
-            <MenuItem Header="_File">
+            <Menu Background="Transparent">
 
-                <MenuItem Header="_New"
-                          Click="New_Click"
-                          HotKey="Ctrl+N"/>
+                <MenuItem Header="_File">
 
-                <MenuItem Header="_Open..."
-                          Click="Open_Click"
-                          HotKey="Ctrl+O"/>
+                    <MenuItem Header="_New"
+                              Click="New_Click"
+                              HotKey="Ctrl+N"/>
 
-                <Separator/>
+                    <MenuItem Header="_Open..."
+                              Click="Open_Click"
+                              HotKey="Ctrl+O"/>
 
-                <MenuItem Header="_Save"
-                          Click="Save_Click"
-                          HotKey="Ctrl+S"/>
+                    <Separator/>
 
-                <MenuItem Header="Save _As..."
-                          Click="SaveAs_Click"
-                          HotKey="Ctrl+Shift+S"/>
+                    <MenuItem Header="_Save"
+                              Click="Save_Click"
+                              HotKey="Ctrl+S"/>
 
-                <Separator/>
+                    <MenuItem Header="Save _As..."
+                              Click="SaveAs_Click"
+                              HotKey="Ctrl+Shift+S"/>
 
-                <MenuItem Header="E_xit"
-                          Click="Exit_Click"/>
+                    <Separator/>
 
-            </MenuItem>
+                    <MenuItem Header="E_xit"
+                              Click="Exit_Click"/>
 
-            <MenuItem Header="_Edit">
+                </MenuItem>
 
-                <MenuItem Header="_Undo"
-                          Click="Undo_Click"
-                          HotKey="Ctrl+Z"/>
+                <MenuItem Header="_Edit">
 
-                <MenuItem Header="_Redo"
-                          Click="Redo_Click"
-                          HotKey="Ctrl+Y"/>
+                    <MenuItem Header="_Undo"
+                              Click="Undo_Click"
+                              HotKey="Ctrl+Z"/>
 
-                <Separator/>
+                    <MenuItem Header="_Redo"
+                              Click="Redo_Click"
+                              HotKey="Ctrl+Y"/>
 
-                <MenuItem Header="Cu_t"
-                          Click="Cut_Click"
-                          HotKey="Ctrl+X"/>
+                    <Separator/>
 
-                <MenuItem Header="_Copy"
-                          Click="Copy_Click"
-                          HotKey="Ctrl+C"/>
+                    <MenuItem Header="Cu_t"
+                              Click="Cut_Click"
+                              HotKey="Ctrl+X"/>
 
-                <MenuItem Header="_Paste"
-                          Click="Paste_Click"
-                          HotKey="Ctrl+V"/>
+                    <MenuItem Header="_Copy"
+                              Click="Copy_Click"
+                              HotKey="Ctrl+C"/>
 
-                <Separator/>
+                    <MenuItem Header="_Paste"
+                              Click="Paste_Click"
+                              HotKey="Ctrl+V"/>
 
-                <MenuItem Header="Select _All"
-                          Click="SelectAll_Click"
-                          HotKey="Ctrl+A"/>
+                    <Separator/>
 
-            </MenuItem>
+                    <MenuItem Header="Select _All"
+                              Click="SelectAll_Click"
+                              HotKey="Ctrl+A"/>
 
-            <MenuItem Header="_View"/>
+                </MenuItem>
 
-            <MenuItem Header="_Help"/>
+                <MenuItem Header="_View"/>
 
-        </Menu>
+                <MenuItem Header="_Help"/>
+
+            </Menu>
+
+        </Border>
 
 
-        <!-- ============================= -->
-        <!-- Status Bar                     -->
-        <!-- ============================= -->
+        <!-- Search Bar -->
+
+        <Border x:Name="SearchBar"
+                DockPanel.Dock="Top"
+                Background="{DynamicResource OrbpadSurfaceBrush}"
+                BorderBrush="{DynamicResource OrbpadBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="10"
+                IsVisible="False">
+
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto"
+                  ColumnSpacing="6">
+
+                <TextBox x:Name="SearchBox"
+                         Grid.Column="0"
+                         PlaceholderText="Find..."/>
+
+                <Button Grid.Column="1"
+                        Content="Previous"
+                        Click="FindPrevious_Click"/>
+
+                <Button Grid.Column="2"
+                        Content="Next"
+                        Click="FindNext_Click"/>
+
+                <Button Grid.Column="3"
+                        Content="Replace"
+                        Click="Replace_Click"/>
+
+                <Button Grid.Column="4"
+                        Content="Replace All"
+                        Click="ReplaceAll_Click"/>
+
+                <Button Grid.Column="5"
+                        Content="×"
+                        Click="CloseSearch_Click"/>
+
+            </Grid>
+
+        </Border>
+
+
+        <!-- Status Bar -->
 
         <Border DockPanel.Dock="Bottom"
                 Background="{DynamicResource OrbpadSurfaceBrush}"
@@ -117,9 +161,7 @@
         </Border>
 
 
-        <!-- ============================= -->
-        <!-- Editor                         -->
-        <!-- ============================= -->
+        <!-- Editor -->
 
         <Border Background="{DynamicResource OrbpadBackgroundBrush}">
 
@@ -128,6 +170,7 @@
                      AcceptsTab="True"
                      TextWrapping="NoWrap"
                      FontSize="16"
+                     FontFamily="Inter"
                      Padding="20"
                      Background="{DynamicResource OrbpadBackgroundBrush}"
                      Foreground="{DynamicResource OrbpadTextBrush}"

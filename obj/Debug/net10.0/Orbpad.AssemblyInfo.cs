@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Orbpad")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+495fa0b2af8dc12105fe9855d0e16818f9c0a147")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d185fecd4f5fd9e5c77648a8b24507ad5dc5ae35")]
 [assembly: System.Reflection.AssemblyProductAttribute("Orbpad")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Orbpad")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
