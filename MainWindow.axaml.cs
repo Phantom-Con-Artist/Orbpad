@@ -28,7 +28,9 @@ public partial class MainWindow : Window
         UpdateStatusBar();
     }
 
-    private async void New_Click(object? sender, RoutedEventArgs e)
+    private async void New_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         if (!await ConfirmDiscardChangesAsync())
             return;
@@ -43,17 +45,20 @@ public partial class MainWindow : Window
         UpdateStatusBar();
     }
 
-    private async void Open_Click(object? sender, RoutedEventArgs e)
+    private async void Open_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         if (!await ConfirmDiscardChangesAsync())
             return;
 
-        var files = await StorageProvider.OpenFilePickerAsync(
-            new FilePickerOpenOptions
-            {
-                Title = "Open File",
-                AllowMultiple = false
-            });
+        var files =
+            await StorageProvider.OpenFilePickerAsync(
+                new FilePickerOpenOptions
+                {
+                    Title = "Open File",
+                    AllowMultiple = false
+                });
 
         if (files.Count == 0)
             return;
@@ -63,7 +68,9 @@ public partial class MainWindow : Window
         if (file.TryGetLocalPath() is not string filePath)
             return;
 
-        _document.Text = _fileService.ReadFile(filePath);
+        _document.Text =
+            _fileService.ReadFile(filePath);
+
         _document.FilePath = filePath;
         _document.IsModified = false;
 
@@ -75,7 +82,9 @@ public partial class MainWindow : Window
         UpdateStatusBar();
     }
 
-    private void Save_Click(object? sender, RoutedEventArgs e)
+    private void Save_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         if (_document.FilePath is null)
         {
@@ -86,12 +95,16 @@ public partial class MainWindow : Window
         SaveCurrentDocument();
     }
 
-    private async void SaveAs_Click(object? sender, RoutedEventArgs e)
+    private async void SaveAs_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         await SaveAsAsync();
     }
 
-    private void Exit_Click(object? sender, RoutedEventArgs e)
+    private void Exit_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         if (_document.IsModified)
         {
@@ -102,200 +115,86 @@ public partial class MainWindow : Window
         Close();
     }
 
-    private void Undo_Click(object? sender, RoutedEventArgs e)
+    private void Undo_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         Editor.Undo();
         UpdateStatusBar();
     }
 
-    private void Redo_Click(object? sender, RoutedEventArgs e)
+    private void Redo_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         Editor.Redo();
         UpdateStatusBar();
     }
 
-    private void Cut_Click(object? sender, RoutedEventArgs e)
+    private void Cut_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         Editor.Cut();
         UpdateStatusBar();
     }
 
-    private void Copy_Click(object? sender, RoutedEventArgs e)
+    private void Copy_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         Editor.Copy();
     }
 
-    private void Paste_Click(object? sender, RoutedEventArgs e)
+    private void Paste_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         Editor.Paste();
         UpdateStatusBar();
     }
 
-    private void SelectAll_Click(object? sender, RoutedEventArgs e)
+    private void SelectAll_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         Editor.SelectAll();
         UpdateStatusBar();
     }
 
-    private void Editor_TextChanged(object? sender, TextChangedEventArgs e)
-    {
-        if (_isUpdatingEditor)
-            return;
-
-        _document.Text = Editor.Text ?? string.Empty;
-        _document.IsModified = true;
-
-        UpdateWindowTitle();
-        UpdateStatusBar();
-    }
-
-    private void Editor_PropertyChanged(
+    private void Find_Click(
         object? sender,
-        AvaloniaPropertyChangedEventArgs e)
+        RoutedEventArgs e)
     {
-        if (e.Property == TextBox.CaretIndexProperty)
-        {
-            UpdateStatusBar();
-        }
+        ShowSearchBar();
     }
 
-    private void ShowSearchBar()
-    {
-        SearchBar.IsVisible = true;
-        SearchBox.Focus();
-
-        if (!string.IsNullOrEmpty(Editor.SelectedText))
-        {
-            SearchBox.Text = Editor.SelectedText;
-        }
-    }
-
-    private void CloseSearch()
+    private void CloseSearch_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         SearchBar.IsVisible = false;
         Editor.Focus();
     }
 
-    private void CloseSearch_Click(object? sender, RoutedEventArgs e)
-    {
-        CloseSearch();
-    }
-
-    private void FindNext_Click(object? sender, RoutedEventArgs e)
+    private void FindNext_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         FindNext();
     }
 
-    private void FindPrevious_Click(object? sender, RoutedEventArgs e)
+    private void FindPrevious_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
         FindPrevious();
     }
 
-    private void FindNext()
+    private void Replace_Click(
+        object? sender,
+        RoutedEventArgs e)
     {
-        string searchText = SearchBox.Text ?? string.Empty;
-
-        if (string.IsNullOrEmpty(searchText))
-            return;
-
-        string text = Editor.Text ?? string.Empty;
-
-        int startIndex = Editor.SelectionEnd;
-
-        int index = text.IndexOf(
-            searchText,
-            startIndex,
-            StringComparison.OrdinalIgnoreCase);
-
-        if (index < 0)
-        {
-            index = text.IndexOf(
-                searchText,
-                0,
-                StringComparison.OrdinalIgnoreCase);
-        }
-
-        if (index < 0)
-            return;
-
-        Editor.SelectionStart = index;
-        Editor.SelectionEnd = index + searchText.Length;
-        Editor.Focus();
-    }
-
-    private void FindPrevious()
-    {
-        string searchText = SearchBox.Text ?? string.Empty;
-
-        if (string.IsNullOrEmpty(searchText))
-            return;
-
-        string text = Editor.Text ?? string.Empty;
-
-        if (text.Length == 0)
-            return;
-
-        int startIndex = Editor.SelectionStart - 1;
-
-        if (startIndex < 0)
-            startIndex = text.Length - 1;
-
-        int index = text.LastIndexOf(
-            searchText,
-            startIndex,
-            StringComparison.OrdinalIgnoreCase);
-
-        if (index < 0)
-        {
-            index = text.LastIndexOf(
-                searchText,
-                text.Length - 1,
-                StringComparison.OrdinalIgnoreCase);
-        }
-
-        if (index < 0)
-            return;
-
-        Editor.SelectionStart = index;
-        Editor.SelectionEnd = index + searchText.Length;
-        Editor.Focus();
-    }
-
-    private void Replace_Click(object? sender, RoutedEventArgs e)
-    {
-        string searchText = SearchBox.Text ?? string.Empty;
-
-        if (string.IsNullOrEmpty(searchText))
-            return;
-
-        if (Editor.SelectedText.Equals(
-                searchText,
-                StringComparison.OrdinalIgnoreCase))
-        {
-            int selectionStart = Editor.SelectionStart;
-            string text = Editor.Text ?? string.Empty;
-
-            string newText = text.Remove(
-                selectionStart,
-                searchText.Length);
-
-            _isUpdatingEditor = true;
-            Editor.Text = newText;
-            _isUpdatingEditor = false;
-
-            Editor.SelectionStart = selectionStart;
-            Editor.SelectionEnd = selectionStart;
-
-            _document.Text = newText;
-            _document.IsModified = true;
-
-            UpdateWindowTitle();
-            UpdateStatusBar();
-
-            FindNext();
-            return;
-        }
-
         FindNext();
     }
 
@@ -303,16 +202,19 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
-        string searchText = SearchBox.Text ?? string.Empty;
+        string searchText =
+            SearchBox.Text ?? string.Empty;
 
         if (string.IsNullOrEmpty(searchText))
             return;
 
-        string text = Editor.Text ?? string.Empty;
+        string text =
+            Editor.Text ?? string.Empty;
 
-        int firstIndex = text.IndexOf(
-            searchText,
-            StringComparison.OrdinalIgnoreCase);
+        int firstIndex =
+            text.IndexOf(
+                searchText,
+                StringComparison.OrdinalIgnoreCase);
 
         if (firstIndex < 0)
             return;
@@ -322,10 +224,11 @@ public partial class MainWindow : Window
 
         while (true)
         {
-            int index = text.IndexOf(
-                searchText,
-                currentIndex,
-                StringComparison.OrdinalIgnoreCase);
+            int index =
+                text.IndexOf(
+                    searchText,
+                    currentIndex,
+                    StringComparison.OrdinalIgnoreCase);
 
             if (index < 0)
             {
@@ -334,7 +237,9 @@ public partial class MainWindow : Window
             }
 
             result += text[currentIndex..index];
-            currentIndex = index + searchText.Length;
+
+            currentIndex =
+                index + searchText.Length;
         }
 
         _isUpdatingEditor = true;
@@ -348,26 +253,151 @@ public partial class MainWindow : Window
         UpdateStatusBar();
     }
 
+    private void ShowSearchBar()
+    {
+        SearchBar.IsVisible = true;
+        SearchBox.Focus();
+
+        if (!string.IsNullOrEmpty(Editor.SelectedText))
+        {
+            SearchBox.Text =
+                Editor.SelectedText;
+        }
+    }
+
+    private void FindNext()
+    {
+        string searchText =
+            SearchBox.Text ?? string.Empty;
+
+        if (string.IsNullOrEmpty(searchText))
+            return;
+
+        string text =
+            Editor.Text ?? string.Empty;
+
+        int startIndex =
+            Editor.SelectionEnd;
+
+        int index =
+            text.IndexOf(
+                searchText,
+                startIndex,
+                StringComparison.OrdinalIgnoreCase);
+
+        if (index < 0)
+        {
+            index =
+                text.IndexOf(
+                    searchText,
+                    0,
+                    StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (index < 0)
+            return;
+
+        Editor.SelectionStart = index;
+        Editor.SelectionEnd =
+            index + searchText.Length;
+
+        Editor.Focus();
+    }
+
+    private void FindPrevious()
+    {
+        string searchText =
+            SearchBox.Text ?? string.Empty;
+
+        if (string.IsNullOrEmpty(searchText))
+            return;
+
+        string text =
+            Editor.Text ?? string.Empty;
+
+        if (text.Length == 0)
+            return;
+
+        int startIndex =
+            Editor.SelectionStart - 1;
+
+        if (startIndex < 0)
+            startIndex = text.Length - 1;
+
+        int index =
+            text.LastIndexOf(
+                searchText,
+                startIndex,
+                StringComparison.OrdinalIgnoreCase);
+
+        if (index < 0)
+        {
+            index =
+                text.LastIndexOf(
+                    searchText,
+                    text.Length - 1,
+                    StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (index < 0)
+            return;
+
+        Editor.SelectionStart = index;
+        Editor.SelectionEnd =
+            index + searchText.Length;
+
+        Editor.Focus();
+    }
+
+    private void Editor_TextChanged(
+        object? sender,
+        TextChangedEventArgs e)
+    {
+        if (_isUpdatingEditor)
+            return;
+
+        _document.Text =
+            Editor.Text ?? string.Empty;
+
+        _document.IsModified = true;
+
+        UpdateWindowTitle();
+        UpdateStatusBar();
+    }
+
+    private void Editor_PropertyChanged(
+        object? sender,
+        AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property ==
+            TextBox.CaretIndexProperty)
+        {
+            UpdateStatusBar();
+        }
+    }
+
     private async Task SaveAsAsync()
     {
-        var file = await StorageProvider.SaveFilePickerAsync(
-            new FilePickerSaveOptions
-            {
-                Title = "Save File",
-                SuggestedFileName = "Untitled.txt",
-                DefaultExtension = "txt",
-                FileTypeChoices =
-                [
-                    new FilePickerFileType("Text File")
-                    {
-                        Patterns = ["*.txt"]
-                    },
-                    new FilePickerFileType("All Files")
-                    {
-                        Patterns = ["*"]
-                    }
-                ]
-            });
+        var file =
+            await StorageProvider.SaveFilePickerAsync(
+                new FilePickerSaveOptions
+                {
+                    Title = "Save File",
+                    SuggestedFileName = "Untitled.txt",
+                    DefaultExtension = "txt",
+                    FileTypeChoices =
+                    [
+                        new FilePickerFileType("Text File")
+                        {
+                            Patterns = ["*.txt"]
+                        },
+
+                        new FilePickerFileType("All Files")
+                        {
+                            Patterns = ["*"]
+                        }
+                    ]
+                });
 
         if (file is null)
             return;
@@ -385,7 +415,8 @@ public partial class MainWindow : Window
         if (_document.FilePath is null)
             return;
 
-        var content = Editor.Text ?? string.Empty;
+        var content =
+            Editor.Text ?? string.Empty;
 
         _fileService.WriteFile(
             _document.FilePath,
@@ -405,7 +436,8 @@ public partial class MainWindow : Window
 
         var dialog = new ConfirmDialog();
 
-        var result = await dialog.ShowDialog<bool?>(this);
+        var result =
+            await dialog.ShowDialog<bool?>(this);
 
         if (result == true)
         {
@@ -448,12 +480,15 @@ public partial class MainWindow : Window
         }
         else
         {
-            fileName = System.IO.Path.GetFileName(
-                _document.FilePath);
+            fileName =
+                System.IO.Path.GetFileName(
+                    _document.FilePath);
         }
 
         string modifiedMarker =
-            _document.IsModified ? " *" : string.Empty;
+            _document.IsModified
+                ? " *"
+                : string.Empty;
 
         Title =
             $"Orbpad — {fileName}{modifiedMarker}";
@@ -461,9 +496,11 @@ public partial class MainWindow : Window
 
     private void UpdateStatusBar()
     {
-        string text = Editor.Text ?? string.Empty;
+        string text =
+            Editor.Text ?? string.Empty;
 
-        int caretIndex = Editor.CaretIndex;
+        int caretIndex =
+            Editor.CaretIndex;
 
         int line = 1;
         int column = 1;
@@ -484,15 +521,20 @@ public partial class MainWindow : Window
             }
         }
 
-        int wordCount = CountWords(text);
-        int characterCount = text.Length;
+        int wordCount =
+            CountWords(text);
+
+        int characterCount =
+            text.Length;
 
         CursorPositionText.Text =
             $"Ln {line}, Col {column}";
 
         WordCountText.Text =
             $"{wordCount} " +
-            $"{(wordCount == 1 ? "word" : "words")}";
+            $"{(wordCount == 1
+                ? "word"
+                : "words")}";
 
         CharacterCountText.Text =
             $"  {characterCount} " +

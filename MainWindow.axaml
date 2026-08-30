@@ -10,7 +10,9 @@
 
     <DockPanel>
 
-        <!-- Menu -->
+        <!-- ========================= -->
+        <!-- Menu                       -->
+        <!-- ========================= -->
 
         <Border DockPanel.Dock="Top"
                 Background="{DynamicResource OrbpadSurfaceBrush}"
@@ -87,7 +89,53 @@
         </Border>
 
 
-        <!-- Search Bar -->
+        <!-- ========================= -->
+        <!-- Toolbar                    -->
+        <!-- ========================= -->
+
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource OrbpadSurfaceBrush}"
+                BorderBrush="{DynamicResource OrbpadBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="10,7">
+
+            <StackPanel Orientation="Horizontal"
+                        Spacing="6">
+
+                <Button Content="New"
+                        Click="New_Click"/>
+
+                <Button Content="Open"
+                        Click="Open_Click"/>
+
+                <Button Content="Save"
+                        Click="Save_Click"/>
+
+                <Border Width="1"
+                        Margin="4,2"
+                        Background="{DynamicResource OrbpadBorderBrush}"/>
+
+                <Button Content="Undo"
+                        Click="Undo_Click"/>
+
+                <Button Content="Redo"
+                        Click="Redo_Click"/>
+
+                <Border Width="1"
+                        Margin="4,2"
+                        Background="{DynamicResource OrbpadBorderBrush}"/>
+
+                <Button Content="Find"
+                        Click="Find_Click"/>
+
+            </StackPanel>
+
+        </Border>
+
+
+        <!-- ========================= -->
+        <!-- Search Bar                 -->
+        <!-- ========================= -->
 
         <Border x:Name="SearchBar"
                 DockPanel.Dock="Top"
@@ -129,7 +177,9 @@
         </Border>
 
 
-        <!-- Status Bar -->
+        <!-- ========================= -->
+        <!-- Status Bar                 -->
+        <!-- ========================= -->
 
         <Border DockPanel.Dock="Bottom"
                 Background="{DynamicResource OrbpadSurfaceBrush}"
@@ -161,7 +211,9 @@
         </Border>
 
 
-        <!-- Editor -->
+        <!-- ========================= -->
+        <!-- Editor                     -->
+        <!-- ========================= -->
 
         <Border Background="{DynamicResource OrbpadBackgroundBrush}">
 
