@@ -7,6 +7,10 @@
 
         <FluentTheme />
 
+        <!-- AvaloniaEdit styles -->
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+
+
         <!-- ========================= -->
         <!-- Window                      -->
         <!-- ========================= -->
@@ -17,6 +21,9 @@
 
             <Setter Property="Foreground"
                     Value="{DynamicResource OrbpadTextBrush}"/>
+
+            <Setter Property="FontFamily"
+                    Value="Inter"/>
         </Style>
 
 
@@ -35,6 +42,31 @@
         <Style Selector="MenuItem">
             <Setter Property="Foreground"
                     Value="{DynamicResource OrbpadTextBrush}"/>
+
+            <Setter Property="CornerRadius"
+                    Value="6"/>
+
+            <Setter Property="Padding"
+                    Value="10,6"/>
+
+            <Setter Property="Transitions">
+                <Transitions>
+
+                    <BrushTransition Property="Background"
+                                      Duration="0:0:0.12"/>
+
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="MenuItem:pointerover">
+
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+
+            <Setter Property="Background"
+                    Value="{DynamicResource OrbpadSurfaceHoverBrush}"/>
+
         </Style>
 
 
@@ -43,40 +75,96 @@
         <!-- ========================= -->
 
         <Style Selector="Button">
+
             <Setter Property="Foreground"
                     Value="{DynamicResource OrbpadTextBrush}"/>
 
             <Setter Property="Background"
                     Value="{DynamicResource OrbpadSurfaceBrush}"/>
+
+            <Setter Property="BorderThickness"
+                    Value="0"/>
+
+            <Setter Property="CornerRadius"
+                    Value="8"/>
+
+            <Setter Property="Padding"
+                    Value="12,6"/>
+
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+
+            <Setter Property="Transitions">
+                <Transitions>
+
+                    <BrushTransition Property="Background"
+                                      Duration="0:0:0.12"/>
+
+                    <TransformOperationsTransition
+                        Property="RenderTransform"
+                        Duration="0:0:0.08"/>
+
+                </Transitions>
+            </Setter>
+
         </Style>
 
         <Style Selector="Button:pointerover">
+
             <Setter Property="Background"
                     Value="{DynamicResource OrbpadSurfaceHoverBrush}"/>
+
         </Style>
 
         <Style Selector="Button:pressed">
+
             <Setter Property="Background"
                     Value="{DynamicResource OrbpadAccentBrush}"/>
+
+            <Setter Property="RenderTransform"
+                    Value="scale(0.97)"/>
+
+        </Style>
+
+        <Style Selector="Button:disabled">
+
+            <Setter Property="Opacity"
+                    Value="0.45"/>
+
         </Style>
 
 
         <!-- ========================= -->
-        <!-- Editor                     -->
+        <!-- TextBox                    -->
         <!-- ========================= -->
 
         <Style Selector="TextBox">
+
             <Setter Property="Background"
                     Value="{DynamicResource OrbpadBackgroundBrush}"/>
 
             <Setter Property="Foreground"
                     Value="{DynamicResource OrbpadTextBrush}"/>
 
-            <Setter Property="FontFamily"
-                    Value="Inter"/>
+            <Setter Property="CaretBrush"
+                    Value="{DynamicResource OrbpadAccentBrush}"/>
+
+            <Setter Property="SelectionBrush"
+                    Value="{DynamicResource OrbpadAccentMutedBrush}"/>
 
             <Setter Property="FontSize"
                     Value="16"/>
+
+            <Setter Property="CornerRadius"
+                    Value="8"/>
+
+        </Style>
+
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource OrbpadAccentBrush}"/>
+
         </Style>
 
 
@@ -85,8 +173,10 @@
         <!-- ========================= -->
 
         <Style Selector="TextBlock">
+
             <Setter Property="Foreground"
                     Value="{DynamicResource OrbpadMutedTextBrush}"/>
+
         </Style>
 
     </Application.Styles>
@@ -99,6 +189,7 @@
     <Application.Resources>
 
         <!-- Main -->
+
         <SolidColorBrush x:Key="OrbpadBackgroundBrush"
                          Color="#121214"/>
 
@@ -111,16 +202,24 @@
         <SolidColorBrush x:Key="OrbpadBorderBrush"
                          Color="#303036"/>
 
+
         <!-- Text -->
+
         <SolidColorBrush x:Key="OrbpadTextBrush"
                          Color="#F4F4F5"/>
 
         <SolidColorBrush x:Key="OrbpadMutedTextBrush"
                          Color="#A1A1AA"/>
 
+
         <!-- Accent -->
+
         <SolidColorBrush x:Key="OrbpadAccentBrush"
                          Color="#8B5CF6"/>
+
+        <SolidColorBrush x:Key="OrbpadAccentMutedBrush"
+                         Color="#8B5CF6"
+                         Opacity="0.30"/>
 
     </Application.Resources>
 

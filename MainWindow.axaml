@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:AvaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
         x:Class="Orbpad.MainWindow"
         Title="Orbpad"
         Width="1000"
@@ -22,9 +23,7 @@
 
             <Menu Background="Transparent">
 
-                <!-- ================= -->
-                <!-- File                -->
-                <!-- ================= -->
+                <!-- File -->
 
                 <MenuItem Header="_File">
 
@@ -57,9 +56,7 @@
                 </MenuItem>
 
 
-                <!-- ================= -->
-                <!-- Edit                -->
-                <!-- ================= -->
+                <!-- Edit -->
 
                 <MenuItem Header="_Edit">
 
@@ -94,9 +91,7 @@
                 </MenuItem>
 
 
-                <!-- ================= -->
-                <!-- View                -->
-                <!-- ================= -->
+                <!-- View -->
 
                 <MenuItem Header="_View">
 
@@ -107,6 +102,10 @@
                     <MenuItem x:Name="StatusBarMenuItem"
                               Header="_Show Status Bar ✓"
                               Click="StatusBar_Click"/>
+
+                    <MenuItem x:Name="LineNumbersMenuItem"
+                              Header="_Show Line Numbers ✓"
+                              Click="LineNumbers_Click"/>
 
                     <Separator/>
 
@@ -133,9 +132,7 @@
                 </MenuItem>
 
 
-                <!-- ================= -->
-                <!-- Help                -->
-                <!-- ================= -->
+                <!-- Help -->
 
                 <MenuItem Header="_Help">
 
@@ -312,17 +309,12 @@
 
         <Border Background="{DynamicResource OrbpadBackgroundBrush}">
 
-            <TextBox x:Name="Editor"
-                     AcceptsReturn="True"
-                     AcceptsTab="True"
-                     TextWrapping="NoWrap"
-                     FontSize="16"
-                     FontFamily="Inter"
-                     Padding="20"
-                     Background="{DynamicResource OrbpadBackgroundBrush}"
-                     Foreground="{DynamicResource OrbpadTextBrush}"
-                     BorderThickness="0"
-                     TextChanged="Editor_TextChanged"/>
+            <AvaloniaEdit:TextEditor x:Name="Editor"
+                                     ShowLineNumbers="True"
+                                     WordWrap="False"
+                                     IsReadOnly="False"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     VerticalScrollBarVisibility="Auto"/>
 
         </Border>
 

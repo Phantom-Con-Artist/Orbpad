@@ -64,6 +64,12 @@ public static class ThemeManager
             "OrbpadAccentBrush",
             palette.Accent);
 
+        SetBrush(
+            application,
+            "OrbpadAccentMutedBrush",
+            palette.Accent,
+            opacity: 0.30);
+
         application.RequestedThemeVariant =
             theme == OrbpadTheme.Light
                 ? ThemeVariant.Light
@@ -76,11 +82,13 @@ public static class ThemeManager
     private static void SetBrush(
         Application application,
         string key,
-        string color)
+        string color,
+        double opacity = 1.0)
     {
         application.Resources[key] =
             new SolidColorBrush(
-                Color.Parse(color));
+                Color.Parse(color),
+                opacity);
     }
 
     private static ThemePalette GetPalette(

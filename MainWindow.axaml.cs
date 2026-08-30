@@ -7,6 +7,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using AvaloniaEdit;
 using Orbpad.Managers;
 using Orbpad.Models;
 using Orbpad.Services;
@@ -21,15 +22,15 @@ public partial class MainWindow : Window
     private readonly Dictionary<Document, Button>
         _documentButtons = new();
 
-    // Remembers the last real selection/caret position in the Editor.
-    // Clicking a menu item moves focus away from the Editor, which
-    // collapses its live selection — these fields let us restore it
-    // right before running a Cut/Copy/Paste command from the menu.
+    // ============================================================
+    // EDITOR SELECTION STATE
+    // ============================================================
+
     private int _lastKnownSelectionStart;
 
-    private int _lastKnownSelectionEnd;
+    private int _lastKnownSelectionLength;
 
-    private int _lastKnownCaretIndex;
+    private int _lastKnownCaretOffset;
 
     public MainWindow()
     {
@@ -43,13 +44,21 @@ public partial class MainWindow : Window
 
         CreateInitialDocument();
 
-        Editor.PropertyChanged +=
-            Editor_PropertyChanged;
+        Editor.TextChanged +=
+            Editor_TextChanged;
+
+        Editor.TextArea.Caret.PositionChanged +=
+            Editor_CaretPositionChanged;
+
+        Editor.TextArea.SelectionChanged +=
+            Editor_SelectionChanged;
 
         UpdateWindowTitle();
         UpdateStatusBar();
         RefreshTabs();
         UpdateThemeMenu();
+
+        SaveEditorSelection();
     }
 
     // ============================================================
@@ -79,6 +88,7 @@ public partial class MainWindow : Window
             }
 
             e.Handled = true;
+
             return;
         }
 
@@ -87,6 +97,7 @@ public partial class MainWindow : Window
             CloseActiveDocument();
 
             e.Handled = true;
+
             return;
         }
 
@@ -156,7 +167,8 @@ public partial class MainWindow : Window
         var document =
             _documentManager.CreateDocument();
 
-        LoadDocumentIntoEditor(document);
+        LoadDocumentIntoEditor(
+            document);
     }
 
     private void NewTab_Click(
@@ -171,7 +183,8 @@ public partial class MainWindow : Window
         var document =
             _documentManager.CreateDocument();
 
-        LoadDocumentIntoEditor(document);
+        LoadDocumentIntoEditor(
+            document);
 
         RefreshTabs();
         UpdateWindowTitle();
@@ -194,7 +207,8 @@ public partial class MainWindow : Window
         _documentManager.SetActiveDocument(
             document);
 
-        LoadDocumentIntoEditor(document);
+        LoadDocumentIntoEditor(
+            document);
 
         UpdateWindowTitle();
         UpdateStatusBar();
@@ -207,7 +221,11 @@ public partial class MainWindow : Window
         Editor.Text =
             document.Text ?? string.Empty;
 
-        Editor.CaretIndex = 0;
+        Editor.CaretOffset = 0;
+
+        _lastKnownSelectionStart = 0;
+        _lastKnownSelectionLength = 0;
+        _lastKnownCaretOffset = 0;
 
         UpdateWindowTitle();
         UpdateStatusBar();
@@ -220,6 +238,7 @@ public partial class MainWindow : Window
     private void RefreshTabs()
     {
         TabPanel.Children.Clear();
+
         _documentButtons.Clear();
 
         foreach (var document
@@ -281,7 +300,8 @@ public partial class MainWindow : Window
         documentButton.Click +=
             (_, _) =>
             {
-                SwitchToDocument(document);
+                SwitchToDocument(
+                    document);
             };
 
         var closeButton =
@@ -333,8 +353,8 @@ public partial class MainWindow : Window
         string resourceKey)
     {
         if (Application.Current is not null &&
-            Application.Current.Resources[resourceKey]
-                is IBrush brush)
+            Application.Current.Resources[
+                resourceKey] is IBrush brush)
         {
             return brush;
         }
@@ -581,9 +601,12 @@ public partial class MainWindow : Window
             var errorDialog =
                 new Window
                 {
-                    Title = "Unable to Open Image",
+                    Title =
+                        "Unable to Open Image",
+
                     Width = 450,
                     Height = 220,
+
                     WindowStartupLocation =
                         WindowStartupLocation.CenterOwner
                 };
@@ -593,6 +616,7 @@ public partial class MainWindow : Window
                 {
                     Margin =
                         new Thickness(24),
+
                     Spacing = 16
                 };
 
@@ -601,13 +625,16 @@ public partial class MainWindow : Window
                 {
                     Text =
                         "Orbpad could not open this image.",
+
                     FontSize = 18
                 });
 
             panel.Children.Add(
                 new TextBlock
                 {
-                    Text = ex.Message,
+                    Text =
+                        ex.Message,
+
                     TextWrapping =
                         TextWrapping.Wrap
                 });
@@ -615,7 +642,9 @@ public partial class MainWindow : Window
             var closeButton =
                 new Button
                 {
-                    Content = "Close",
+                    Content =
+                        "Close",
+
                     HorizontalAlignment =
                         Avalonia.Layout.HorizontalAlignment.Right
                 };
@@ -678,23 +707,13 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
-        if (Editor.TextWrapping ==
-            TextWrapping.NoWrap)
-        {
-            Editor.TextWrapping =
-                TextWrapping.Wrap;
+        Editor.WordWrap =
+            !Editor.WordWrap;
 
-            WordWrapMenuItem.Header =
-                "_Word Wrap ✓";
-        }
-        else
-        {
-            Editor.TextWrapping =
-                TextWrapping.NoWrap;
-
-            WordWrapMenuItem.Header =
-                "_Word Wrap";
-        }
+        WordWrapMenuItem.Header =
+            Editor.WordWrap
+                ? "_Word Wrap ✓"
+                : "_Word Wrap";
     }
 
     private void StatusBar_Click(
@@ -708,6 +727,19 @@ public partial class MainWindow : Window
             StatusBar.IsVisible
                 ? "_Show Status Bar ✓"
                 : "_Show Status Bar";
+    }
+
+    private void LineNumbers_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        Editor.ShowLineNumbers =
+            !Editor.ShowLineNumbers;
+
+        LineNumbersMenuItem.Header =
+            Editor.ShowLineNumbers
+                ? "_Show Line Numbers ✓"
+                : "_Show Line Numbers";
     }
 
     // ============================================================
@@ -792,7 +824,8 @@ public partial class MainWindow : Window
         var dialog =
             new AboutDialog();
 
-        await dialog.ShowDialog(this);
+        await dialog.ShowDialog(
+            this);
     }
 
     // ============================================================
@@ -899,7 +932,8 @@ public partial class MainWindow : Window
                 .SaveFilePickerAsync(
                     new FilePickerSaveOptions
                     {
-                        Title = "Save File",
+                        Title =
+                            "Save File",
 
                         SuggestedFileName =
                             "Untitled.txt",
@@ -1020,6 +1054,7 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         Editor.Undo();
+
         UpdateStatusBar();
     }
 
@@ -1028,6 +1063,7 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         Editor.Redo();
+
         UpdateStatusBar();
     }
 
@@ -1038,6 +1074,7 @@ public partial class MainWindow : Window
         RestoreEditorSelection();
 
         Editor.Cut();
+
         UpdateStatusBar();
     }
 
@@ -1057,6 +1094,7 @@ public partial class MainWindow : Window
         RestoreEditorSelection();
 
         Editor.Paste();
+
         UpdateStatusBar();
     }
 
@@ -1065,7 +1103,89 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         Editor.SelectAll();
+
+        SaveEditorSelection();
+
         UpdateStatusBar();
+    }
+
+    // ============================================================
+    // EDITOR SELECTION
+    // ============================================================
+
+    private void Editor_CaretPositionChanged(
+        object? sender,
+        EventArgs e)
+    {
+        if (Editor.TextArea.IsFocused)
+        {
+            _lastKnownCaretOffset =
+                Editor.CaretOffset;
+
+            if (Editor.SelectionLength > 0)
+            {
+                SaveEditorSelection();
+            }
+        }
+
+        UpdateStatusBar();
+    }
+
+    private void Editor_SelectionChanged(
+        object? sender,
+        EventArgs e)
+    {
+        if (!Editor.TextArea.IsFocused)
+            return;
+
+        SaveEditorSelection();
+    }
+
+    private void SaveEditorSelection()
+    {
+        _lastKnownSelectionStart =
+            Editor.SelectionStart;
+
+        _lastKnownSelectionLength =
+            Editor.SelectionLength;
+
+        _lastKnownCaretOffset =
+            Editor.CaretOffset;
+    }
+
+    private void RestoreEditorSelection()
+    {
+        Editor.TextArea.Focus();
+
+        int textLength =
+            (Editor.Text ?? string.Empty).Length;
+
+        if (_lastKnownSelectionLength > 0)
+        {
+            int start =
+                Math.Clamp(
+                    _lastKnownSelectionStart,
+                    0,
+                    textLength);
+
+            int length =
+                Math.Clamp(
+                    _lastKnownSelectionLength,
+                    0,
+                    textLength - start);
+
+            Editor.Select(
+                start,
+                length);
+
+            return;
+        }
+
+        Editor.CaretOffset =
+            Math.Clamp(
+                _lastKnownCaretOffset,
+                0,
+                textLength);
     }
 
     // ============================================================
@@ -1086,7 +1206,7 @@ public partial class MainWindow : Window
         SearchBar.IsVisible =
             false;
 
-        Editor.Focus();
+        Editor.TextArea.Focus();
     }
 
     private void FindNext_Click(
@@ -1196,7 +1316,8 @@ public partial class MainWindow : Window
             Editor.Text ?? string.Empty;
 
         int startIndex =
-            Editor.SelectionEnd;
+            Editor.SelectionStart +
+            Editor.SelectionLength;
 
         int index =
             text.IndexOf(
@@ -1216,13 +1337,13 @@ public partial class MainWindow : Window
         if (index < 0)
             return;
 
-        Editor.SelectionStart =
-            index;
+        Editor.Select(
+            index,
+            searchText.Length);
 
-        Editor.SelectionEnd =
-            index + searchText.Length;
+        SaveEditorSelection();
 
-        Editor.Focus();
+        Editor.TextArea.Focus();
     }
 
     private void FindPrevious()
@@ -1269,22 +1390,22 @@ public partial class MainWindow : Window
         if (index < 0)
             return;
 
-        Editor.SelectionStart =
-            index;
+        Editor.Select(
+            index,
+            searchText.Length);
 
-        Editor.SelectionEnd =
-            index + searchText.Length;
+        SaveEditorSelection();
 
-        Editor.Focus();
+        Editor.TextArea.Focus();
     }
 
     // ============================================================
-    // EDITOR
+    // EDITOR TEXT
     // ============================================================
 
     private void Editor_TextChanged(
         object? sender,
-        TextChangedEventArgs e)
+        EventArgs e)
     {
         var document =
             _documentManager.ActiveDocument;
@@ -1310,61 +1431,6 @@ public partial class MainWindow : Window
         UpdateWindowTitle();
         UpdateStatusBar();
         RefreshTabs();
-    }
-
-    private void Editor_PropertyChanged(
-        object? sender,
-        AvaloniaPropertyChangedEventArgs e)
-    {
-        if (e.Property ==
-            TextBox.CaretIndexProperty)
-        {
-            _lastKnownCaretIndex =
-                Editor.CaretIndex;
-
-            UpdateStatusBar();
-        }
-        else if (e.Property == TextBox.SelectionStartProperty ||
-                 e.Property == TextBox.SelectionEndProperty)
-        {
-            // Only remember a genuine, non-empty selection. Losing
-            // focus collapses SelectionStart/SelectionEnd to the same
-            // value, and we don't want that momentary collapse to
-            // stomp on the real selection the user made.
-            if (Editor.SelectionStart !=
-                Editor.SelectionEnd)
-            {
-                _lastKnownSelectionStart =
-                    Editor.SelectionStart;
-
-                _lastKnownSelectionEnd =
-                    Editor.SelectionEnd;
-            }
-        }
-    }
-
-    // Restores focus and the last known selection (or caret position)
-    // to the Editor. Call this immediately before Cut/Copy/Paste when
-    // the command may have been triggered from a menu, since opening
-    // the menu moves focus off the Editor and collapses its selection.
-    private void RestoreEditorSelection()
-    {
-        Editor.Focus();
-
-        if (_lastKnownSelectionStart !=
-            _lastKnownSelectionEnd)
-        {
-            Editor.SelectionStart =
-                _lastKnownSelectionStart;
-
-            Editor.SelectionEnd =
-                _lastKnownSelectionEnd;
-        }
-        else
-        {
-            Editor.CaretIndex =
-                _lastKnownCaretIndex;
-        }
     }
 
     // ============================================================
@@ -1416,27 +1482,14 @@ public partial class MainWindow : Window
         string text =
             Editor.Text ?? string.Empty;
 
-        int caretIndex =
-            Editor.CaretIndex;
+        var caret =
+            Editor.TextArea.Caret;
 
-        int line = 1;
-        int column = 1;
+        int line =
+            caret.Line;
 
-        for (int i = 0;
-             i < caretIndex &&
-             i < text.Length;
-             i++)
-        {
-            if (text[i] == '\n')
-            {
-                line++;
-                column = 1;
-            }
-            else
-            {
-                column++;
-            }
-        }
+        int column =
+            caret.Column;
 
         int wordCount =
             CountWords(text);

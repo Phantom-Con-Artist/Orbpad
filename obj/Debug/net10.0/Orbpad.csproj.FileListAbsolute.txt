@@ -89,3 +89,5 @@ C:\Users\subhr\Orbis Project\Orbpad\obj\Debug\net10.0\refint\Orbpad.dll
 C:\Users\subhr\Orbis Project\Orbpad\obj\Debug\net10.0\Orbpad.pdb
 C:\Users\subhr\Orbis Project\Orbpad\obj\Debug\net10.0\Orbpad.genruntimeconfig.cache
 C:\Users\subhr\Orbis Project\Orbpad\obj\Debug\net10.0\ref\Orbpad.dll
+C:\Users\subhr\Orbis Project\Orbpad\bin\Debug\net10.0\AvaloniaEdit.dll
+C:\Users\subhr\Orbis Project\Orbpad\bin\Debug\net10.0\zh-Hans\AvaloniaEdit.resources.dll
