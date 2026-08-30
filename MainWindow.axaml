@@ -13,23 +13,37 @@
         <Menu DockPanel.Dock="Top">
 
             <MenuItem Header="_File">
-                <MenuItem Header="_New" Click = "New_Click"/>
-                <MenuItem Header="_Open..."/>
+                <MenuItem Header="_New"
+                          Click="New_Click"/>
+
+                <MenuItem Header="_Open..."
+                          Click="Open_Click"/>
+
                 <Separator/>
-                <MenuItem Header="_Save"/>
-                <MenuItem Header="Save _As..."/>
+
+                <MenuItem Header="_Save"
+                          Click="Save_Click"/>
+
+                <MenuItem Header="Save _As..."
+                          Click="SaveAs_Click"/>
+
                 <Separator/>
+
                 <MenuItem Header="E_xit"/>
             </MenuItem>
 
             <MenuItem Header="_Edit">
                 <MenuItem Header="_Undo"/>
                 <MenuItem Header="_Redo"/>
+
                 <Separator/>
+
                 <MenuItem Header="Cu_t"/>
                 <MenuItem Header="_Copy"/>
                 <MenuItem Header="_Paste"/>
+
                 <Separator/>
+
                 <MenuItem Header="Select _All"/>
             </MenuItem>
 
