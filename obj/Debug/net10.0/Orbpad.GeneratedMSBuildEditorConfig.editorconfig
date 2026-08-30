@@ -9,7 +9,7 @@ build_property.AvaloniaNameGeneratorAttachDevTools = true
 build_property.AvaloniaUseCompiledBindingsByDefault = true
 build_property.AvaloniaMainPackageVersion = 12.1.1
 build_property.AvaloniaPreviewerNetCoreToolPath = C:\Users\subhr\.nuget\packages\avalonia\12.1.1\buildTransitive\\..\tools\net8.0\designer\Avalonia.Designer.HostApp.dll
-build_property.AvaloniaResourcePaths = 
+build_property.AvaloniaResourcePaths = C:\Users\subhr\Orbis Project\Orbpad\AboutDialog.axaml,C:\Users\subhr\Orbis Project\Orbpad\App.axaml,C:\Users\subhr\Orbis Project\Orbpad\ConfirmDialog.axaml,C:\Users\subhr\Orbis Project\Orbpad\ImageViewerWindow.axaml,C:\Users\subhr\Orbis Project\Orbpad\MainWindow.axaml,C:\Users\subhr\Orbis Project\Orbpad\Markdown\MarkdownPreviewControl.axaml,C:\Users\subhr\Orbis Project\Orbpad\Markdown\MarkdownPreviewWindow.axaml,C:\Users\subhr\Orbis Project\Orbpad\Styles\OrbpadTheme.axaml
 build_property.TargetFramework = net10.0
 build_property.TargetFrameworkIdentifier = .NETCoreApp
 build_property.TargetFrameworkVersion = v10.0
@@ -41,6 +41,12 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [C:/Users/subhr/Orbis Project/Orbpad/MainWindow.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/subhr/Orbis Project/Orbpad/Markdown/MarkdownPreviewControl.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/subhr/Orbis Project/Orbpad/Markdown/MarkdownPreviewWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [C:/Users/subhr/Orbis Project/Orbpad/Styles/OrbpadTheme.axaml]

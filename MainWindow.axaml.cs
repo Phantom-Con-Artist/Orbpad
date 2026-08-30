@@ -22,26 +22,27 @@ public partial class MainWindow : Window
     private readonly SettingsService _settingsService;
     private readonly AppSettings _settings;
 
-    private readonly SyntaxHighlightingService _syntaxHighlightingService;
+    private readonly SyntaxHighlightingService
+        _syntaxHighlightingService;
 
     private readonly Dictionary<Document, Button>
         _documentButtons = new();
 
     private const int MaxRecentFiles = 10;
 
-    // ============================================================
-    // EDITOR SELECTION STATE
-    // ============================================================
-
     private int _lastKnownSelectionStart;
-
     private int _lastKnownSelectionLength;
-
     private int _lastKnownCaretOffset;
+
+
+    // ============================================================
+    // CONSTRUCTOR
+    // ============================================================
 
     public MainWindow()
     {
         InitializeComponent();
+
 
         // ========================================================
         // SETTINGS
@@ -53,6 +54,7 @@ public partial class MainWindow : Window
         _settings =
             _settingsService.Load();
 
+
         // ========================================================
         // SYNTAX HIGHLIGHTING
         // ========================================================
@@ -61,11 +63,13 @@ public partial class MainWindow : Window
             new SyntaxHighlightingService(
                 Editor);
 
+
         // ========================================================
         // APPLY SAVED SETTINGS
         // ========================================================
 
         ApplySavedSettings();
+
 
         // ========================================================
         // CORE SERVICES
@@ -77,7 +81,13 @@ public partial class MainWindow : Window
         _fileService =
             new FileService();
 
+
+        // ========================================================
+        // INITIAL DOCUMENT
+        // ========================================================
+
         CreateInitialDocument();
+
 
         // ========================================================
         // EDITOR EVENTS
@@ -92,8 +102,9 @@ public partial class MainWindow : Window
         Editor.TextArea.SelectionChanged +=
             Editor_SelectionChanged;
 
+
         // ========================================================
-        // INITIAL UI STATE
+        // INITIAL UI
         // ========================================================
 
         UpdateWindowTitle();
@@ -105,6 +116,7 @@ public partial class MainWindow : Window
 
         SaveEditorSelection();
     }
+
 
     // ============================================================
     // KEYBOARD SHORTCUTS
@@ -137,6 +149,7 @@ public partial class MainWindow : Window
             return;
         }
 
+
         if (e.Key == Key.W)
         {
             CloseActiveDocument();
@@ -145,6 +158,7 @@ public partial class MainWindow : Window
 
             return;
         }
+
 
         if (e.Key >= Key.D1 &&
             e.Key <= Key.D9)
@@ -158,6 +172,7 @@ public partial class MainWindow : Window
         }
     }
 
+
     private void SwitchToNextDocument()
     {
         var document =
@@ -169,6 +184,7 @@ public partial class MainWindow : Window
         SwitchToDocument(document);
     }
 
+
     private void SwitchToPreviousDocument()
     {
         var document =
@@ -179,6 +195,7 @@ public partial class MainWindow : Window
 
         SwitchToDocument(document);
     }
+
 
     private void SwitchToDocumentAt(
         int index)
@@ -192,6 +209,7 @@ public partial class MainWindow : Window
         SwitchToDocument(document);
     }
 
+
     private void CloseActiveDocument()
     {
         var document =
@@ -202,6 +220,7 @@ public partial class MainWindow : Window
 
         _ = CloseDocumentAsync(document);
     }
+
 
     // ============================================================
     // DOCUMENT CREATION
@@ -216,12 +235,14 @@ public partial class MainWindow : Window
             document);
     }
 
+
     private void NewTab_Click(
         object? sender,
         RoutedEventArgs e)
     {
         CreateNewDocument();
     }
+
 
     private void CreateNewDocument()
     {
@@ -235,6 +256,7 @@ public partial class MainWindow : Window
         UpdateWindowTitle();
         UpdateStatusBar();
     }
+
 
     // ============================================================
     // DOCUMENT SWITCHING
@@ -260,19 +282,28 @@ public partial class MainWindow : Window
         UpdateTabAppearance();
     }
 
+
     private void LoadDocumentIntoEditor(
         Document document)
     {
         Editor.Text =
             document.Text ?? string.Empty;
 
-        // Apply syntax highlighting based on
-        // the document's file extension.
-        //
-        // Untitled documents have no file path,
-        // so the service falls back to plain text.
+
+        // ========================================================
+        // SYNTAX HIGHLIGHTING
+        // ========================================================
+
         _syntaxHighlightingService.ApplyForFile(
             document.FilePath);
+
+
+        // ========================================================
+        // MARKDOWN VIEW
+        // ========================================================
+
+        RefreshMarkdownView();
+
 
         Editor.CaretOffset = 0;
 
@@ -283,6 +314,7 @@ public partial class MainWindow : Window
         UpdateWindowTitle();
         UpdateStatusBar();
     }
+
 
     // ============================================================
     // TABS
@@ -306,6 +338,7 @@ public partial class MainWindow : Window
         UpdateTabAppearance();
     }
 
+
     private Border CreateTab(
         Document document)
     {
@@ -326,6 +359,7 @@ public partial class MainWindow : Window
                     new Thickness(0)
             };
 
+
         var grid =
             new Grid
             {
@@ -334,11 +368,13 @@ public partial class MainWindow : Window
                         "Auto,Auto")
             };
 
+
         var documentButton =
             new Button
             {
                 Content =
-                    GetDocumentTitle(document),
+                    GetDocumentTitle(
+                        document),
 
                 Background =
                     Brushes.Transparent,
@@ -350,12 +386,14 @@ public partial class MainWindow : Window
                     new Thickness(10, 6)
             };
 
+
         documentButton.Click +=
             (_, _) =>
             {
                 SwitchToDocument(
                     document);
             };
+
 
         var closeButton =
             new Button
@@ -373,12 +411,14 @@ public partial class MainWindow : Window
                     new Thickness(7, 4)
             };
 
+
         closeButton.Click +=
             async (_, _) =>
             {
                 await CloseDocumentAsync(
                     document);
             };
+
 
         Grid.SetColumn(
             documentButton,
@@ -388,20 +428,25 @@ public partial class MainWindow : Window
             closeButton,
             1);
 
+
         grid.Children.Add(
             documentButton);
 
         grid.Children.Add(
             closeButton);
 
+
         container.Child =
             grid;
+
 
         _documentButtons[document] =
             documentButton;
 
+
         return container;
     }
+
 
     private IBrush GetThemeBrush(
         string resourceKey)
@@ -415,6 +460,7 @@ public partial class MainWindow : Window
 
         return Brushes.Transparent;
     }
+
 
     private void UpdateTabAppearance()
     {
@@ -434,6 +480,7 @@ public partial class MainWindow : Window
         }
     }
 
+
     private string GetDocumentTitle(
         Document document)
     {
@@ -448,6 +495,7 @@ public partial class MainWindow : Window
             documentNumber++;
         }
 
+
         if (document.FilePath is not null)
         {
             string fileName =
@@ -459,10 +507,12 @@ public partial class MainWindow : Window
                 : fileName;
         }
 
+
         return document.IsModified
             ? $"Untitled {documentNumber} *"
             : $"Untitled {documentNumber}";
     }
+
 
     // ============================================================
     // CLOSE DOCUMENT
@@ -495,12 +545,15 @@ public partial class MainWindow : Window
             }
         }
 
+
         bool wasActive =
             _documentManager.ActiveDocument ==
             document;
 
+
         _documentManager.RemoveDocument(
             document);
+
 
         if (_documentManager.Documents.Count == 0)
         {
@@ -522,10 +575,12 @@ public partial class MainWindow : Window
             }
         }
 
+
         RefreshTabs();
         UpdateWindowTitle();
         UpdateStatusBar();
     }
+
 
     private async Task<CloseDocumentResult>
         ShowCloseConfirmationAsync(
@@ -538,6 +593,7 @@ public partial class MainWindow : Window
             await dialog.ShowDialog<bool?>(
                 this);
 
+
         if (result == true)
             return CloseDocumentResult.Save;
 
@@ -546,6 +602,7 @@ public partial class MainWindow : Window
 
         return CloseDocumentResult.Cancel;
     }
+
 
     // ============================================================
     // FILE MENU
@@ -560,6 +617,7 @@ public partial class MainWindow : Window
 
         CreateNewDocument();
     }
+
 
     private async void Open_Click(
         object? sender,
@@ -577,11 +635,14 @@ public partial class MainWindow : Window
                             false
                     });
 
+
         if (files.Count == 0)
             return;
 
+
         var file =
             files[0];
+
 
         if (file.TryGetLocalPath()
             is not string filePath)
@@ -589,8 +650,10 @@ public partial class MainWindow : Window
             return;
         }
 
+
         OpenTextFile(filePath);
     }
+
 
     private void OpenTextFile(
         string filePath)
@@ -601,40 +664,52 @@ public partial class MainWindow : Window
                 System.IO.Path.GetFullPath(
                     filePath);
 
+
             if (!System.IO.File.Exists(
                     fullPath))
             {
-                RemoveRecentFile(fullPath);
+                RemoveRecentFile(
+                    fullPath);
 
                 return;
             }
 
+
             var document =
                 _documentManager.CreateDocument();
+
 
             document.Text =
                 _fileService.ReadFile(
                     fullPath);
 
+
             document.FilePath =
                 fullPath;
 
+
             document.MarkAsSaved();
+
 
             LoadDocumentIntoEditor(
                 document);
+
 
             RefreshTabs();
             UpdateWindowTitle();
             UpdateStatusBar();
 
-            AddRecentFile(fullPath);
+
+            AddRecentFile(
+                fullPath);
         }
         catch
         {
-            RemoveRecentFile(filePath);
+            RemoveRecentFile(
+                filePath);
         }
     }
+
 
     // ============================================================
     // RECENT FILES
@@ -649,7 +724,9 @@ public partial class MainWindow : Window
             return;
         }
 
+
         string fullPath;
+
 
         try
         {
@@ -662,11 +739,13 @@ public partial class MainWindow : Window
             return;
         }
 
+
         if (_settings.RecentFiles is null)
         {
             _settings.RecentFiles =
                 new List<string>();
         }
+
 
         for (int i =
                  _settings.RecentFiles.Count - 1;
@@ -682,9 +761,11 @@ public partial class MainWindow : Window
             }
         }
 
+
         _settings.RecentFiles.Insert(
             0,
             fullPath);
+
 
         while (_settings.RecentFiles.Count >
                MaxRecentFiles)
@@ -693,16 +774,19 @@ public partial class MainWindow : Window
                 _settings.RecentFiles.Count - 1);
         }
 
+
         UpdateRecentFilesMenu();
 
         SaveCurrentSettings();
     }
+
 
     private void RemoveRecentFile(
         string filePath)
     {
         if (_settings.RecentFiles is null)
             return;
+
 
         for (int i =
                  _settings.RecentFiles.Count - 1;
@@ -718,14 +802,17 @@ public partial class MainWindow : Window
             }
         }
 
+
         UpdateRecentFilesMenu();
 
         SaveCurrentSettings();
     }
 
+
     private void UpdateRecentFilesMenu()
     {
         RecentFilesMenuItem.Items.Clear();
+
 
         if (_settings.RecentFiles is null)
         {
@@ -733,8 +820,10 @@ public partial class MainWindow : Window
                 new List<string>();
         }
 
+
         var validFiles =
             new List<string>();
+
 
         foreach (var filePath
                  in _settings.RecentFiles)
@@ -745,14 +834,17 @@ public partial class MainWindow : Window
                 continue;
             }
 
+
             if (!System.IO.File.Exists(
                     filePath))
             {
                 continue;
             }
 
+
             bool duplicate =
                 false;
+
 
             foreach (var existingPath
                      in validFiles)
@@ -769,11 +861,13 @@ public partial class MainWindow : Window
                 }
             }
 
+
             if (!duplicate)
             {
                 validFiles.Add(
                     filePath);
             }
+
 
             if (validFiles.Count >=
                 MaxRecentFiles)
@@ -782,7 +876,9 @@ public partial class MainWindow : Window
             }
         }
 
+
         _settings.RecentFiles.Clear();
+
 
         foreach (var filePath
                  in validFiles)
@@ -790,6 +886,7 @@ public partial class MainWindow : Window
             _settings.RecentFiles.Add(
                 filePath);
         }
+
 
         if (_settings.RecentFiles.Count == 0)
         {
@@ -806,6 +903,7 @@ public partial class MainWindow : Window
             return;
         }
 
+
         foreach (var filePath
                  in _settings.RecentFiles)
         {
@@ -820,15 +918,19 @@ public partial class MainWindow : Window
                         filePath
                 };
 
+
             menuItem.Click +=
                 RecentFile_Click;
+
 
             RecentFilesMenuItem.Items.Add(
                 menuItem);
         }
 
+
         RecentFilesMenuItem.Items.Add(
             new Separator());
+
 
         var clearItem =
             new MenuItem
@@ -837,12 +939,15 @@ public partial class MainWindow : Window
                     "Clear Recent Files"
             };
 
+
         clearItem.Click +=
             ClearRecentFiles_Click;
+
 
         RecentFilesMenuItem.Items.Add(
             clearItem);
     }
+
 
     private void RecentFile_Click(
         object? sender,
@@ -851,11 +956,14 @@ public partial class MainWindow : Window
         if (sender is not MenuItem menuItem)
             return;
 
+
         if (menuItem.Tag is not string filePath)
             return;
 
+
         OpenTextFile(filePath);
     }
+
 
     private void ClearRecentFiles_Click(
         object? sender,
@@ -867,6 +975,7 @@ public partial class MainWindow : Window
 
         SaveCurrentSettings();
     }
+
 
     // ============================================================
     // IMAGE OPENING
@@ -893,28 +1002,35 @@ public partial class MainWindow : Window
                         ]
                     });
 
+
         if (files.Count == 0)
             return;
 
+
         var file =
             files[0];
+
 
         try
         {
             await using var stream =
                 await file.OpenReadAsync();
 
+
             var bitmap =
                 new Avalonia.Media.Imaging.Bitmap(
                     stream);
 
+
             string title =
                 file.Name;
+
 
             var imageWindow =
                 new ImageViewerWindow(
                     bitmap,
                     title);
+
 
             await imageWindow.ShowDialog(
                 this);
@@ -937,6 +1053,7 @@ public partial class MainWindow : Window
                         WindowStartupLocation.CenterOwner
                 };
 
+
             var panel =
                 new StackPanel
                 {
@@ -946,6 +1063,7 @@ public partial class MainWindow : Window
                     Spacing =
                         16
                 };
+
 
             panel.Children.Add(
                 new TextBlock
@@ -957,6 +1075,7 @@ public partial class MainWindow : Window
                         18
                 });
 
+
             panel.Children.Add(
                 new TextBlock
                 {
@@ -966,6 +1085,7 @@ public partial class MainWindow : Window
                     TextWrapping =
                         TextWrapping.Wrap
                 });
+
 
             var closeButton =
                 new Button
@@ -977,22 +1097,27 @@ public partial class MainWindow : Window
                         Avalonia.Layout.HorizontalAlignment.Right
                 };
 
+
             closeButton.Click +=
                 (_, _) =>
                 {
                     errorDialog.Close();
                 };
 
+
             panel.Children.Add(
                 closeButton);
 
+
             errorDialog.Content =
                 panel;
+
 
             await errorDialog.ShowDialog(
                 this);
         }
     }
+
 
     private void Save_Click(
         object? sender,
@@ -1001,8 +1126,10 @@ public partial class MainWindow : Window
         var document =
             _documentManager.ActiveDocument;
 
+
         if (document is null)
             return;
+
 
         if (document.FilePath is null)
         {
@@ -1011,8 +1138,10 @@ public partial class MainWindow : Window
             return;
         }
 
+
         SaveCurrentDocument();
     }
+
 
     private async void SaveAs_Click(
         object? sender,
@@ -1021,12 +1150,14 @@ public partial class MainWindow : Window
         await SaveAsAsync();
     }
 
+
     private void Exit_Click(
         object? sender,
         RoutedEventArgs e)
     {
         _ = ExitApplicationAsync();
     }
+
 
     // ============================================================
     // VIEW
@@ -1039,13 +1170,16 @@ public partial class MainWindow : Window
         Editor.WordWrap =
             !Editor.WordWrap;
 
+
         WordWrapMenuItem.Header =
             Editor.WordWrap
                 ? "_Word Wrap ✓"
                 : "_Word Wrap";
 
+
         SaveCurrentSettings();
     }
+
 
     private void StatusBar_Click(
         object? sender,
@@ -1054,13 +1188,16 @@ public partial class MainWindow : Window
         StatusBar.IsVisible =
             !StatusBar.IsVisible;
 
+
         StatusBarMenuItem.Header =
             StatusBar.IsVisible
                 ? "_Show Status Bar ✓"
                 : "_Show Status Bar";
 
+
         SaveCurrentSettings();
     }
+
 
     private void LineNumbers_Click(
         object? sender,
@@ -1069,13 +1206,16 @@ public partial class MainWindow : Window
         Editor.ShowLineNumbers =
             !Editor.ShowLineNumbers;
 
+
         LineNumbersMenuItem.Header =
             Editor.ShowLineNumbers
                 ? "_Show Line Numbers ✓"
                 : "_Show Line Numbers";
 
+
         SaveCurrentSettings();
     }
+
 
     private void Toolbar_Click(
         object? sender,
@@ -1084,13 +1224,16 @@ public partial class MainWindow : Window
         Toolbar.IsVisible =
             !Toolbar.IsVisible;
 
+
         ToolbarMenuItem.Header =
             Toolbar.IsVisible
                 ? "_Show Toolbar ✓"
                 : "_Show Toolbar";
 
+
         SaveCurrentSettings();
     }
+
 
     // ============================================================
     // FONT CONTROLS
@@ -1103,12 +1246,14 @@ public partial class MainWindow : Window
         SetEditorFont("Inter");
     }
 
+
     private void SegoeUIFont_Click(
         object? sender,
         RoutedEventArgs e)
     {
         SetEditorFont("Segoe UI");
     }
+
 
     private void ConsolasFont_Click(
         object? sender,
@@ -1117,12 +1262,14 @@ public partial class MainWindow : Window
         SetEditorFont("Consolas");
     }
 
+
     private void CourierNewFont_Click(
         object? sender,
         RoutedEventArgs e)
     {
         SetEditorFont("Courier New");
     }
+
 
     private void SetEditorFont(
         string fontName)
@@ -1131,10 +1278,12 @@ public partial class MainWindow : Window
             new FontFamily(
                 fontName);
 
+
         UpdateFontMenu();
 
         SaveCurrentSettings();
     }
+
 
     private void FontSize10_Click(
         object? sender,
@@ -1143,12 +1292,14 @@ public partial class MainWindow : Window
         SetEditorFontSize(10);
     }
 
+
     private void FontSize12_Click(
         object? sender,
         RoutedEventArgs e)
     {
         SetEditorFontSize(12);
     }
+
 
     private void FontSize14_Click(
         object? sender,
@@ -1157,12 +1308,14 @@ public partial class MainWindow : Window
         SetEditorFontSize(14);
     }
 
+
     private void FontSize16_Click(
         object? sender,
         RoutedEventArgs e)
     {
         SetEditorFontSize(16);
     }
+
 
     private void FontSize18_Click(
         object? sender,
@@ -1171,12 +1324,14 @@ public partial class MainWindow : Window
         SetEditorFontSize(18);
     }
 
+
     private void FontSize20_Click(
         object? sender,
         RoutedEventArgs e)
     {
         SetEditorFontSize(20);
     }
+
 
     private void FontSize24_Click(
         object? sender,
@@ -1185,6 +1340,7 @@ public partial class MainWindow : Window
         SetEditorFontSize(24);
     }
 
+
     private void FontSize28_Click(
         object? sender,
         RoutedEventArgs e)
@@ -1192,51 +1348,26 @@ public partial class MainWindow : Window
         SetEditorFontSize(28);
     }
 
+
     private void SetEditorFontSize(
         double fontSize)
     {
         Editor.FontSize =
             fontSize;
 
+
         UpdateFontMenu();
 
         SaveCurrentSettings();
     }
 
-    // ============================================================
-    // VIEW MENU STATE
-    // ============================================================
-
-    private void UpdateViewMenu()
-    {
-        WordWrapMenuItem.Header =
-            Editor.WordWrap
-                ? "_Word Wrap ✓"
-                : "_Word Wrap";
-
-        StatusBarMenuItem.Header =
-            StatusBar.IsVisible
-                ? "_Show Status Bar ✓"
-                : "_Show Status Bar";
-
-        LineNumbersMenuItem.Header =
-            Editor.ShowLineNumbers
-                ? "_Show Line Numbers ✓"
-                : "_Show Line Numbers";
-
-        ToolbarMenuItem.Header =
-            Toolbar.IsVisible
-                ? "_Show Toolbar ✓"
-                : "_Show Toolbar";
-
-        UpdateFontMenu();
-    }
 
     private void UpdateFontMenu()
     {
         string currentFont =
             Editor.FontFamily?.Name
             ?? "Inter";
+
 
         InterFontMenuItem.Header =
             string.Equals(
@@ -1246,6 +1377,7 @@ public partial class MainWindow : Window
                 ? "Inter ✓"
                 : "Inter";
 
+
         SegoeUIFontMenuItem.Header =
             string.Equals(
                 currentFont,
@@ -1253,6 +1385,7 @@ public partial class MainWindow : Window
                 StringComparison.OrdinalIgnoreCase)
                 ? "Segoe UI ✓"
                 : "Segoe UI";
+
 
         ConsolasFontMenuItem.Header =
             string.Equals(
@@ -1262,6 +1395,7 @@ public partial class MainWindow : Window
                 ? "Consolas ✓"
                 : "Consolas";
 
+
         CourierNewFontMenuItem.Header =
             string.Equals(
                 currentFont,
@@ -1269,6 +1403,7 @@ public partial class MainWindow : Window
                 StringComparison.OrdinalIgnoreCase)
                 ? "Courier New ✓"
                 : "Courier New";
+
 
         SetFontSizeMenuHeader(
             FontSize10MenuItem,
@@ -1303,6 +1438,41 @@ public partial class MainWindow : Window
             28);
     }
 
+
+    // ============================================================
+    // VIEW MENU STATE
+    // ============================================================
+
+    private void UpdateViewMenu()
+    {
+        WordWrapMenuItem.Header =
+            Editor.WordWrap
+                ? "_Word Wrap ✓"
+                : "_Word Wrap";
+
+
+        StatusBarMenuItem.Header =
+            StatusBar.IsVisible
+                ? "_Show Status Bar ✓"
+                : "_Show Status Bar";
+
+
+        LineNumbersMenuItem.Header =
+            Editor.ShowLineNumbers
+                ? "_Show Line Numbers ✓"
+                : "_Show Line Numbers";
+
+
+        ToolbarMenuItem.Header =
+            Toolbar.IsVisible
+                ? "_Show Toolbar ✓"
+                : "_Show Toolbar";
+
+
+        UpdateFontMenu();
+    }
+
+
     private void SetFontSizeMenuHeader(
         MenuItem menuItem,
         double size)
@@ -1313,6 +1483,7 @@ public partial class MainWindow : Window
                 ? $"{size:0} ✓"
                 : $"{size:0}";
     }
+
 
     // ============================================================
     // THEMES
@@ -1325,10 +1496,13 @@ public partial class MainWindow : Window
         ThemeManager.ApplyTheme(
             ThemeManager.OrbpadTheme.Dark);
 
+
         RefreshTabs();
         UpdateThemeMenu();
+
         SaveCurrentSettings();
     }
+
 
     private void MidnightTheme_Click(
         object? sender,
@@ -1337,10 +1511,13 @@ public partial class MainWindow : Window
         ThemeManager.ApplyTheme(
             ThemeManager.OrbpadTheme.Midnight);
 
+
         RefreshTabs();
         UpdateThemeMenu();
+
         SaveCurrentSettings();
     }
+
 
     private void ForestTheme_Click(
         object? sender,
@@ -1349,10 +1526,13 @@ public partial class MainWindow : Window
         ThemeManager.ApplyTheme(
             ThemeManager.OrbpadTheme.Forest);
 
+
         RefreshTabs();
         UpdateThemeMenu();
+
         SaveCurrentSettings();
     }
+
 
     private void LightTheme_Click(
         object? sender,
@@ -1361,10 +1541,13 @@ public partial class MainWindow : Window
         ThemeManager.ApplyTheme(
             ThemeManager.OrbpadTheme.Light);
 
+
         RefreshTabs();
         UpdateThemeMenu();
+
         SaveCurrentSettings();
     }
+
 
     // ============================================================
     // SETTINGS
@@ -1387,6 +1570,7 @@ public partial class MainWindow : Window
                 ThemeManager.OrbpadTheme.Dark);
         }
 
+
         Toolbar.IsVisible =
             _settings.ShowToolbar;
 
@@ -1399,6 +1583,7 @@ public partial class MainWindow : Window
         Editor.WordWrap =
             _settings.WordWrap;
 
+
         if (!string.IsNullOrWhiteSpace(
                 _settings.FontFamily))
         {
@@ -1407,11 +1592,13 @@ public partial class MainWindow : Window
                     _settings.FontFamily);
         }
 
+
         if (_settings.FontSize > 0)
         {
             Editor.FontSize =
                 _settings.FontSize;
         }
+
 
         Width =
             Math.Max(
@@ -1423,6 +1610,7 @@ public partial class MainWindow : Window
                 MinHeight,
                 _settings.WindowHeight);
 
+
         if (_settings.WindowX.HasValue &&
             _settings.WindowY.HasValue)
         {
@@ -1433,10 +1621,12 @@ public partial class MainWindow : Window
         }
     }
 
+
     private void SaveCurrentSettings()
     {
         _settings.Theme =
             ThemeManager.CurrentTheme.ToString();
+
 
         _settings.ShowToolbar =
             Toolbar.IsVisible;
@@ -1450,12 +1640,14 @@ public partial class MainWindow : Window
         _settings.WordWrap =
             Editor.WordWrap;
 
+
         _settings.FontFamily =
             Editor.FontFamily?.Name ??
             "Inter";
 
         _settings.FontSize =
             Editor.FontSize;
+
 
         _settings.WindowWidth =
             Width;
@@ -1469,9 +1661,11 @@ public partial class MainWindow : Window
         _settings.WindowY =
             Position.Y;
 
+
         _settingsService.Save(
             _settings);
     }
+
 
     private void UpdateThemeMenu()
     {
@@ -1481,11 +1675,13 @@ public partial class MainWindow : Window
                 ? "Orbpad _Dark ✓"
                 : "Orbpad _Dark";
 
+
         MidnightThemeMenuItem.Header =
             ThemeManager.CurrentTheme ==
             ThemeManager.OrbpadTheme.Midnight
                 ? "_Midnight ✓"
                 : "_Midnight";
+
 
         ForestThemeMenuItem.Header =
             ThemeManager.CurrentTheme ==
@@ -1493,12 +1689,14 @@ public partial class MainWindow : Window
                 ? "_Forest ✓"
                 : "_Forest";
 
+
         LightThemeMenuItem.Header =
             ThemeManager.CurrentTheme ==
             ThemeManager.OrbpadTheme.Light
                 ? "_Light ✓"
                 : "_Light";
     }
+
 
     // ============================================================
     // HELP
@@ -1515,6 +1713,7 @@ public partial class MainWindow : Window
             this);
     }
 
+
     // ============================================================
     // EXIT
     // ============================================================
@@ -1527,21 +1726,27 @@ public partial class MainWindow : Window
             if (!document.IsModified)
                 continue;
 
+
             _documentManager.SetActiveDocument(
                 document);
+
 
             LoadDocumentIntoEditor(
                 document);
 
+
             bool shouldContinue =
                 await ConfirmDiscardChangesAsync();
+
 
             if (!shouldContinue)
                 return;
         }
 
+
         Close();
     }
+
 
     // ============================================================
     // SAVE
@@ -1556,19 +1761,24 @@ public partial class MainWindow : Window
             var previousDocument =
                 _documentManager.ActiveDocument;
 
+
             _documentManager.SetActiveDocument(
                 document);
+
 
             LoadDocumentIntoEditor(
                 document);
 
+
             bool saved =
                 await SaveAsAsync();
+
 
             if (previousDocument is not null)
             {
                 bool stillExists =
                     false;
+
 
                 foreach (var existingDocument
                          in _documentManager.Documents)
@@ -1583,30 +1793,38 @@ public partial class MainWindow : Window
                     }
                 }
 
+
                 if (stillExists)
                 {
                     _documentManager.SetActiveDocument(
                         previousDocument);
+
 
                     LoadDocumentIntoEditor(
                         previousDocument);
                 }
             }
 
+
             return saved;
         }
+
 
         _fileService.WriteFile(
             document.FilePath,
             document.Text);
 
+
         document.MarkAsSaved();
+
 
         RefreshTabs();
         UpdateWindowTitle();
 
+
         return true;
     }
+
 
     private async Task<bool>
         SaveAsAsync()
@@ -1614,8 +1832,10 @@ public partial class MainWindow : Window
         var document =
             _documentManager.ActiveDocument;
 
+
         if (document is null)
             return false;
+
 
         var file =
             await StorageProvider
@@ -1653,8 +1873,10 @@ public partial class MainWindow : Window
                         ]
                     });
 
+
         if (file is null)
             return false;
+
 
         if (file.TryGetLocalPath()
             is not string filePath)
@@ -1662,26 +1884,34 @@ public partial class MainWindow : Window
             return false;
         }
 
+
         document.FilePath =
             filePath;
 
+
         SaveCurrentDocument();
 
-        // Re-evaluate syntax highlighting now that
-        // the document has a real file extension.
+
         _syntaxHighlightingService.ApplyForFile(
             filePath);
+
+
+        RefreshMarkdownView();
+
 
         AddRecentFile(
             filePath);
 
+
         return true;
     }
+
 
     private void SaveCurrentDocument()
     {
         var document =
             _documentManager.ActiveDocument;
+
 
         if (document is null ||
             document.FilePath is null)
@@ -1689,22 +1919,28 @@ public partial class MainWindow : Window
             return;
         }
 
+
         string content =
             Editor.Text ?? string.Empty;
 
+
         document.Text =
             content;
+
 
         _fileService.WriteFile(
             document.FilePath,
             document.Text);
 
+
         document.MarkAsSaved();
+
 
         UpdateWindowTitle();
         UpdateStatusBar();
         RefreshTabs();
     }
+
 
     private async Task<bool>
         ConfirmDiscardChangesAsync()
@@ -1712,18 +1948,22 @@ public partial class MainWindow : Window
         var document =
             _documentManager.ActiveDocument;
 
+
         if (document is null ||
             !document.IsModified)
         {
             return true;
         }
 
+
         var dialog =
             new ConfirmDialog();
+
 
         var result =
             await dialog.ShowDialog<bool?>(
                 this);
+
 
         if (result == true)
         {
@@ -1732,16 +1972,20 @@ public partial class MainWindow : Window
                 return await SaveAsAsync();
             }
 
+
             SaveCurrentDocument();
 
             return true;
         }
 
+
         if (result == false)
             return true;
 
+
         return false;
     }
+
 
     // ============================================================
     // EDIT
@@ -1756,6 +2000,7 @@ public partial class MainWindow : Window
         UpdateStatusBar();
     }
 
+
     private void Redo_Click(
         object? sender,
         RoutedEventArgs e)
@@ -1764,6 +2009,7 @@ public partial class MainWindow : Window
 
         UpdateStatusBar();
     }
+
 
     private void Cut_Click(
         object? sender,
@@ -1776,6 +2022,7 @@ public partial class MainWindow : Window
         UpdateStatusBar();
     }
 
+
     private void Copy_Click(
         object? sender,
         RoutedEventArgs e)
@@ -1784,6 +2031,7 @@ public partial class MainWindow : Window
 
         Editor.Copy();
     }
+
 
     private void Paste_Click(
         object? sender,
@@ -1796,6 +2044,7 @@ public partial class MainWindow : Window
         UpdateStatusBar();
     }
 
+
     private void SelectAll_Click(
         object? sender,
         RoutedEventArgs e)
@@ -1806,6 +2055,7 @@ public partial class MainWindow : Window
 
         UpdateStatusBar();
     }
+
 
     // ============================================================
     // EDITOR SELECTION
@@ -1820,14 +2070,17 @@ public partial class MainWindow : Window
             _lastKnownCaretOffset =
                 Editor.CaretOffset;
 
+
             if (Editor.SelectionLength > 0)
             {
                 SaveEditorSelection();
             }
         }
 
+
         UpdateStatusBar();
     }
+
 
     private void Editor_SelectionChanged(
         object? sender,
@@ -1836,8 +2089,10 @@ public partial class MainWindow : Window
         if (!Editor.TextArea.IsFocused)
             return;
 
+
         SaveEditorSelection();
     }
+
 
     private void SaveEditorSelection()
     {
@@ -1851,12 +2106,15 @@ public partial class MainWindow : Window
             Editor.CaretOffset;
     }
 
+
     private void RestoreEditorSelection()
     {
         Editor.TextArea.Focus();
 
+
         int textLength =
             (Editor.Text ?? string.Empty).Length;
+
 
         if (_lastKnownSelectionLength > 0)
         {
@@ -1866,18 +2124,22 @@ public partial class MainWindow : Window
                     0,
                     textLength);
 
+
             int length =
                 Math.Clamp(
                     _lastKnownSelectionLength,
                     0,
                     textLength - start);
 
+
             Editor.Select(
                 start,
                 length);
 
+
             return;
         }
+
 
         Editor.CaretOffset =
             Math.Clamp(
@@ -1885,6 +2147,7 @@ public partial class MainWindow : Window
                 0,
                 textLength);
     }
+
 
     // ============================================================
     // SEARCH
@@ -1897,6 +2160,7 @@ public partial class MainWindow : Window
         ShowSearchBar();
     }
 
+
     private void CloseSearch_Click(
         object? sender,
         RoutedEventArgs e)
@@ -1907,12 +2171,14 @@ public partial class MainWindow : Window
         Editor.TextArea.Focus();
     }
 
+
     private void FindNext_Click(
         object? sender,
         RoutedEventArgs e)
     {
         FindNext();
     }
+
 
     private void FindPrevious_Click(
         object? sender,
@@ -1921,6 +2187,7 @@ public partial class MainWindow : Window
         FindPrevious();
     }
 
+
     private void Replace_Click(
         object? sender,
         RoutedEventArgs e)
@@ -1928,17 +2195,21 @@ public partial class MainWindow : Window
         string searchText =
             SearchBox.Text ?? string.Empty;
 
+
         if (string.IsNullOrEmpty(
                 searchText))
         {
             return;
         }
 
+
         string replacementText =
             ReplaceBox.Text ?? string.Empty;
 
+
         string selectedText =
             Editor.SelectedText ?? string.Empty;
+
 
         bool selectionMatchesSearch =
             Editor.SelectionLength > 0 &&
@@ -1947,26 +2218,32 @@ public partial class MainWindow : Window
                 searchText,
                 StringComparison.OrdinalIgnoreCase);
 
+
         if (selectionMatchesSearch)
         {
             int start =
                 Editor.SelectionStart;
+
 
             Editor.Document.Replace(
                 start,
                 Editor.SelectionLength,
                 replacementText);
 
+
             Editor.CaretOffset =
                 start + replacementText.Length;
 
+
             SaveEditorSelection();
         }
+
 
         FindNext();
 
         UpdateStatusBar();
     }
+
 
     private void ReplaceAll_Click(
         object? sender,
@@ -1975,22 +2252,28 @@ public partial class MainWindow : Window
         string searchText =
             SearchBox.Text ?? string.Empty;
 
+
         if (string.IsNullOrEmpty(
                 searchText))
         {
             return;
         }
 
+
         string replacementText =
             ReplaceBox.Text ?? string.Empty;
+
 
         string text =
             Editor.Text ?? string.Empty;
 
+
         var matchOffsets =
             new List<int>();
 
+
         int searchIndex = 0;
+
 
         while (true)
         {
@@ -2000,22 +2283,30 @@ public partial class MainWindow : Window
                     searchIndex,
                     StringComparison.OrdinalIgnoreCase);
 
+
             if (index < 0)
                 break;
 
-            matchOffsets.Add(index);
+
+            matchOffsets.Add(
+                index);
+
 
             searchIndex =
                 index + searchText.Length;
         }
 
+
         if (matchOffsets.Count == 0)
             return;
+
 
         var document =
             Editor.Document;
 
+
         document.UndoStack.StartUndoGroup();
+
 
         try
         {
@@ -2035,16 +2326,19 @@ public partial class MainWindow : Window
             document.UndoStack.EndUndoGroup();
         }
 
+
         Editor.CaretOffset =
             Math.Min(
                 matchOffsets[0] +
                 replacementText.Length,
                 Editor.Text?.Length ?? 0);
 
+
         SaveEditorSelection();
 
         UpdateStatusBar();
     }
+
 
     private void SearchBox_KeyDown(
         object? sender,
@@ -2052,6 +2346,7 @@ public partial class MainWindow : Window
     {
         if (e.Key != Key.Enter)
             return;
+
 
         if (e.KeyModifiers.HasFlag(
                 KeyModifiers.Shift))
@@ -2063,8 +2358,10 @@ public partial class MainWindow : Window
             FindNext();
         }
 
+
         e.Handled = true;
     }
+
 
     private void ReplaceBox_KeyDown(
         object? sender,
@@ -2073,19 +2370,24 @@ public partial class MainWindow : Window
         if (e.Key != Key.Enter)
             return;
 
+
         Replace_Click(
             sender,
             new RoutedEventArgs());
 
+
         e.Handled = true;
     }
+
 
     private void ShowSearchBar()
     {
         SearchBar.IsVisible =
             true;
 
+
         SearchBox.Focus();
+
 
         if (!string.IsNullOrEmpty(
                 Editor.SelectedText))
@@ -2095,10 +2397,12 @@ public partial class MainWindow : Window
         }
     }
 
+
     private void FindNext()
     {
         string searchText =
             SearchBox.Text ?? string.Empty;
+
 
         if (string.IsNullOrEmpty(
                 searchText))
@@ -2106,18 +2410,22 @@ public partial class MainWindow : Window
             return;
         }
 
+
         string text =
             Editor.Text ?? string.Empty;
+
 
         int startIndex =
             Editor.SelectionStart +
             Editor.SelectionLength;
+
 
         int index =
             text.IndexOf(
                 searchText,
                 startIndex,
                 StringComparison.OrdinalIgnoreCase);
+
 
         if (index < 0)
         {
@@ -2128,22 +2436,27 @@ public partial class MainWindow : Window
                     StringComparison.OrdinalIgnoreCase);
         }
 
+
         if (index < 0)
             return;
+
 
         Editor.Select(
             index,
             searchText.Length);
+
 
         SaveEditorSelection();
 
         Editor.TextArea.Focus();
     }
 
+
     private void FindPrevious()
     {
         string searchText =
             SearchBox.Text ?? string.Empty;
+
 
         if (string.IsNullOrEmpty(
                 searchText))
@@ -2151,14 +2464,18 @@ public partial class MainWindow : Window
             return;
         }
 
+
         string text =
             Editor.Text ?? string.Empty;
+
 
         if (text.Length == 0)
             return;
 
+
         int startIndex =
             Editor.SelectionStart - 1;
+
 
         if (startIndex < 0)
         {
@@ -2166,11 +2483,13 @@ public partial class MainWindow : Window
                 text.Length - 1;
         }
 
+
         int index =
             text.LastIndexOf(
                 searchText,
                 startIndex,
                 StringComparison.OrdinalIgnoreCase);
+
 
         if (index < 0)
         {
@@ -2181,17 +2500,21 @@ public partial class MainWindow : Window
                     StringComparison.OrdinalIgnoreCase);
         }
 
+
         if (index < 0)
             return;
+
 
         Editor.Select(
             index,
             searchText.Length);
 
+
         SaveEditorSelection();
 
         Editor.TextArea.Focus();
     }
+
 
     // ============================================================
     // EDITOR TEXT
@@ -2204,11 +2527,14 @@ public partial class MainWindow : Window
         var document =
             _documentManager.ActiveDocument;
 
+
         if (document is null)
             return;
 
+
         string editorText =
             Editor.Text ?? string.Empty;
+
 
         if (editorText ==
             document.Text)
@@ -2219,13 +2545,16 @@ public partial class MainWindow : Window
             return;
         }
 
+
         document.Text =
             editorText;
+
 
         UpdateWindowTitle();
         UpdateStatusBar();
         RefreshTabs();
     }
+
 
     // ============================================================
     // WINDOW TITLE
@@ -2236,6 +2565,7 @@ public partial class MainWindow : Window
         var document =
             _documentManager.ActiveDocument;
 
+
         if (document is null)
         {
             Title =
@@ -2244,7 +2574,9 @@ public partial class MainWindow : Window
             return;
         }
 
+
         string fileName;
+
 
         if (document.FilePath is null)
         {
@@ -2258,14 +2590,17 @@ public partial class MainWindow : Window
                     document.FilePath);
         }
 
+
         string modifiedMarker =
             document.IsModified
                 ? " *"
                 : string.Empty;
 
+
         Title =
             $"Orbpad — {fileName}{modifiedMarker}";
     }
+
 
     // ============================================================
     // STATUS BAR
@@ -2276,23 +2611,30 @@ public partial class MainWindow : Window
         string text =
             Editor.Text ?? string.Empty;
 
+
         var caret =
             Editor.TextArea.Caret;
+
 
         int line =
             caret.Line;
 
+
         int column =
             caret.Column;
+
 
         int wordCount =
             CountWords(text);
 
+
         int characterCount =
             text.Length;
 
+
         CursorPositionText.Text =
             $"Ln {line}, Col {column}";
+
 
         WordCountText.Text =
             $"{wordCount} " +
@@ -2300,12 +2642,14 @@ public partial class MainWindow : Window
                 ? "word"
                 : "words")}";
 
+
         CharacterCountText.Text =
             $"  {characterCount} " +
             $"{(characterCount == 1
                 ? "character"
                 : "characters")}";
     }
+
 
     private static int CountWords(
         string text)
@@ -2316,12 +2660,14 @@ public partial class MainWindow : Window
             return 0;
         }
 
+
         return text.Split(
             (char[]?)null,
             StringSplitOptions
                 .RemoveEmptyEntries)
             .Length;
     }
+
 
     // ============================================================
     // WINDOW LIFETIME
@@ -2332,10 +2678,13 @@ public partial class MainWindow : Window
     {
         SaveCurrentSettings();
 
+
         _syntaxHighlightingService.Dispose();
+
 
         base.OnClosed(e);
     }
+
 
     private enum CloseDocumentResult
     {

@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:AvaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        xmlns:Markdown="clr-namespace:Orbpad.Markdown"
         x:Class="Orbpad.MainWindow"
         Title="Orbpad"
         Width="1000"
@@ -12,9 +13,9 @@
 
     <DockPanel>
 
-        <!-- ========================= -->
-        <!-- Menu                       -->
-        <!-- ========================= -->
+        <!-- ===================================================== -->
+        <!-- MENU                                                  -->
+        <!-- ===================================================== -->
 
         <Border DockPanel.Dock="Top"
                 Background="{DynamicResource OrbpadSurfaceBrush}"
@@ -23,9 +24,9 @@
 
             <Menu Background="Transparent">
 
-                <!-- ================= -->
-                <!-- File                -->
-                <!-- ================= -->
+                <!-- ================================================= -->
+                <!-- FILE                                                -->
+                <!-- ================================================= -->
 
                 <MenuItem Header="_File">
 
@@ -63,9 +64,9 @@
                 </MenuItem>
 
 
-                <!-- ================= -->
-                <!-- Edit                -->
-                <!-- ================= -->
+                <!-- ================================================= -->
+                <!-- EDIT                                                -->
+                <!-- ================================================= -->
 
                 <MenuItem Header="_Edit">
 
@@ -100,9 +101,9 @@
                 </MenuItem>
 
 
-                <!-- ================= -->
-                <!-- View                -->
-                <!-- ================= -->
+                <!-- ================================================= -->
+                <!-- VIEW                                                -->
+                <!-- ================================================= -->
 
                 <MenuItem Header="_View">
 
@@ -124,9 +125,10 @@
 
                     <Separator/>
 
-                    <!-- ================= -->
-                    <!-- Font                -->
-                    <!-- ================= -->
+
+                    <!-- ================================================= -->
+                    <!-- FONT                                                -->
+                    <!-- ================================================= -->
 
                     <MenuItem Header="_Font">
 
@@ -149,9 +151,9 @@
                     </MenuItem>
 
 
-                    <!-- ================= -->
-                    <!-- Font Size           -->
-                    <!-- ================= -->
+                    <!-- ================================================= -->
+                    <!-- FONT SIZE                                           -->
+                    <!-- ================================================= -->
 
                     <MenuItem Header="Font _Size">
 
@@ -189,11 +191,38 @@
 
                     </MenuItem>
 
+
                     <Separator/>
 
-                    <!-- ================= -->
-                    <!-- Themes              -->
-                    <!-- ================= -->
+
+                    <!-- ================================================= -->
+                    <!-- MARKDOWN                                             -->
+                    <!-- ================================================= -->
+
+                    <MenuItem x:Name="MarkdownMenuItem"
+                              Header="_Markdown">
+
+                        <MenuItem x:Name="MarkdownEditMenuItem"
+                                  Header="_Edit ✓"
+                                  Click="MarkdownEdit_Click"/>
+
+                        <MenuItem x:Name="MarkdownSplitMenuItem"
+                                  Header="_Split"
+                                  Click="MarkdownSplit_Click"/>
+
+                        <MenuItem x:Name="MarkdownPreviewMenuItem"
+                                  Header="_Preview"
+                                  Click="MarkdownPreview_Click"/>
+
+                    </MenuItem>
+
+
+                    <Separator/>
+
+
+                    <!-- ================================================= -->
+                    <!-- THEMES                                              -->
+                    <!-- ================================================= -->
 
                     <MenuItem Header="_Themes">
 
@@ -218,9 +247,9 @@
                 </MenuItem>
 
 
-                <!-- ================= -->
-                <!-- Help                -->
-                <!-- ================= -->
+                <!-- ================================================= -->
+                <!-- HELP                                                -->
+                <!-- ================================================= -->
 
                 <MenuItem Header="_Help">
 
@@ -234,9 +263,9 @@
         </Border>
 
 
-        <!-- ========================= -->
-        <!-- Toolbar                    -->
-        <!-- ========================= -->
+        <!-- ===================================================== -->
+        <!-- TOOLBAR                                                -->
+        <!-- ===================================================== -->
 
         <Border x:Name="Toolbar"
                 DockPanel.Dock="Top"
@@ -279,9 +308,9 @@
         </Border>
 
 
-        <!-- ========================= -->
-        <!-- Tabs                       -->
-        <!-- ========================= -->
+        <!-- ===================================================== -->
+        <!-- TABS                                                   -->
+        <!-- ===================================================== -->
 
         <Border DockPanel.Dock="Top"
                 Background="{DynamicResource OrbpadSurfaceBrush}"
@@ -313,9 +342,9 @@
         </Border>
 
 
-        <!-- ========================= -->
-        <!-- Search Bar                 -->
-        <!-- ========================= -->
+        <!-- ===================================================== -->
+        <!-- SEARCH BAR                                             -->
+        <!-- ===================================================== -->
 
         <Border x:Name="SearchBar"
                 DockPanel.Dock="Top"
@@ -327,8 +356,6 @@
 
             <Grid RowDefinitions="Auto,Auto"
                   RowSpacing="6">
-
-                <!-- Find row -->
 
                 <Grid Grid.Row="0"
                       ColumnDefinitions="*,Auto,Auto,Auto"
@@ -354,8 +381,6 @@
                 </Grid>
 
 
-                <!-- Replace row -->
-
                 <Grid Grid.Row="1"
                       ColumnDefinitions="*,Auto,Auto"
                       ColumnSpacing="6">
@@ -380,9 +405,9 @@
         </Border>
 
 
-        <!-- ========================= -->
-        <!-- Status Bar                 -->
-        <!-- ========================= -->
+        <!-- ===================================================== -->
+        <!-- STATUS BAR                                             -->
+        <!-- ===================================================== -->
 
         <Border x:Name="StatusBar"
                 DockPanel.Dock="Bottom"
@@ -415,18 +440,52 @@
         </Border>
 
 
-        <!-- ========================= -->
-        <!-- Editor                     -->
-        <!-- ========================= -->
+        <!-- ===================================================== -->
+        <!-- EDITOR WORKSPACE                                      -->
+        <!-- ===================================================== -->
 
         <Border Background="{DynamicResource OrbpadBackgroundBrush}">
 
-            <AvaloniaEdit:TextEditor x:Name="Editor"
-                                     ShowLineNumbers="True"
-                                     WordWrap="False"
-                                     IsReadOnly="False"
-                                     HorizontalScrollBarVisibility="Auto"
-                                     VerticalScrollBarVisibility="Auto"/>
+            <Grid x:Name="EditorWorkspace"
+                  ColumnDefinitions="*,4,*">
+
+                <!-- ================================================= -->
+                <!-- EDITOR                                              -->
+                <!-- ================================================= -->
+
+                <AvaloniaEdit:TextEditor
+                    x:Name="Editor"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    ShowLineNumbers="True"
+                    WordWrap="False"
+                    IsReadOnly="False"
+                    HorizontalScrollBarVisibility="Auto"
+                    VerticalScrollBarVisibility="Auto"/>
+
+
+                <!-- ================================================= -->
+                <!-- MARKDOWN SPLITTER                                   -->
+                <!-- ================================================= -->
+
+                <GridSplitter x:Name="MarkdownSplitter"
+                              Grid.Column="1"
+                              IsVisible="False"
+                              ResizeDirection="Columns"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"/>
+
+
+                <!-- ================================================= -->
+                <!-- MARKDOWN PREVIEW                                    -->
+                <!-- ================================================= -->
+
+                <Markdown:MarkdownPreviewControl
+                    x:Name="MarkdownPreview"
+                    Grid.Column="2"
+                    IsVisible="False"/>
+
+            </Grid>
 
         </Border>
 
