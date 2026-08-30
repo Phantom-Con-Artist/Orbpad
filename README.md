@@ -104,11 +104,14 @@ Five polished built-in themes — see [Themes](#themes) below.
 
 ## Screenshots
 
-> Screenshots will be added here for the official release.
+### Editor
+![Orbpad Editor](docs/screenshot-editor.png)
 
-| Editor | File Explorer | Markdown Preview |
-|---|---|---|
-| `docs/screenshot-editor.png` | `docs/screenshot-explorer.png` | `docs/screenshot-markdown.png` |
+### File Explorer
+![Orbpad File Explorer](docs/screenshot-explorer.png)
+
+### Markdown Preview
+![Orbpad Markdown Preview](docs/screenshot-markdown.png)
 
 ---
 
