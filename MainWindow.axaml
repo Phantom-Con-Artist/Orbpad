@@ -6,7 +6,8 @@
         Height="700"
         MinWidth="600"
         MinHeight="400"
-        Background="{DynamicResource OrbpadBackgroundBrush}">
+        Background="{DynamicResource OrbpadBackgroundBrush}"
+        KeyDown="Window_KeyDown">
 
     <DockPanel>
 

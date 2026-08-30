@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
@@ -17,8 +18,6 @@ public partial class MainWindow : Window
     private readonly DocumentManager _documentManager;
     private readonly FileService _fileService;
 
-    private bool _isUpdatingEditor;
-
     private readonly Dictionary<Document, Button>
         _documentButtons = new();
 
@@ -26,8 +25,11 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        _documentManager = new DocumentManager();
-        _fileService = new FileService();
+        _documentManager =
+            new DocumentManager();
+
+        _fileService =
+            new FileService();
 
         CreateInitialDocument();
 
@@ -39,12 +41,112 @@ public partial class MainWindow : Window
         RefreshTabs();
     }
 
+    // ============================================================
+    // KEYBOARD SHORTCUTS
+    // ============================================================
+
+    private void Window_KeyDown(
+        object? sender,
+        KeyEventArgs e)
+    {
+        if (!e.KeyModifiers.HasFlag(
+                KeyModifiers.Control))
+        {
+            return;
+        }
+
+        if (e.Key == Key.Tab)
+        {
+            if (e.KeyModifiers.HasFlag(
+                    KeyModifiers.Shift))
+            {
+                SwitchToPreviousDocument();
+            }
+            else
+            {
+                SwitchToNextDocument();
+            }
+
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.W)
+        {
+            CloseActiveDocument();
+
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key >= Key.D1 &&
+            e.Key <= Key.D9)
+        {
+            int index =
+                e.Key - Key.D1;
+
+            SwitchToDocumentAt(index);
+
+            e.Handled = true;
+        }
+    }
+
+    private void SwitchToNextDocument()
+    {
+        var document =
+            _documentManager.GetNextDocument();
+
+        if (document is null)
+            return;
+
+        SwitchToDocument(document);
+    }
+
+    private void SwitchToPreviousDocument()
+    {
+        var document =
+            _documentManager.GetPreviousDocument();
+
+        if (document is null)
+            return;
+
+        SwitchToDocument(document);
+    }
+
+    private void SwitchToDocumentAt(
+        int index)
+    {
+        var document =
+            _documentManager.GetDocumentAt(index);
+
+        if (document is null)
+            return;
+
+        SwitchToDocument(document);
+    }
+
+    private void CloseActiveDocument()
+    {
+        var document =
+            _documentManager.ActiveDocument;
+
+        if (document is null)
+            return;
+
+        _ = CloseDocumentAsync(document);
+    }
+
+    // ============================================================
+    // DOCUMENT CREATION
+    // ============================================================
+
     private void CreateInitialDocument()
     {
         var document =
             _documentManager.CreateDocument();
 
-        LoadDocumentIntoEditor(document);
+        LoadDocumentIntoEditor(
+            document);
     }
 
     private void NewTab_Click(
@@ -59,13 +161,65 @@ public partial class MainWindow : Window
         var document =
             _documentManager.CreateDocument();
 
-        LoadDocumentIntoEditor(document);
+        LoadDocumentIntoEditor(
+            document);
 
         RefreshTabs();
+        UpdateWindowTitle();
+        UpdateStatusBar();
+    }
+
+    // ============================================================
+    // DOCUMENT SWITCHING
+    // ============================================================
+
+    private void SwitchToDocument(
+        Document document)
+    {
+        if (_documentManager.ActiveDocument ==
+            document)
+        {
+            return;
+        }
+
+        _documentManager.SetActiveDocument(
+            document);
+
+        LoadDocumentIntoEditor(
+            document);
+
+        UpdateWindowTitle();
+        UpdateStatusBar();
+        UpdateTabAppearance();
+    }
+
+    private void LoadDocumentIntoEditor(
+        Document document)
+    {
+        /*
+         * The important part:
+         *
+         * We simply load the document's text.
+         *
+         * Editor_TextChanged compares the editor
+         * contents against the document contents.
+         *
+         * Therefore loading a document does NOT
+         * automatically make it modified.
+         */
+
+        Editor.Text =
+            document.Text ?? string.Empty;
+
+        Editor.CaretIndex = 0;
 
         UpdateWindowTitle();
         UpdateStatusBar();
     }
+
+    // ============================================================
+    // TABS
+    // ============================================================
 
     private void RefreshTabs()
     {
@@ -179,6 +333,58 @@ public partial class MainWindow : Window
         return container;
     }
 
+    private void UpdateTabAppearance()
+    {
+        foreach (var pair
+                 in _documentButtons)
+        {
+            bool isActive =
+                pair.Key ==
+                _documentManager.ActiveDocument;
+
+            pair.Value.Background =
+                new SolidColorBrush(
+                    Color.Parse(
+                        isActive
+                            ? "#2A2A2E"
+                            : "#202023"));
+        }
+    }
+
+    private string GetDocumentTitle(
+        Document document)
+    {
+        int documentNumber = 1;
+
+        foreach (var currentDocument
+                 in _documentManager.Documents)
+        {
+            if (currentDocument == document)
+                break;
+
+            documentNumber++;
+        }
+
+        if (document.FilePath is not null)
+        {
+            string fileName =
+                System.IO.Path.GetFileName(
+                    document.FilePath);
+
+            return document.IsModified
+                ? $"{fileName} *"
+                : fileName;
+        }
+
+        return document.IsModified
+            ? $"Untitled {documentNumber} *"
+            : $"Untitled {documentNumber}";
+    }
+
+    // ============================================================
+    // CLOSE DOCUMENT
+    // ============================================================
+
     private async Task CloseDocumentAsync(
         Document document)
     {
@@ -234,7 +440,6 @@ public partial class MainWindow : Window
         }
 
         RefreshTabs();
-
         UpdateWindowTitle();
         UpdateStatusBar();
     }
@@ -251,17 +456,138 @@ public partial class MainWindow : Window
                 this);
 
         if (result == true)
-        {
             return CloseDocumentResult.Save;
-        }
 
         if (result == false)
-        {
             return CloseDocumentResult.DontSave;
-        }
 
         return CloseDocumentResult.Cancel;
     }
+
+    // ============================================================
+    // FILE MENU
+    // ============================================================
+
+    private async void New_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        if (!await ConfirmDiscardChangesAsync())
+            return;
+
+        CreateNewDocument();
+    }
+
+    private async void Open_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        var files =
+            await StorageProvider
+                .OpenFilePickerAsync(
+                    new FilePickerOpenOptions
+                    {
+                        Title = "Open File",
+                        AllowMultiple = false
+                    });
+
+        if (files.Count == 0)
+            return;
+
+        var file =
+            files[0];
+
+        if (file.TryGetLocalPath()
+            is not string filePath)
+        {
+            return;
+        }
+
+        var document =
+            _documentManager.CreateDocument();
+
+        document.Text =
+            _fileService.ReadFile(
+                filePath);
+
+        document.FilePath =
+            filePath;
+
+        document.IsModified =
+            false;
+
+        LoadDocumentIntoEditor(
+            document);
+
+        RefreshTabs();
+        UpdateWindowTitle();
+        UpdateStatusBar();
+    }
+
+    private void Save_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        var document =
+            _documentManager.ActiveDocument;
+
+        if (document is null)
+            return;
+
+        if (document.FilePath is null)
+        {
+            _ = SaveAsAsync();
+            return;
+        }
+
+        SaveCurrentDocument();
+    }
+
+    private async void SaveAs_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        await SaveAsAsync();
+    }
+
+    private void Exit_Click(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        _ = ExitApplicationAsync();
+    }
+
+    // ============================================================
+    // EXIT
+    // ============================================================
+
+    private async Task ExitApplicationAsync()
+    {
+        foreach (var document
+                 in _documentManager.Documents)
+        {
+            if (!document.IsModified)
+                continue;
+
+            _documentManager.SetActiveDocument(
+                document);
+
+            LoadDocumentIntoEditor(
+                document);
+
+            bool shouldContinue =
+                await ConfirmDiscardChangesAsync();
+
+            if (!shouldContinue)
+                return;
+        }
+
+        Close();
+    }
+
+    // ============================================================
+    // SAVE
+    // ============================================================
 
     private async Task<bool>
         SaveDocumentAsync(
@@ -316,204 +642,141 @@ public partial class MainWindow : Window
         document.IsModified =
             false;
 
+        RefreshTabs();
+        UpdateWindowTitle();
+
         return true;
     }
 
-    private void SwitchToDocument(
-        Document document)
-    {
-        if (_documentManager.ActiveDocument ==
-            document)
-        {
-            return;
-        }
-
-        _documentManager.SetActiveDocument(
-            document);
-
-        LoadDocumentIntoEditor(
-            document);
-
-        UpdateWindowTitle();
-        UpdateStatusBar();
-        UpdateTabAppearance();
-    }
-
-    private void LoadDocumentIntoEditor(
-        Document document)
-    {
-        _isUpdatingEditor = true;
-
-        Editor.Text =
-            document.Text;
-
-        _isUpdatingEditor = false;
-    }
-
-    private string GetDocumentTitle(
-        Document document)
-    {
-        int documentNumber = 1;
-
-        foreach (var currentDocument
-                 in _documentManager.Documents)
-        {
-            if (currentDocument == document)
-                break;
-
-            documentNumber++;
-        }
-
-        if (document.FilePath is not null)
-        {
-            string fileName =
-                System.IO.Path.GetFileName(
-                    document.FilePath);
-
-            return document.IsModified
-                ? $"{fileName} *"
-                : fileName;
-        }
-
-        return document.IsModified
-            ? $"Untitled {documentNumber} *"
-            : $"Untitled {documentNumber}";
-    }
-
-    private void UpdateTabAppearance()
-    {
-        foreach (var pair
-                 in _documentButtons)
-        {
-            bool isActive =
-                pair.Key ==
-                _documentManager.ActiveDocument;
-
-            pair.Value.Background =
-                new SolidColorBrush(
-                    Color.Parse(
-                        isActive
-                            ? "#2A2A2E"
-                            : "#202023"));
-        }
-    }
-
-    private async void New_Click(
-        object? sender,
-        RoutedEventArgs e)
-    {
-        if (!await ConfirmDiscardChangesAsync())
-            return;
-
-        CreateNewDocument();
-    }
-
-    private async void Open_Click(
-        object? sender,
-        RoutedEventArgs e)
-    {
-        if (!await ConfirmDiscardChangesAsync())
-            return;
-
-        var files =
-            await StorageProvider
-                .OpenFilePickerAsync(
-                    new FilePickerOpenOptions
-                    {
-                        Title = "Open File",
-                        AllowMultiple = false
-                    });
-
-        if (files.Count == 0)
-            return;
-
-        var file =
-            files[0];
-
-        if (file.TryGetLocalPath()
-            is not string filePath)
-        {
-            return;
-        }
-
-        var document =
-            _documentManager.CreateDocument();
-
-        document.Text =
-            _fileService.ReadFile(
-                filePath);
-
-        document.FilePath =
-            filePath;
-
-        document.IsModified =
-            false;
-
-        LoadDocumentIntoEditor(
-            document);
-
-        RefreshTabs();
-
-        UpdateWindowTitle();
-        UpdateStatusBar();
-    }
-
-    private void Save_Click(
-        object? sender,
-        RoutedEventArgs e)
+    private async Task<bool> SaveAsAsync()
     {
         var document =
             _documentManager.ActiveDocument;
 
         if (document is null)
-            return;
+            return false;
 
-        if (document.FilePath is null)
+        var file =
+            await StorageProvider
+                .SaveFilePickerAsync(
+                    new FilePickerSaveOptions
+                    {
+                        Title = "Save File",
+
+                        SuggestedFileName =
+                            "Untitled.txt",
+
+                        DefaultExtension =
+                            "txt",
+
+                        FileTypeChoices =
+                        [
+                            new FilePickerFileType(
+                                "Text File")
+                            {
+                                Patterns =
+                                [
+                                    "*.txt"
+                                ]
+                            },
+
+                            new FilePickerFileType(
+                                "All Files")
+                            {
+                                Patterns =
+                                [
+                                    "*"
+                                ]
+                            }
+                        ]
+                    });
+
+        if (file is null)
+            return false;
+
+        if (file.TryGetLocalPath()
+            is not string filePath)
         {
-            _ = SaveAsAsync();
-            return;
+            return false;
         }
+
+        document.FilePath =
+            filePath;
 
         SaveCurrentDocument();
+
+        return true;
     }
 
-    private async void SaveAs_Click(
-        object? sender,
-        RoutedEventArgs e)
+    private void SaveCurrentDocument()
     {
-        await SaveAsAsync();
-    }
+        var document =
+            _documentManager.ActiveDocument;
 
-    private void Exit_Click(
-        object? sender,
-        RoutedEventArgs e)
-    {
-        _ = ExitApplicationAsync();
-    }
-
-    private async Task ExitApplicationAsync()
-    {
-        foreach (var document
-                 in _documentManager.Documents)
+        if (document is null ||
+            document.FilePath is null)
         {
-            if (!document.IsModified)
-                continue;
-
-            _documentManager.SetActiveDocument(
-                document);
-
-            LoadDocumentIntoEditor(
-                document);
-
-            var shouldContinue =
-                await ConfirmDiscardChangesAsync();
-
-            if (!shouldContinue)
-                return;
+            return;
         }
 
-        Close();
+        string content =
+            Editor.Text ?? string.Empty;
+
+        _fileService.WriteFile(
+            document.FilePath,
+            content);
+
+        document.Text =
+            content;
+
+        document.IsModified =
+            false;
+
+        UpdateWindowTitle();
+        UpdateStatusBar();
+        RefreshTabs();
     }
+
+    private async Task<bool>
+        ConfirmDiscardChangesAsync()
+    {
+        var document =
+            _documentManager.ActiveDocument;
+
+        if (document is null ||
+            !document.IsModified)
+        {
+            return true;
+        }
+
+        var dialog =
+            new ConfirmDialog();
+
+        var result =
+            await dialog.ShowDialog<bool?>(
+                this);
+
+        if (result == true)
+        {
+            if (document.FilePath is null)
+            {
+                return await SaveAsAsync();
+            }
+
+            SaveCurrentDocument();
+
+            return true;
+        }
+
+        if (result == false)
+            return true;
+
+        return false;
+    }
+
+    // ============================================================
+    // EDIT
+    // ============================================================
 
     private void Undo_Click(
         object? sender,
@@ -561,6 +824,10 @@ public partial class MainWindow : Window
         Editor.SelectAll();
         UpdateStatusBar();
     }
+
+    // ============================================================
+    // SEARCH
+    // ============================================================
 
     private void Find_Click(
         object? sender,
@@ -652,12 +919,8 @@ public partial class MainWindow : Window
                 index + searchText.Length;
         }
 
-        _isUpdatingEditor = true;
-
         Editor.Text =
             result;
-
-        _isUpdatingEditor = false;
 
         var document =
             _documentManager.ActiveDocument;
@@ -788,21 +1051,42 @@ public partial class MainWindow : Window
         Editor.Focus();
     }
 
+    // ============================================================
+    // EDITOR
+    // ============================================================
+
     private void Editor_TextChanged(
         object? sender,
         TextChangedEventArgs e)
     {
-        if (_isUpdatingEditor)
-            return;
-
         var document =
             _documentManager.ActiveDocument;
 
         if (document is null)
             return;
 
-        document.Text =
+        string editorText =
             Editor.Text ?? string.Empty;
+
+        string documentText =
+            document.Text ?? string.Empty;
+
+        /*
+         * THIS IS THE IMPORTANT FIX.
+         *
+         * If the editor already contains exactly
+         * what the active document contains,
+         * then nothing has actually changed.
+         *
+         * This happens when switching tabs.
+         */
+        if (editorText == documentText)
+        {
+            return;
+        }
+
+        document.Text =
+            editorText;
 
         document.IsModified =
             true;
@@ -823,131 +1107,9 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task<bool> SaveAsAsync()
-    {
-        var document =
-            _documentManager.ActiveDocument;
-
-        if (document is null)
-            return false;
-
-        var file =
-            await StorageProvider
-                .SaveFilePickerAsync(
-                    new FilePickerSaveOptions
-                    {
-                        Title = "Save File",
-
-                        SuggestedFileName =
-                            "Untitled.txt",
-
-                        DefaultExtension =
-                            "txt",
-
-                        FileTypeChoices =
-                        [
-                            new FilePickerFileType(
-                                "Text File")
-                            {
-                                Patterns =
-                                [
-                                    "*.txt"
-                                ]
-                            },
-
-                            new FilePickerFileType(
-                                "All Files")
-                            {
-                                Patterns =
-                                [
-                                    "*"
-                                ]
-                            }
-                        ]
-                    });
-
-        if (file is null)
-            return false;
-
-        if (file.TryGetLocalPath()
-            is not string filePath)
-        {
-            return false;
-        }
-
-        document.FilePath =
-            filePath;
-
-        SaveCurrentDocument();
-
-        return true;
-    }
-
-    private void SaveCurrentDocument()
-    {
-        var document =
-            _documentManager.ActiveDocument;
-
-        if (document is null ||
-            document.FilePath is null)
-        {
-            return;
-        }
-
-        string content =
-            Editor.Text ?? string.Empty;
-
-        _fileService.WriteFile(
-            document.FilePath,
-            content);
-
-        document.Text =
-            content;
-
-        document.IsModified =
-            false;
-
-        UpdateWindowTitle();
-        UpdateStatusBar();
-        RefreshTabs();
-    }
-
-    private async Task<bool>
-        ConfirmDiscardChangesAsync()
-    {
-        var document =
-            _documentManager.ActiveDocument;
-
-        if (document is null ||
-            !document.IsModified)
-        {
-            return true;
-        }
-
-        var dialog =
-            new ConfirmDialog();
-
-        var result =
-            await dialog.ShowDialog<bool?>(
-                this);
-
-        if (result == true)
-        {
-            if (document.FilePath is null)
-            {
-                return await SaveAsAsync();
-            }
-
-            SaveCurrentDocument();
-
-            return true;
-        }
-
-        if (result == false)
-            return true;
-
-        return false;
-    }
+    // ============================================================
+    // WINDOW TITLE
+    // ============================================================
 
     private void UpdateWindowTitle()
     {
@@ -956,7 +1118,9 @@ public partial class MainWindow : Window
 
         if (document is null)
         {
-            Title = "Orbpad";
+            Title =
+                "Orbpad";
+
             return;
         }
 
@@ -964,7 +1128,8 @@ public partial class MainWindow : Window
 
         if (document.FilePath is null)
         {
-            fileName = "Untitled";
+            fileName =
+                "Untitled";
         }
         else
         {
@@ -981,6 +1146,10 @@ public partial class MainWindow : Window
         Title =
             $"Orbpad — {fileName}{modifiedMarker}";
     }
+
+    // ============================================================
+    // STATUS BAR
+    // ============================================================
 
     private void UpdateStatusBar()
     {
