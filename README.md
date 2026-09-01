@@ -50,11 +50,15 @@
 
 </div>
 
+<div align="center">
+
 [![GitHub](https://img.shields.io/badge/GitHub-Orbpad-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Phantom-Con-Artist/Orbpad)
 [![Release](https://img.shields.io/badge/Release-v1.0.0-6f42c1?style=for-the-badge)](https://github.com/Phantom-Con-Artist/Orbpad/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![Avalonia](https://img.shields.io/badge/UI-Avalonia-9146FF?style=for-the-badge)](https://avaloniaui.net/)
+
+</div>
 
 ---
 
