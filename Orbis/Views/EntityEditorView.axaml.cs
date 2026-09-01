@@ -2,13 +2,17 @@ using System;
 using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Orb.Engine.Graph;
 using Orb.Engine.Types;
 using Orbpad.Orbis.ViewModels;
+
 
 namespace Orbpad.Orbis.Views;
 
 public partial class EntityEditorView : UserControl
 {
+    private string? _editingPropertyName;
+
     public EntityEditorView()
     {
         InitializeComponent();
@@ -63,68 +67,122 @@ public partial class EntityEditorView : UserControl
     // PROPERTY EDITOR
     // ============================================================
 
-    private void AddProperty_Click(
-        object? sender,
-        RoutedEventArgs e)
+    private void SaveProperty_Click(object? sender, RoutedEventArgs e)
     {
-        PropertyErrorText.IsVisible = false;
-        PropertyErrorText.Text = string.Empty;
+        ClearPropertyError();
 
-        string name =
-            PropertyNameBox.Text?.Trim()
-            ?? string.Empty;
-
+        string name = PropertyNameBox.Text?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(name))
         {
-            ShowPropertyError(
-                "Property name is required.");
-
+            ShowPropertyError("Property name is required.");
             return;
         }
 
         if (DataContext is not EntityEditorViewModel viewModel)
         {
-            ShowPropertyError(
-                "The entity editor is not connected to a ViewModel.");
-
+            ShowPropertyError("The entity editor is not connected to a ViewModel.");
             return;
         }
 
-        if (PropertyTypeComboBox.SelectedItem
-            is not ComboBoxItem selectedItem)
+        if (PropertyTypeComboBox.SelectedItem is not ComboBoxItem selectedItem)
         {
-            ShowPropertyError(
-                "Select a property type.");
-
+            ShowPropertyError("Select a property type.");
             return;
         }
 
-        string typeName =
-            selectedItem.Content?.ToString()
-            ?? string.Empty;
-
-        string rawValue =
-            PropertyValueBox.Text
-            ?? string.Empty;
+        string typeName = selectedItem.Content?.ToString() ?? string.Empty;
+        string rawValue = PropertyValueBox.Text ?? string.Empty;
 
         try
         {
-            OrbValue value =
-                CreateOrbValue(
-                    typeName,
-                    rawValue);
+            OrbValue value = CreateOrbValue(typeName, rawValue);
 
-            viewModel.AddProperty(
-                name,
-                value);
+            if (_editingPropertyName is null)
+                viewModel.AddProperty(name, value);
+            else
+                viewModel.UpdateProperty(_editingPropertyName, name, value);
 
             ClearPropertyForm();
         }
         catch (Exception ex)
         {
-            ShowPropertyError(
-                ex.Message);
+            ShowPropertyError(ex.Message);
         }
+    }
+
+    private void EditProperty_Click(object? sender, RoutedEventArgs e)
+    {
+        ClearPropertyError();
+
+        if (sender is not Button button ||
+            button.DataContext is not OrbProperty property)
+        {
+            ShowPropertyError("The selected property could not be loaded.");
+            return;
+        }
+
+        _editingPropertyName = property.Name;
+        PropertyEditorTitle.Text = $"Edit Property: {property.Name}";
+        PropertySaveButton.Content = "Save Property";
+        PropertyCancelButton.IsVisible = true;
+        PropertyNameBox.Text = property.Name;
+        PropertyValueBox.Text = property.Value?.Value?.ToString() ?? string.Empty;
+
+        PropertyTypeComboBox.SelectedItem =
+            FindPropertyTypeItem(property.Value?.Type);
+
+        if (PropertyTypeComboBox.SelectedItem is null)
+            PropertyTypeComboBox.SelectedIndex = 1;
+
+        PropertyNameBox.Focus();
+    }
+
+    private void RemoveProperty_Click(object? sender, RoutedEventArgs e)
+    {
+        ClearPropertyError();
+
+        if (sender is not Button button ||
+            button.DataContext is not OrbProperty property)
+        {
+            ShowPropertyError("The selected property could not be removed.");
+            return;
+        }
+
+        if (DataContext is not EntityEditorViewModel viewModel)
+        {
+            ShowPropertyError("The entity editor is not connected to a ViewModel.");
+            return;
+        }
+
+        viewModel.RemoveProperty(property);
+
+        if (string.Equals(_editingPropertyName, property.Name, StringComparison.Ordinal))
+            ClearPropertyForm();
+    }
+
+    private void CancelPropertyEdit_Click(object? sender, RoutedEventArgs e)
+    {
+        ClearPropertyForm();
+    }
+
+    private ComboBoxItem? FindPropertyTypeItem(OrbValueType? type)
+    {
+        if (type is null)
+            return null;
+
+        string typeName = type.Value.ToString();
+
+        foreach (var item in PropertyTypeComboBox.Items)
+        {
+            if (item is ComboBoxItem comboBoxItem &&
+                string.Equals(comboBoxItem.Content?.ToString(), typeName,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return comboBoxItem;
+            }
+        }
+
+        return null;
     }
 
 
@@ -268,22 +326,22 @@ public partial class EntityEditorView : UserControl
 
     private void ClearPropertyForm()
     {
-        PropertyNameBox.Text =
-            string.Empty;
-
-        PropertyValueBox.Text =
-            string.Empty;
-
-        PropertyTypeComboBox.SelectedIndex =
-            1;
-
-        PropertyErrorText.Text =
-            string.Empty;
-
-        PropertyErrorText.IsVisible =
-            false;
-
+        _editingPropertyName = null;
+        PropertyEditorTitle.Text = "Add Property";
+        PropertySaveButton.Content = "Add Property";
+        PropertyCancelButton.IsVisible = false;
+        PropertyNameBox.Text = string.Empty;
+        PropertyValueBox.Text = string.Empty;
+        PropertyTypeComboBox.SelectedIndex = 1;
+        ClearPropertyError();
         PropertyNameBox.Focus();
+    }
+
+
+    private void ClearPropertyError()
+    {
+        PropertyErrorText.Text = string.Empty;
+        PropertyErrorText.IsVisible = false;
     }
 
 

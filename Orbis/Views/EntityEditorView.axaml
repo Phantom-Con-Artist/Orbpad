@@ -165,208 +165,90 @@
             <!-- ================================================= -->
             <!-- PROPERTIES                                        -->
             <!-- ================================================= -->
-
-            <Border
-                Padding="20"
-                CornerRadius="8"
-                BorderThickness="1"
-                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
-
-                <StackPanel
-                    Spacing="16">
-
-                    <StackPanel
-                        Spacing="4">
-
-                        <TextBlock
-                            Text="Properties"
-                            FontSize="18"
-                            FontWeight="SemiBold" />
-
-                        <TextBlock
-                            Text="Custom data belonging to this entity."
-                            FontSize="13"
-                            Opacity="0.65" />
-
+            <Border Padding="20" CornerRadius="8" BorderThickness="1"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+                <StackPanel Spacing="16">
+                    <StackPanel Spacing="4">
+                        <DockPanel>
+                            <TextBlock Text="Properties" FontSize="18" FontWeight="SemiBold" />
+                            <TextBlock DockPanel.Dock="Right" Text="{Binding Properties.Count, StringFormat='{}{0}'}"
+                                       FontSize="12" Opacity="0.55" VerticalAlignment="Center" />
+                        </DockPanel>
+                        <TextBlock Text="Custom data belonging to this entity." FontSize="13" Opacity="0.65" />
                     </StackPanel>
 
-
-                    <!-- ================================================= -->
-                    <!-- PROPERTY LIST                                      -->
-                    <!-- ================================================= -->
-
-                    <ItemsControl
-                        ItemsSource="{Binding Properties}">
-
+                    <ItemsControl ItemsSource="{Binding Properties}">
                         <ItemsControl.ItemTemplate>
-
-                            <DataTemplate
-                                x:DataType="graph:OrbProperty">
-
-                                <Border
-                                    Margin="0,0,0,8"
-                                    Padding="12"
-                                    CornerRadius="6"
-                                    BorderThickness="1"
-                                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
-
-                                    <Grid
-                                        ColumnDefinitions="2*,Auto,3*,Auto"
-                                        ColumnSpacing="12">
-
-                                        <TextBlock
-                                            Grid.Column="0"
-                                            Text="{Binding Name}"
-                                            VerticalAlignment="Center"
-                                            FontWeight="SemiBold" />
-
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Text="{Binding Value.Type}"
-                                            VerticalAlignment="Center"
-                                            Opacity="0.55" />
-
-                                        <TextBlock
-                                            Grid.Column="2"
-                                            Text="{Binding Value.Value}"
-                                            VerticalAlignment="Center"
-                                            Opacity="0.75" />
-
-                                        <Button
-                                            Grid.Column="3"
-                                            Content="Remove"
-                                            Padding="12,6" />
-
+                            <DataTemplate x:DataType="graph:OrbProperty">
+                                <Border Margin="0,0,0,8" Padding="12" CornerRadius="6"
+                                        BorderThickness="1"
+                                        BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+                                    <Grid ColumnDefinitions="2*,Auto,3*,Auto,Auto" ColumnSpacing="10">
+                                        <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                                   VerticalAlignment="Center" FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <Border Grid.Column="1" Padding="7,3" CornerRadius="4"
+                                                Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+                                            <TextBlock Text="{Binding Value.Type}" FontSize="11" Opacity="0.65" />
+                                        </Border>
+                                        <TextBlock Grid.Column="2" Text="{Binding Value.Value}"
+                                                   VerticalAlignment="Center" Opacity="0.75"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <Button Grid.Column="3" Content="Edit" Padding="10,5"
+                                                Click="EditProperty_Click" />
+                                        <Button Grid.Column="4" Content="Remove" Padding="10,5"
+                                                Click="RemoveProperty_Click" />
                                     </Grid>
-
                                 </Border>
-
                             </DataTemplate>
-
                         </ItemsControl.ItemTemplate>
-
                     </ItemsControl>
 
+                    <Border Padding="16" CornerRadius="6"
+                            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                            BorderThickness="1"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+                        <StackPanel Spacing="12">
+                            <TextBlock x:Name="PropertyEditorTitle" Text="Add Property"
+                                       FontSize="15" FontWeight="SemiBold" />
 
-                    <!-- ================================================= -->
-                    <!-- ADD PROPERTY FORM                                  -->
-                    <!-- ================================================= -->
-
-                    <Border
-                        Padding="16"
-                        CornerRadius="6"
-                        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                        BorderThickness="1"
-                        BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
-
-                        <StackPanel
-                            Spacing="12">
-
-                            <TextBlock
-                                Text="Add Property"
-                                FontSize="15"
-                                FontWeight="SemiBold" />
-
-
-                            <!-- NAME -->
-
-                            <StackPanel
-                                Spacing="5">
-
-                                <TextBlock
-                                    Text="Property Name"
-                                    FontSize="13"
-                                    FontWeight="SemiBold" />
-
-                                <TextBox
-                                    x:Name="PropertyNameBox"
-                                    PlaceholderText="e.g. population, capital, age" />
-
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Property Name" FontSize="13" FontWeight="SemiBold" />
+                                <TextBox x:Name="PropertyNameBox"
+                                         PlaceholderText="e.g. population, capital, age" />
                             </StackPanel>
 
-
-                            <!-- TYPE -->
-
-                            <StackPanel
-                                Spacing="5">
-
-                                <TextBlock
-                                    Text="Value Type"
-                                    FontSize="13"
-                                    FontWeight="SemiBold" />
-
-                                <ComboBox
-                                    x:Name="PropertyTypeComboBox"
-                                    SelectedIndex="1">
-
-                                    <ComboBoxItem
-                                        Content="Null" />
-
-                                    <ComboBoxItem
-                                        Content="String" />
-
-                                    <ComboBoxItem
-                                        Content="Boolean" />
-
-                                    <ComboBoxItem
-                                        Content="Integer" />
-
-                                    <ComboBoxItem
-                                        Content="Decimal" />
-
-                                    <ComboBoxItem
-                                        Content="DateTime" />
-
-                                    <ComboBoxItem
-                                        Content="Guid" />
-
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Value Type" FontSize="13" FontWeight="SemiBold" />
+                                <ComboBox x:Name="PropertyTypeComboBox" SelectedIndex="1">
+                                    <ComboBoxItem Content="Null" />
+                                    <ComboBoxItem Content="String" />
+                                    <ComboBoxItem Content="Boolean" />
+                                    <ComboBoxItem Content="Integer" />
+                                    <ComboBoxItem Content="Decimal" />
+                                    <ComboBoxItem Content="DateTime" />
+                                    <ComboBoxItem Content="Guid" />
                                 </ComboBox>
-
                             </StackPanel>
 
-
-                            <!-- VALUE -->
-
-                            <StackPanel
-                                Spacing="5">
-
-                                <TextBlock
-                                    Text="Value"
-                                    FontSize="13"
-                                    FontWeight="SemiBold" />
-
-                                <TextBox
-                                    x:Name="PropertyValueBox"
-                                    PlaceholderText="Property value" />
-
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Value" FontSize="13" FontWeight="SemiBold" />
+                                <TextBox x:Name="PropertyValueBox" PlaceholderText="Property value" />
                             </StackPanel>
 
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="PropertySaveButton" Content="Add Property"
+                                        Padding="16,8" Click="SaveProperty_Click" />
+                                <Button x:Name="PropertyCancelButton" Content="Cancel"
+                                        Padding="16,8" IsVisible="False"
+                                        Click="CancelPropertyEdit_Click" />
+                            </StackPanel>
 
-                            <!-- ADD -->
-
-                            <Button
-                                Content="Add Property"
-                                HorizontalAlignment="Left"
-                                Padding="16,8"
-                                Click="AddProperty_Click" />
-
-
-                            <!-- ERROR -->
-
-                            <TextBlock
-                                x:Name="PropertyErrorText"
-                                Text=""
-                                Foreground="IndianRed"
-                                FontSize="12"
-                                IsVisible="False"
-                                TextWrapping="Wrap" />
-
+                            <TextBlock x:Name="PropertyErrorText" Text="" Foreground="IndianRed"
+                                       FontSize="12" IsVisible="False" TextWrapping="Wrap" />
                         </StackPanel>
-
                     </Border>
-
                 </StackPanel>
-
             </Border>
 
 

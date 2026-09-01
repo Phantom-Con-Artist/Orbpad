@@ -163,9 +163,51 @@ public sealed class EntityEditorViewModel : INotifyPropertyChanged
             Value = value
         };
 
+        if (_entity.Properties.ContainsKey(name))
+        {
+            throw new InvalidOperationException(
+                $"A property named '{name}' already exists.");
+        }
+
         _entity.Properties[name] = property;
 
         Properties.Add(property);
+    }
+
+    /// <summary>
+    /// Updates an existing property.
+    /// </summary>
+    public void UpdateProperty(
+        string originalName,
+        string name,
+        OrbValue value)
+    {
+        if (string.IsNullOrWhiteSpace(originalName))
+            throw new ArgumentException("Original property name is required.", nameof(originalName));
+
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Property name is required.", nameof(name));
+
+        ArgumentNullException.ThrowIfNull(value);
+
+        if (!_entity.Properties.TryGetValue(originalName, out var property))
+            throw new InvalidOperationException($"Property '{originalName}' does not exist.");
+
+        if (!string.Equals(originalName, name, StringComparison.Ordinal) &&
+            _entity.Properties.ContainsKey(name))
+        {
+            throw new InvalidOperationException(
+                $"A property named '{name}' already exists.");
+        }
+
+        _entity.Properties.Remove(originalName);
+        property.Name = name;
+        property.Value = value;
+        _entity.Properties[name] = property;
+
+        int index = Properties.IndexOf(property);
+        if (index >= 0)
+            Properties[index] = property;
     }
 
     /// <summary>
