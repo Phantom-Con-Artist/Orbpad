@@ -23,9 +23,6 @@ public partial class MainWindow
     private LoreEditorViewModel? _orbisLoreEditorViewModel;
 
     private string? _currentLoreFilePath;
-
-    private bool _loreEditorIsDirty;
-
     private readonly HashSet<Document> _loreDocuments = new();
 
 
@@ -92,10 +89,6 @@ public partial class MainWindow
         ShowLoreEditor(
             graph,
             null);
-
-        _loreEditorIsDirty =
-            false;
-
         RefreshTabs();
         UpdateWindowTitle();
         UpdateStatusBar();
@@ -231,9 +224,6 @@ public partial class MainWindow
 
         _currentLoreFilePath =
             filePath;
-
-        _loreEditorIsDirty =
-            false;
     }
 
 
@@ -1017,12 +1007,6 @@ public partial class MainWindow
 
         _currentLoreFilePath =
             null;
-
-
-        _loreEditorIsDirty =
-            false;
-
-
         // --------------------------------------------------------
         // Remove Lore document/tab.
         // --------------------------------------------------------

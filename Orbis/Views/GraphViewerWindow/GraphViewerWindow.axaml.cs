@@ -114,6 +114,13 @@ public partial class GraphViewerWindow : Window
             ? "relationship"
             : "relationships");
 
+    // Required by Avalonia's runtime XAML loader.
+    // The normal application path uses the OrbGraph constructor below.
+    public GraphViewerWindow()
+        : this(new OrbGraph(), null)
+    {
+    }
+
     public GraphViewerWindow(
         OrbGraph graph,
         string? loreTitle = null)
@@ -428,7 +435,7 @@ public partial class GraphViewerWindow : Window
                 IsFilled = false
             };
 
-        figure.Segments.Add(
+        figure.Segments!.Add(
             new BezierSegment
             {
                 Point1 = control1,
@@ -436,7 +443,7 @@ public partial class GraphViewerWindow : Window
                 Point3 = curveEnd
             });
 
-        geometry.Figures.Add(figure);
+        geometry.Figures!.Add(figure);
 
         // ------------------------------------------------------------
         // A wide, faint duplicate of the same geometry sits underneath
@@ -799,7 +806,7 @@ public partial class GraphViewerWindow : Window
                 IsFilled = false
             };
 
-        figure.Segments.Add(
+        figure.Segments!.Add(
             new ArcSegment
             {
                 Point =
@@ -820,7 +827,7 @@ public partial class GraphViewerWindow : Window
                     SweepDirection.Clockwise
             });
 
-        geometry.Figures.Add(figure);
+        geometry.Figures!.Add(figure);
 
         var glow =
             new Path

@@ -1,10 +1,32 @@
 # Third-Party Notices
 
-## Orbpad v1.0.0
+## Orbpad v1.0.1
 
 Orbpad uses and redistributes software components developed by third parties.
 
 The licenses of these components are separate from the MIT License covering Orbpad's own source code.
+
+---
+
+## Orb.Engine
+
+**Project:** Orb.Engine
+
+**Repository:** https://github.com/Phantom-Con-Artist/Orb
+
+Orb.Engine is the separate core engine project used by Orbpad for its Orbis structured-information and graph functionality.
+
+Orb.Engine provides the underlying graph and structured-data functionality used by Orbpad for:
+
+- Entities
+- Relationships
+- Lore graphs
+- Graph visualization data
+- Structured serialization
+
+Orb.Engine is maintained as a separate repository within the Orbis Project.
+
+For the current license, copyright information, and project-specific notices for Orb.Engine, refer to the Orb.Engine repository.
 
 ---
 
@@ -16,9 +38,9 @@ The licenses of these components are separate from the MIT License covering Orbp
 
 Avalonia is the UI framework used by Orbpad.
 
-License: MIT License
+**License:** MIT License
 
-Project:
+**Project:**
 
 https://github.com/AvaloniaUI/Avalonia
 
@@ -32,9 +54,9 @@ https://github.com/AvaloniaUI/Avalonia
 
 AvaloniaEdit provides the text editing component used by Orbpad.
 
-License: MIT License
+**License:** MIT License
 
-Project:
+**Project:**
 
 https://github.com/AvaloniaUI/AvaloniaEdit
 
@@ -48,9 +70,9 @@ https://github.com/AvaloniaUI/AvaloniaEdit
 
 This component provides TextMate integration for AvaloniaEdit and is used by Orbpad for syntax-highlighting support.
 
-License: MIT License
+**License:** MIT License
 
-Project:
+**Project:**
 
 https://github.com/AvaloniaUI/AvaloniaEdit
 
@@ -60,9 +82,9 @@ https://github.com/AvaloniaUI/AvaloniaEdit
 
 TextMateSharp components provide TextMate-based language grammar and syntax-highlighting functionality.
 
-License: MIT License
+**License:** MIT License
 
-Project:
+**Project:**
 
 https://github.com/danipen/TextMateSharp
 
@@ -76,9 +98,9 @@ https://github.com/danipen/TextMateSharp
 
 Markdig is used by Orbpad for Markdown parsing and rendering.
 
-License: BSD-2-Clause
+**License:** BSD-2-Clause
 
-Project:
+**Project:**
 
 https://github.com/xoofx/markdig
 
@@ -92,9 +114,9 @@ https://github.com/xoofx/markdig
 
 This component provides WebView functionality for Avalonia applications.
 
-License: MIT License
+**License:** MIT License
 
-Project:
+**Project:**
 
 https://github.com/AvaloniaUI/Avalonia.Controls.WebView
 
@@ -108,9 +130,9 @@ https://github.com/AvaloniaUI/Avalonia.Controls.WebView
 
 Provides desktop platform integration for Avalonia applications.
 
-License: MIT License
+**License:** MIT License
 
-Project:
+**Project:**
 
 https://github.com/AvaloniaUI/Avalonia
 
@@ -124,9 +146,9 @@ https://github.com/AvaloniaUI/Avalonia
 
 Provides Fluent-style controls and theme resources used by Orbpad.
 
-License: MIT License
+**License:** MIT License
 
-Project:
+**Project:**
 
 https://github.com/AvaloniaUI/Avalonia
 
@@ -140,7 +162,7 @@ https://github.com/AvaloniaUI/Avalonia
 
 Provides Inter font integration for Avalonia applications.
 
-Project:
+**Project:**
 
 https://github.com/AvaloniaUI/Avalonia
 
@@ -154,6 +176,8 @@ https://github.com/AvaloniaUI/Avalonia
 
 Provides diagnostic support for Avalonia applications.
 
+This package is included for development diagnostics and is not included as a normal runtime dependency outside the Debug configuration.
+
 Project information and licensing are provided by the upstream package.
 
 ---
@@ -164,7 +188,7 @@ Orbpad is built using the .NET platform and related Microsoft-provided runtime c
 
 .NET and its associated components are subject to their respective Microsoft licenses and terms.
 
-Project:
+**Project:**
 
 https://dotnet.microsoft.com/
 
@@ -176,7 +200,7 @@ These third-party components remain subject to their respective licenses.
 
 Nothing in this file modifies or replaces the license terms of any third-party component.
 
-Users and redistributors should retain all copyright notices and license information required by the applicable third-party licenses.
+Users and redistributors should retain all copyright notices and license information required by the applicable licenses.
 
 ---
 
@@ -184,6 +208,6 @@ Users and redistributors should retain all copyright notices and license informa
 
 The Orbpad application source code is distributed under the MIT License.
 
-Copyright © 2026 Phantom Con Artist.
+**Copyright © 2026 Subhradeep Sarkar.**
 
 See [`LICENSE`](LICENSE) for the Orbpad license.
