@@ -44,9 +44,17 @@
                     <MenuItem Header="New _Entity"
                               Click="NewEntity_Click"/>
 
+                    <MenuItem Header="New _Lore"
+                              Click="NewLore_Click"/>
+
+                    <Separator/>
+
                     <MenuItem Header="_Open..."
                               Click="Open_Click"
                               HotKey="Ctrl+O"/>
+
+                    <MenuItem Header="Open _Lore..."
+                              Click="OpenLore_Click"/>
 
                     <MenuItem Header="Open _Image..."
                               Click="OpenImage_Click"/>
@@ -302,8 +310,14 @@
                 <Button Content="New Entity"
                         Click="NewEntity_Click"/>
 
+                <Button Content="New Lore"
+                        Click="NewLore_Click"/>
+
                 <Button Content="Open"
                         Click="Open_Click"/>
+
+                <Button Content="Open Lore"
+                        Click="OpenLore_Click"/>
 
                 <Button Content="Save"
                         Click="Save_Click"/>

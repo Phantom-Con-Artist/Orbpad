@@ -1,0 +1,243 @@
+<Window
+    x:Class="Orbpad.Orbis.Views.GraphViewerWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:views="using:Orbpad.Orbis.Views"
+    x:DataType="views:GraphViewerWindow"
+    Width="1200"
+    Height="760"
+    MinWidth="850"
+    MinHeight="500"
+    Title="Orbis Graph Viewer"
+    WindowStartupLocation="CenterOwner">
+
+    <Grid
+        RowDefinitions="Auto,*"
+        Background="{DynamicResource OrbpadBackgroundBrush}">
+
+        <Border
+            Grid.Row="0"
+            Padding="16,12"
+            BorderBrush="{DynamicResource OrbpadBorderBrush}"
+            BorderThickness="0,0,0,1"
+            Background="{DynamicResource OrbpadSurfaceBrush}">
+
+            <Grid ColumnDefinitions="*,Auto">
+
+                <StackPanel Spacing="2">
+                    <TextBlock
+                        Text="{Binding LoreTitle}"
+                        FontSize="18"
+                        FontWeight="SemiBold" />
+                    <TextBlock
+                        Text="{Binding GraphSummary}"
+                        FontSize="12"
+                        Opacity="0.55" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <Button Content="Reset View" Padding="12,7" Click="ResetView_Click" />
+                    <Button Content="Fit Graph" Padding="12,7" Click="FitGraph_Click" />
+                    <Button Content="Close" Padding="12,7" Click="Close_Click" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid
+            Grid.Row="1"
+            ColumnDefinitions="*,320"
+            Margin="12"
+            ColumnSpacing="12">
+
+            <Border
+                Grid.Column="0"
+                CornerRadius="12"
+                Background="{DynamicResource OrbpadBackgroundBrush}"
+                BorderBrush="{DynamicResource OrbpadBorderBrush}"
+                BorderThickness="1"
+                ClipToBounds="True">
+
+                <Grid>
+                    <Border IsHitTestVisible="False">
+                        <Border.Background>
+                            <DrawingBrush
+                                TileMode="Tile"
+                                Stretch="None"
+                                DestinationRect="0,0,26,26"
+                                SourceRect="0,0,26,26">
+                                <DrawingBrush.Drawing>
+                                    <GeometryDrawing>
+                                        <GeometryDrawing.Geometry>
+                                            <EllipseGeometry
+                                                Center="13,13"
+                                                RadiusX="1.1"
+                                                RadiusY="1.1" />
+                                        </GeometryDrawing.Geometry>
+                                        <GeometryDrawing.Brush>
+                                            <SolidColorBrush
+                                                Color="#3A4657"
+                                                Opacity="0.35" />
+                                        </GeometryDrawing.Brush>
+                                    </GeometryDrawing>
+                                </DrawingBrush.Drawing>
+                            </DrawingBrush>
+                        </Border.Background>
+                    </Border>
+
+                    <Canvas
+                        x:Name="GraphCanvas"
+                        Background="Transparent"
+                        PointerWheelChanged="GraphCanvas_PointerWheelChanged"
+                        PointerPressed="GraphCanvas_PointerPressed"
+                        PointerMoved="GraphCanvas_PointerMoved"
+                        PointerReleased="GraphCanvas_PointerReleased" />
+                </Grid>
+            </Border>
+
+            <Border
+                Grid.Column="1"
+                CornerRadius="12"
+                Background="#10161E"
+                BorderBrush="{DynamicResource OrbpadBorderBrush}"
+                BorderThickness="1"
+                Padding="16">
+
+                <ScrollViewer
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Disabled">
+
+                    <Grid>
+
+                        <StackPanel
+                            x:Name="InspectorEmptyState"
+                            Spacing="8"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Text="Inspector"
+                                FontSize="17"
+                                FontWeight="SemiBold" />
+                            <TextBlock
+                                Text="Select an entity or relationship in the graph."
+                                FontSize="12"
+                                Opacity="0.5"
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <StackPanel
+                            x:Name="EntityInspector"
+                            IsVisible="False"
+                            Spacing="14">
+
+                            <StackPanel Spacing="3">
+                                <TextBlock
+                                    Text="ENTITY"
+                                    FontSize="10"
+                                    FontWeight="SemiBold"
+                                    LetterSpacing="1.2"
+                                    Foreground="#22D3EE" />
+                                <TextBlock
+                                    x:Name="EntityNameText"
+                                    FontSize="19"
+                                    FontWeight="SemiBold"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <Border
+                                Padding="10"
+                                CornerRadius="8"
+                                Background="#151C25"
+                                BorderBrush="#273241"
+                                BorderThickness="1">
+                                <StackPanel Spacing="8">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="Type" FontSize="10" Opacity="0.5" />
+                                        <TextBlock x:Name="EntityTypeText" FontSize="12" />
+                                    </StackPanel>
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="ID" FontSize="10" Opacity="0.5" />
+                                        <TextBlock
+                                            x:Name="EntityIdText"
+                                            FontSize="11"
+                                            Opacity="0.7"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <StackPanel Spacing="7">
+                                <TextBlock
+                                    Text="Properties"
+                                    FontSize="13"
+                                    FontWeight="SemiBold" />
+                                <StackPanel x:Name="EntityPropertiesPanel" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel
+                            x:Name="RelationshipInspector"
+                            IsVisible="False"
+                            Spacing="14">
+
+                            <StackPanel Spacing="3">
+                                <TextBlock
+                                    Text="RELATIONSHIP"
+                                    FontSize="10"
+                                    FontWeight="SemiBold"
+                                    LetterSpacing="1.2"
+                                    Foreground="#22D3EE" />
+                                <TextBlock
+                                    x:Name="RelationshipTypeText"
+                                    FontSize="19"
+                                    FontWeight="SemiBold"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <Border
+                                Padding="10"
+                                CornerRadius="8"
+                                Background="#151C25"
+                                BorderBrush="#273241"
+                                BorderThickness="1">
+                                <StackPanel Spacing="10">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="Source" FontSize="10" Opacity="0.5" />
+                                        <TextBlock
+                                            x:Name="RelationshipSourceText"
+                                            FontSize="12"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="Target" FontSize="10" Opacity="0.5" />
+                                        <TextBlock
+                                            x:Name="RelationshipTargetText"
+                                            FontSize="12"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="ID" FontSize="10" Opacity="0.5" />
+                                        <TextBlock
+                                            x:Name="RelationshipIdText"
+                                            FontSize="11"
+                                            Opacity="0.7"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <StackPanel Spacing="7">
+                                <TextBlock
+                                    Text="Properties"
+                                    FontSize="13"
+                                    FontWeight="SemiBold" />
+                                <StackPanel x:Name="RelationshipPropertiesPanel" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

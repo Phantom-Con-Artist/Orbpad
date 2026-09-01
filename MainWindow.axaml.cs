@@ -297,12 +297,32 @@ public partial class MainWindow : Window
 private void LoadDocumentIntoEditor(
     Document document)
 {
+    if (IsLoreDocument(document.FilePath)
+        || _loreDocuments.Contains(document))
+    {
+        if (string.IsNullOrWhiteSpace(document.FilePath)
+            && _orbisLoreEditorViewModel is not null)
+        {
+            ShowLoreEditor(
+                _orbisLoreEditorViewModel.Graph,
+                null);
+        }
+        else
+        {
+            _ = LoadLoreDocumentAsync(document);
+        }
+
+        return;
+    }
+
     if (IsEntityDocument(document.FilePath))
     {
+        HideLoreEditor();
         _ = LoadEntityDocumentAsync(document);
         return;
     }
 
+    HideLoreEditor();
     ShowNormalEditor();
 
     Editor.Text =
@@ -422,6 +442,19 @@ private async Task LoadEntityDocumentAsync(
         return string.Equals(
             System.IO.Path.GetExtension(filePath),
             ".entity",
+            StringComparison.OrdinalIgnoreCase);
+    }
+
+
+    private static bool IsLoreDocument(
+        string? filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+            return false;
+
+        return string.Equals(
+            System.IO.Path.GetExtension(filePath),
+            ".lore",
             StringComparison.OrdinalIgnoreCase);
     }
 
@@ -631,6 +664,30 @@ private async Task LoadEntityDocumentAsync(
     private async Task CloseDocumentAsync(
         Document document)
     {
+        // Lore documents are owned by the Lore editor rather than the
+        // normal text document pipeline. Let the Lore close routine
+        // handle its editor instance, dirty state, and tab together.
+        if (_orbisLoreEditor is not null)
+        {
+            bool isActiveLore =
+                document == _documentManager.ActiveDocument
+                && (string.IsNullOrWhiteSpace(document.FilePath)
+                    || IsLoreDocument(document.FilePath));
+
+            bool isCurrentLore =
+                !string.IsNullOrWhiteSpace(_currentLoreFilePath)
+                && string.Equals(
+                    document.FilePath,
+                    _currentLoreFilePath,
+                    StringComparison.OrdinalIgnoreCase);
+
+            if (isActiveLore || isCurrentLore)
+            {
+                await CloseLoreEditorAsync();
+                return;
+            }
+        }
+
         if (document.IsModified)
         {
             var result =
@@ -2028,22 +2085,6 @@ private async Task LoadEntityDocumentAsync(
 
         if (document is null)
             return false;
-
-        // ========================================================
-        // ORBIS ENTITY SAVE AS
-        // ========================================================
-        //
-        // Save As for an entity is a fork:
-        // the original entity stays untouched and the new file
-        // receives a new Entity ID.
-        // ========================================================
-
-        if (_orbisEntityEditorViewModel is not null
-            && OrbisEntityEditor.IsVisible)
-        {
-            return await SaveEntityAsAsync(
-                document);
-        }
 
 
         var file =
