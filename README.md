@@ -15,7 +15,7 @@
            height="128">
     </td>
     <td align="center">
-      <img src="docs/orbisecosystemlogo1.png"
+      <img src="docs/orbisecosysetmlogo1.png"
            alt="Orb Ecosystem"
            width="128"
            height="128">
