@@ -1,6 +1,35 @@
 <div align="center">
 
-<img src="Assets/orb_v256.png" alt="Orbpad" width="128" height="128">
+<table>
+  <tr>
+    <td align="center">
+      <img src="Assets/orb_v256.png"
+           alt="Orbpad"
+           width="128"
+           height="128">
+    </td>
+    <td align="center">
+      <img src="docs/orbisprojectlogo.png"
+           alt="Orb Project"
+           width="128"
+           height="128">
+    </td>
+    <td align="center">
+      <img src="docs/orbisecosystemlogo1.png"
+           alt="Orb Ecosystem"
+           width="128"
+           height="128">
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<img src="docs/orbisprojectcover.png"
+     alt="Orb Project"
+     width="900">
+
+<br><br>
 
 # Orbpad
 
