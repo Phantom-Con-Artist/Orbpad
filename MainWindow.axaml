@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:AvaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
         xmlns:Markdown="clr-namespace:Orbpad.Markdown"
+        xmlns:orbis="using:Orbpad.Orbis.Views"
         x:Class="Orbpad.MainWindow"
         Title="Orbpad"
         Icon="/Assets/Orbpad.ico"
@@ -39,6 +40,9 @@
                     <MenuItem Header="_New"
                               Click="New_Click"
                               HotKey="Ctrl+N"/>
+
+                    <MenuItem Header="New _Entity"
+                              Click="NewEntity_Click"/>
 
                     <MenuItem Header="_Open..."
                               Click="Open_Click"
@@ -295,6 +299,9 @@
                 <Button Content="New"
                         Click="New_Click"/>
 
+                <Button Content="New Entity"
+                        Click="NewEntity_Click"/>
+
                 <Button Content="Open"
                         Click="Open_Click"/>
 
@@ -493,6 +500,17 @@
                     IsReadOnly="False"
                     HorizontalScrollBarVisibility="Auto"
                     VerticalScrollBarVisibility="Auto"/>
+
+
+                <!-- ================================================= -->
+                <!-- ORBIS ENTITY EDITOR                                -->
+                <!-- ================================================= -->
+
+                <orbis:EntityEditorView
+                    x:Name="OrbisEntityEditor"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    IsVisible="False"/>
 
 
                 <!-- ================================================= -->

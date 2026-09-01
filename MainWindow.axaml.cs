@@ -11,6 +11,9 @@ using AvaloniaEdit;
 using Orbpad.Managers;
 using Orbpad.Models;
 using Orbpad.Services;
+using Orb.Engine.Graph;
+using Orb.Engine.Types;
+using Orbpad.Orbis.ViewModels;
 
 namespace Orbpad;
 
@@ -27,6 +30,8 @@ public partial class MainWindow : Window
 
     private readonly Dictionary<Document, Button>
         _documentButtons = new();
+
+    private EntityEditorViewModel? _orbisEntityEditorViewModel;
 
     private const int MaxRecentFiles = 10;
 
@@ -289,36 +294,135 @@ public partial class MainWindow : Window
     }
 
 
-    private void LoadDocumentIntoEditor(
-        Document document)
+private void LoadDocumentIntoEditor(
+    Document document)
+{
+    if (IsEntityDocument(document.FilePath))
     {
-        Editor.Text =
-            document.Text ?? string.Empty;
+        _ = LoadEntityDocumentAsync(document);
+        return;
+    }
 
+    ShowNormalEditor();
 
-        // ========================================================
-        // SYNTAX HIGHLIGHTING
-        // ========================================================
+    Editor.Text =
+        document.Text ?? string.Empty;
 
-        _syntaxHighlightingService.ApplyForFile(
+    // ========================================================
+    // SYNTAX HIGHLIGHTING
+    // ========================================================
+
+    _syntaxHighlightingService.ApplyForFile(
+        document.FilePath);
+
+    // ========================================================
+    // MARKDOWN VIEW
+    // ========================================================
+
+    RefreshMarkdownView();
+
+    Editor.CaretOffset = 0;
+
+    _lastKnownSelectionStart = 0;
+    _lastKnownSelectionLength = 0;
+    _lastKnownCaretOffset = 0;
+
+    UpdateWindowTitle();
+    UpdateStatusBar();
+}
+
+private async Task LoadEntityDocumentAsync(
+    Document document)
+{
+    if (string.IsNullOrWhiteSpace(document.FilePath))
+    {
+        ShowNormalEditor();
+        return;
+    }
+
+    try
+    {
+        // --------------------------------------------------------
+        // Make sure the Orbis document service exists.
+        // --------------------------------------------------------
+
+        if (_orbisDocumentService is null)
+        {
+            InitializeOrbis();
+        }
+
+        // --------------------------------------------------------
+        // LOAD THE ACTUAL ENTITY FROM DISK.
+        //
+        // DO NOT create a new OrbEntity here.
+        //
+        // This preserves:
+        // - Entity ID
+        // - Name
+        // - Type
+        // - Properties
+        // - Relationships
+        // - Everything stored in the .entity file
+        // --------------------------------------------------------
+
+        OrbEntity entity =
+            await _orbisDocumentService!
+                .LoadEntityAsync(
+                    document.FilePath);
+
+        var graph =
+            new OrbGraph();
+
+        graph.AddEntity(entity);
+
+        // --------------------------------------------------------
+        // The Document is the tab.
+        // The EntityEditorViewModel is the editor for that tab.
+        // --------------------------------------------------------
+
+        ShowEntityEditor(
+            entity,
+            graph,
             document.FilePath);
-
-
-        // ========================================================
-        // MARKDOWN VIEW
-        // ========================================================
-
-        RefreshMarkdownView();
-
-
-        Editor.CaretOffset = 0;
-
-        _lastKnownSelectionStart = 0;
-        _lastKnownSelectionLength = 0;
-        _lastKnownCaretOffset = 0;
 
         UpdateWindowTitle();
         UpdateStatusBar();
+        RefreshTabs();
+    }
+    catch (Exception ex)
+    {
+        await ShowOrbisErrorAsync(
+            "Orbpad could not open the entity.",
+            ex.Message);
+
+        ShowNormalEditor();
+    }
+}
+
+
+    private void ShowNormalEditor()
+    {
+        OrbisEntityEditor.IsVisible = false;
+        Editor.IsVisible = true;
+
+        _orbisEntityEditorViewModel = null;
+
+        MarkdownSplitter.IsVisible = false;
+        MarkdownPreview.IsVisible = false;
+    }
+
+
+
+    private static bool IsEntityDocument(
+        string? filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+            return false;
+
+        return string.Equals(
+            System.IO.Path.GetExtension(filePath),
+            ".entity",
+            StringComparison.OrdinalIgnoreCase);
     }
 
 
@@ -687,26 +791,29 @@ public partial class MainWindow : Window
                 _documentManager.CreateDocument();
 
 
-            document.Text =
-                _fileService.ReadFile(
-                    fullPath);
-
-
             document.FilePath =
                 fullPath;
 
+            if (IsEntityDocument(fullPath))
+            {
+                document.Text =
+                    string.Empty;
+            }
+            else
+            {
+                document.Text =
+                    _fileService.ReadFile(
+                        fullPath);
+            }
 
             document.MarkAsSaved();
-
 
             LoadDocumentIntoEditor(
                 document);
 
-
             RefreshTabs();
             UpdateWindowTitle();
             UpdateStatusBar();
-
 
             AddRecentFile(
                 fullPath);
@@ -1831,29 +1938,47 @@ public partial class MainWindow : Window
         SaveDocumentAsync(
             Document document)
     {
+        // ============================================================
+        // ORBIS ENTITY DOCUMENT
+        // ============================================================
+
+        if (IsEntityDocument(document.FilePath))
+        {
+            if (_orbisEntityEditorViewModel is null)
+            {
+                return false;
+            }
+
+            _documentManager.SetActiveDocument(
+                document);
+
+            await SaveEntityAsync();
+
+            return !_entityEditorIsDirty;
+        }
+
+        // ============================================================
+        // NORMAL TEXT DOCUMENT
+        // ============================================================
+
         if (document.FilePath is null)
         {
             var previousDocument =
                 _documentManager.ActiveDocument;
 
-
             _documentManager.SetActiveDocument(
                 document);
-
 
             LoadDocumentIntoEditor(
                 document);
 
-
             bool saved =
                 await SaveAsAsync();
-
 
             if (previousDocument is not null)
             {
                 bool stillExists =
                     false;
-
 
                 foreach (var existingDocument
                          in _documentManager.Documents)
@@ -1868,34 +1993,27 @@ public partial class MainWindow : Window
                     }
                 }
 
-
                 if (stillExists)
                 {
                     _documentManager.SetActiveDocument(
                         previousDocument);
-
 
                     LoadDocumentIntoEditor(
                         previousDocument);
                 }
             }
 
-
             return saved;
         }
-
 
         _fileService.WriteFile(
             document.FilePath,
             document.Text);
 
-
         document.MarkAsSaved();
-
 
         RefreshTabs();
         UpdateWindowTitle();
-
 
         return true;
     }
@@ -1910,6 +2028,22 @@ public partial class MainWindow : Window
 
         if (document is null)
             return false;
+
+        // ========================================================
+        // ORBIS ENTITY SAVE AS
+        // ========================================================
+        //
+        // Save As for an entity is a fork:
+        // the original entity stays untouched and the new file
+        // receives a new Entity ID.
+        // ========================================================
+
+        if (_orbisEntityEditorViewModel is not null
+            && OrbisEntityEditor.IsVisible)
+        {
+            return await SaveEntityAsAsync(
+                document);
+        }
 
 
         var file =
@@ -1967,9 +2101,23 @@ public partial class MainWindow : Window
         document.FilePath =
             filePath;
 
+        if (IsEntityDocument(filePath))
+        {
+            _currentEntityFilePath =
+                filePath;
+
+            await SaveEntityAsync();
+
+            AddRecentFile(
+                filePath);
+
+            RefreshTabs();
+            UpdateWindowTitle();
+
+            return !_entityEditorIsDirty;
+        }
 
         SaveCurrentDocument();
-
 
         _syntaxHighlightingService.ApplyForFile(
             filePath);
@@ -1986,39 +2134,48 @@ public partial class MainWindow : Window
     }
 
 
-    private void SaveCurrentDocument()
+private void SaveCurrentDocument()
+{
+    var document =
+        _documentManager.ActiveDocument;
+
+    if (document is null ||
+        document.FilePath is null)
     {
-        var document =
-            _documentManager.ActiveDocument;
-
-
-        if (document is null ||
-            document.FilePath is null)
-        {
-            return;
-        }
-
-
-        string content =
-            Editor.Text ?? string.Empty;
-
-
-        document.Text =
-            content;
-
-
-        _fileService.WriteFile(
-            document.FilePath,
-            document.Text);
-
-
-        document.MarkAsSaved();
-
-
-        UpdateWindowTitle();
-        UpdateStatusBar();
-        RefreshTabs();
+        return;
     }
+
+    // ============================================================
+    // ORBIS ENTITY DOCUMENT
+    // ============================================================
+
+    if (IsEntityDocument(
+            document.FilePath))
+    {
+        _ = SaveEntityAsync();
+        return;
+    }
+
+    // ============================================================
+    // NORMAL TEXT DOCUMENT
+    // ============================================================
+
+    string content =
+        Editor.Text ?? string.Empty;
+
+    document.Text =
+        content;
+
+    _fileService.WriteFile(
+        document.FilePath,
+        document.Text);
+
+    document.MarkAsSaved();
+
+    UpdateWindowTitle();
+    UpdateStatusBar();
+    RefreshTabs();
+}
 
 
     private async Task<bool>

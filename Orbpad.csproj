@@ -83,4 +83,13 @@
 
   </ItemGroup>
 
+    <ItemGroup>
+    <!-- ======================================================== -->
+    <!-- ORBIS ENGINE                                             -->
+    <!-- ======================================================== -->
+
+    <ProjectReference Include="..\Orb\Orb.Engine\Orb.Engine.csproj" />
+
+  </ItemGroup>
+
 </Project>

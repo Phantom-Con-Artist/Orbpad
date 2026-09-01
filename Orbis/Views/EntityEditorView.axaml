@@ -1,0 +1,474 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:Orbpad.Orbis.ViewModels"
+    xmlns:graph="using:Orb.Engine.Graph"
+    xmlns:models="using:Orbpad.Orbis.Models"
+    x:Class="Orbpad.Orbis.Views.EntityEditorView"
+    x:DataType="vm:EntityEditorViewModel">
+
+    <ScrollViewer
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto">
+
+        <StackPanel
+            Margin="32"
+            Spacing="24"
+            MaxWidth="900">
+
+            <!-- ================================================= -->
+            <!-- EDITOR TOOLBAR                                    -->
+            <!-- ================================================= -->
+
+            <Border
+                Padding="14"
+                CornerRadius="8"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+
+                <Grid
+                    ColumnDefinitions="*,Auto,Auto,Auto"
+                    ColumnSpacing="8">
+
+                    <StackPanel
+                        Grid.Column="0"
+                        Spacing="2"
+                        VerticalAlignment="Center">
+
+                        <TextBlock
+                            Text="Entity Editor"
+                            FontSize="20"
+                            FontWeight="SemiBold" />
+
+                        <TextBlock
+                            Text="Orbis Entity"
+                            FontSize="12"
+                            Opacity="0.6" />
+
+                    </StackPanel>
+
+                    <Button
+                        Grid.Column="1"
+                        Content="Save"
+                        Padding="16,8"
+                        Click="Save_Click" />
+
+                    <Button
+                        Grid.Column="2"
+                        Content="Open"
+                        Padding="16,8"
+                        Click="Open_Click" />
+
+                    <Button
+                        Grid.Column="3"
+                        Content="Close"
+                        Padding="16,8"
+                        Click="Close_Click" />
+
+                </Grid>
+
+            </Border>
+
+
+            <!-- ================================================= -->
+            <!-- HEADER                                            -->
+            <!-- ================================================= -->
+
+            <StackPanel
+                Spacing="4">
+
+                <TextBlock
+                    Text="Entity"
+                    FontSize="28"
+                    FontWeight="SemiBold" />
+
+                <TextBlock
+                    Text="Edit an Orbis entity"
+                    FontSize="14"
+                    Opacity="0.65" />
+
+            </StackPanel>
+
+
+            <!-- ================================================= -->
+            <!-- IDENTITY                                          -->
+            <!-- ================================================= -->
+
+            <Border
+                Padding="20"
+                CornerRadius="8"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+
+                <StackPanel
+                    Spacing="16">
+
+                    <TextBlock
+                        Text="Identity"
+                        FontSize="18"
+                        FontWeight="SemiBold" />
+
+
+                    <!-- NAME -->
+
+                    <StackPanel
+                        Spacing="6">
+
+                        <TextBlock
+                            Text="Name"
+                            FontWeight="SemiBold" />
+
+                        <TextBox
+                            Text="{Binding Name}"
+                            PlaceholderText="Entity name" />
+
+                    </StackPanel>
+
+
+                    <!-- TYPE -->
+
+                    <StackPanel
+                        Spacing="6">
+
+                        <TextBlock
+                            Text="Type"
+                            FontWeight="SemiBold" />
+
+                        <TextBox
+                            Text="{Binding Type}"
+                            PlaceholderText="Entity type" />
+
+                    </StackPanel>
+
+
+                    <!-- ID -->
+
+                    <StackPanel
+                        Spacing="6">
+
+                        <TextBlock
+                            Text="ID"
+                            FontWeight="SemiBold" />
+
+                        <TextBox
+                            Text="{Binding Id}"
+                            IsReadOnly="True"
+                            IsTabStop="False" />
+
+                    </StackPanel>
+
+                </StackPanel>
+
+            </Border>
+
+
+            <!-- ================================================= -->
+            <!-- PROPERTIES                                        -->
+            <!-- ================================================= -->
+
+            <Border
+                Padding="20"
+                CornerRadius="8"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+
+                <StackPanel
+                    Spacing="16">
+
+                    <StackPanel
+                        Spacing="4">
+
+                        <TextBlock
+                            Text="Properties"
+                            FontSize="18"
+                            FontWeight="SemiBold" />
+
+                        <TextBlock
+                            Text="Custom data belonging to this entity."
+                            FontSize="13"
+                            Opacity="0.65" />
+
+                    </StackPanel>
+
+
+                    <!-- ================================================= -->
+                    <!-- PROPERTY LIST                                      -->
+                    <!-- ================================================= -->
+
+                    <ItemsControl
+                        ItemsSource="{Binding Properties}">
+
+                        <ItemsControl.ItemTemplate>
+
+                            <DataTemplate
+                                x:DataType="graph:OrbProperty">
+
+                                <Border
+                                    Margin="0,0,0,8"
+                                    Padding="12"
+                                    CornerRadius="6"
+                                    BorderThickness="1"
+                                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+
+                                    <Grid
+                                        ColumnDefinitions="2*,Auto,3*,Auto"
+                                        ColumnSpacing="12">
+
+                                        <TextBlock
+                                            Grid.Column="0"
+                                            Text="{Binding Name}"
+                                            VerticalAlignment="Center"
+                                            FontWeight="SemiBold" />
+
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Text="{Binding Value.Type}"
+                                            VerticalAlignment="Center"
+                                            Opacity="0.55" />
+
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            Text="{Binding Value.Value}"
+                                            VerticalAlignment="Center"
+                                            Opacity="0.75" />
+
+                                        <Button
+                                            Grid.Column="3"
+                                            Content="Remove"
+                                            Padding="12,6" />
+
+                                    </Grid>
+
+                                </Border>
+
+                            </DataTemplate>
+
+                        </ItemsControl.ItemTemplate>
+
+                    </ItemsControl>
+
+
+                    <!-- ================================================= -->
+                    <!-- ADD PROPERTY FORM                                  -->
+                    <!-- ================================================= -->
+
+                    <Border
+                        Padding="16"
+                        CornerRadius="6"
+                        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+
+                        <StackPanel
+                            Spacing="12">
+
+                            <TextBlock
+                                Text="Add Property"
+                                FontSize="15"
+                                FontWeight="SemiBold" />
+
+
+                            <!-- NAME -->
+
+                            <StackPanel
+                                Spacing="5">
+
+                                <TextBlock
+                                    Text="Property Name"
+                                    FontSize="13"
+                                    FontWeight="SemiBold" />
+
+                                <TextBox
+                                    x:Name="PropertyNameBox"
+                                    PlaceholderText="e.g. population, capital, age" />
+
+                            </StackPanel>
+
+
+                            <!-- TYPE -->
+
+                            <StackPanel
+                                Spacing="5">
+
+                                <TextBlock
+                                    Text="Value Type"
+                                    FontSize="13"
+                                    FontWeight="SemiBold" />
+
+                                <ComboBox
+                                    x:Name="PropertyTypeComboBox"
+                                    SelectedIndex="1">
+
+                                    <ComboBoxItem
+                                        Content="Null" />
+
+                                    <ComboBoxItem
+                                        Content="String" />
+
+                                    <ComboBoxItem
+                                        Content="Boolean" />
+
+                                    <ComboBoxItem
+                                        Content="Integer" />
+
+                                    <ComboBoxItem
+                                        Content="Decimal" />
+
+                                    <ComboBoxItem
+                                        Content="DateTime" />
+
+                                    <ComboBoxItem
+                                        Content="Guid" />
+
+                                </ComboBox>
+
+                            </StackPanel>
+
+
+                            <!-- VALUE -->
+
+                            <StackPanel
+                                Spacing="5">
+
+                                <TextBlock
+                                    Text="Value"
+                                    FontSize="13"
+                                    FontWeight="SemiBold" />
+
+                                <TextBox
+                                    x:Name="PropertyValueBox"
+                                    PlaceholderText="Property value" />
+
+                            </StackPanel>
+
+
+                            <!-- ADD -->
+
+                            <Button
+                                Content="Add Property"
+                                HorizontalAlignment="Left"
+                                Padding="16,8"
+                                Click="AddProperty_Click" />
+
+
+                            <!-- ERROR -->
+
+                            <TextBlock
+                                x:Name="PropertyErrorText"
+                                Text=""
+                                Foreground="IndianRed"
+                                FontSize="12"
+                                IsVisible="False"
+                                TextWrapping="Wrap" />
+
+                        </StackPanel>
+
+                    </Border>
+
+                </StackPanel>
+
+            </Border>
+
+
+            <!-- ================================================= -->
+            <!-- RELATIONSHIPS                                     -->
+            <!-- ================================================= -->
+
+            <Border
+                Padding="20"
+                CornerRadius="8"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+
+                <StackPanel
+                    Spacing="16">
+
+                    <StackPanel
+                        Spacing="4">
+
+                        <TextBlock
+                            Text="Relationships"
+                            FontSize="18"
+                            FontWeight="SemiBold" />
+
+                        <TextBlock
+                            Text="Connections between this entity and other entities."
+                            FontSize="13"
+                            Opacity="0.65" />
+
+                    </StackPanel>
+
+
+                    <!-- ================================================= -->
+                    <!-- RELATIONSHIP LIST                                  -->
+                    <!-- ================================================= -->
+
+                    <ItemsControl
+                        ItemsSource="{Binding Relationships}">
+
+                        <ItemsControl.ItemTemplate>
+
+                            <DataTemplate
+                                x:DataType="models:OrbisRelationshipViewModel">
+
+                                <Border
+                                    Margin="0,0,0,8"
+                                    Padding="12"
+                                    CornerRadius="6"
+                                    BorderThickness="1"
+                                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+
+                                    <Grid
+                                        ColumnDefinitions="2*,Auto,3*,Auto"
+                                        ColumnSpacing="12">
+
+                                        <TextBlock
+                                            Grid.Column="0"
+                                            Text="{Binding Type}"
+                                            VerticalAlignment="Center"
+                                            FontWeight="SemiBold" />
+
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Text="→"
+                                            VerticalAlignment="Center"
+                                            Opacity="0.65" />
+
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            Text="{Binding TargetId}"
+                                            VerticalAlignment="Center"
+                                            Opacity="0.75" />
+
+                                        <Button
+                                            Grid.Column="3"
+                                            Content="Remove"
+                                            Padding="12,6" />
+
+                                    </Grid>
+
+                                </Border>
+
+                            </DataTemplate>
+
+                        </ItemsControl.ItemTemplate>
+
+                    </ItemsControl>
+
+
+                    <!-- ADD RELATIONSHIP -->
+
+                    <Button
+                        Content="+  Add Relationship"
+                        HorizontalAlignment="Left"
+                        Padding="16,8" />
+
+                </StackPanel>
+
+            </Border>
+
+        </StackPanel>
+
+    </ScrollViewer>
+
+</UserControl>
