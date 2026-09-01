@@ -1,7 +1,7 @@
 <div align="center">
 
   <p>
-    <img src="Assets/orbpadlogo.png"
+    <img src="Assets/orb_v256.png"
          alt="Orbpad"
          width="128"
          height="128"/>
