@@ -1,51 +1,60 @@
 <div align="center">
 
-<table>
-  <tr>
-    <td align="center">
-      <img src="Assets/orb_v256.png"
-           alt="Orbpad"
-           width="128"
-           height="128">
-    </td>
-    <td align="center">
-      <img src="docs/orbisprojectlogo.png"
-           alt="Orb Project"
-           width="128"
-           height="128">
-    </td>
-    <td align="center">
-      <img src="docs/orbisecosysetmlogo1.png"
-           alt="Orb Ecosystem"
-           width="128"
-           height="128">
-    </td>
-  </tr>
-</table>
+  <p>
+    <img src="Assets/orbpadlogo.png"
+         alt="Orbpad"
+         width="128"
+         height="128"/>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <img src="docs/orbisprojectlogo.png"
+         alt="Orb Project"
+         width="128"
+         height="128"/>
+  </p>
 
-<br>
+  <p>
+    <strong>A project under</strong>
+  </p>
 
-<img src="docs/orbisprojectcover.png"
-     alt="Orb Project"
-     width="900">
+  <h2>The Orbis Project</h2>
 
-<br><br>
+  <br/>
 
-# Orbpad
+  <img src="docs/orbisprojectcover.png"
+       alt="The Orbis Project"
+       width="900"/>
 
-**A lightweight, fast, and focused desktop text editor for Windows.**
+  <br/><br/>
 
-Built for plain text, source code, and Markdown.
+  <h1>Orbpad</h1>
 
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6?logo=windows&logoColor=white)](#system-requirements)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Release](https://img.shields.io/badge/release-v1.0.0-6f42c1)](#download)
-[![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](#technology)
-[![Built with Avalonia](https://img.shields.io/badge/UI-Avalonia-9146FF)](#technology)
+  <p>
+    <strong>
+      A lightweight, fast, and focused desktop text editor for Windows.
+    </strong>
+    <br/>
+    Built for plain text, source code, and Markdown.
+  </p>
 
-[Download](#download) · [Features](#features) · [Installation](#installation) · [Documentation](#documentation) · [Contributing](#contributing)
+  <br/>
+
+  <h3>An extension of the Orbis Ecosystem</h3>
+
+  <p>
+    Orbpad is a human-facing authoring application within the Orbis Ecosystem,
+    designed to provide a focused environment for creating, editing, and
+    managing information through a simple and extensible desktop workspace.
+  </p>
+
+  <br/>
 
 </div>
+
+[![GitHub](https://img.shields.io/badge/GitHub-Orbpad-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Phantom-Con-Artist/Orbpad)
+[![Release](https://img.shields.io/badge/Release-v1.0.0-6f42c1?style=for-the-badge)](https://github.com/Phantom-Con-Artist/Orbpad/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![Avalonia](https://img.shields.io/badge/UI-Avalonia-9146FF?style=for-the-badge)](https://avaloniaui.net/)
 
 ---
 
