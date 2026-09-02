@@ -1,30 +1,9 @@
 <div align="center">
 
-  <p>
-    <img src="Assets/orb_v256.png"
-         alt="Orbpad"
-         width="128"
-         height="128"/>
-    &nbsp;&nbsp;&nbsp;&nbsp;
-    <img src="docs/orbisprojectlogo.png"
-         alt="Orbis Project"
-         width="128"
-         height="128"/>
-  </p>
-
-  <p>
-    <strong>A project under</strong>
-  </p>
-
-  <h2>The Orbis Project</h2>
-
-  <br/>
-
-  <img src="docs/orbisprojectcover.png"
-       alt="The Orbis Project"
-       width="900"/>
-
-  <br/><br/>
+  <img src="Assets/orb_v256.png"
+       alt="Orbpad"
+       width="128"
+       height="128"/>
 
   <h1>Orbpad</h1>
 
@@ -36,9 +15,27 @@
     Built for plain text, source code, Markdown, and structured Orbis information.
   </p>
 
-  <br/>
+</div>
 
-  <h3>An application within the Orbis Ecosystem</h3>
+---
+
+<div align="center">
+
+  <img src="docs/powered-by-orb-engine.png"
+       alt="Powered By Orb Engine"
+       width="900"/>
+
+</div>
+
+---
+
+<div align="center">
+
+  <h3>An Application Within the Orbis Ecosystem</h3>
+
+  <img src="docs/orbisecosystemcover.png"
+       alt="Orbis Ecosystem"
+       width="900"/>
 
   <p>
     Orbpad is a human-facing authoring application within the Orbis Ecosystem,
@@ -47,9 +44,39 @@
     and relationships.
   </p>
 
-  <br/>
-
 </div>
+
+---
+<div align="center">
+
+<p>
+  <a href="https://github.com/Phantom-Con-Artist/Orbpad">
+    <img src="https://img.shields.io/badge/GitHub-Orbpad-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+  </a>
+  <a href="https://github.com/Phantom-Con-Artist/Orb">
+    <img src="https://img.shields.io/badge/Orb%20Engine-Orbis%20Core-0cc0df?style=for-the-badge&logo=github&logoColor=white" alt="Orb Engine">
+  </a>
+  <a href="https://github.com/Phantom-Con-Artist/Orb">
+    <img src="https://img.shields.io/badge/Powered%20By-Orb%20Engine-0cc0df?style=for-the-badge&logo=github&logoColor=white" alt="Powered By Orb Engine">
+  </a>
+  <a href="https://github.com/Phantom-Con-Artist/Orbpad/releases">
+    <img src="https://img.shields.io/badge/Release-v1.0.1-6f42c1?style=for-the-badge" alt="Release">
+  </a>
+</p>
+
+<p>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="License: MIT">
+  </a>
+  <a href="https://dotnet.microsoft.com/">
+    <img src="https://img.shields.io/badge/.NET-10-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 10">
+  </a>
+  <a href="https://avaloniaui.net/">
+    <img src="https://img.shields.io/badge/UI-Avalonia-9146FF?style=for-the-badge" alt="Avalonia">
+  </a>
+</p>
+
+</div>>
 
 <div align="center">
 
